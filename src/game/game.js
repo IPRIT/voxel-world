@@ -54,7 +54,7 @@ export default class Game {
   /**
    * Camera settings
    */
-  _fov = 20;
+  _fov = 50;
   _aspect = this._screenWidth / this._screenHeight;
   _near = 10;
   _far = 3000;
