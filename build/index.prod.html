@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../dist/rabotify.min.css">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+  <r-app>
+    <r-btn>Test</r-btn>
+    <r-checkbox ripple label="test"></r-checkbox>
+    <r-dialog escCloseable>
+      <r-btn slot="activator">Test</r-btn>
+      <r-dialog-card toolbar-light toolbar-shadow>
+        <span slot="title">Title</span>
+        Test
+      </r-dialog-card>
+    </r-dialog>
+  </r-app>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="../dist/rabotify.min.js"></script>
+<script>
+  new Vue().$mount('#app');
+</script>
+</body>
+</html>

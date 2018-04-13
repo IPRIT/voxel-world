@@ -1,0 +1,384 @@
+@import "~compass-mixins";
+@import '~sass-bem-utils/dist/sass-bem-utils';
+@import "../settings/index";
+@import "functions";
+
+/** Typography */
+@mixin font-style($size, $height, $weight) {
+  font-size: $size;
+  line-height: $height;
+  font-weight: $weight;
+}
+
+// Element must be `display: block` or `display: inline-block` to work.
+@mixin overflow-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@mixin font-caption {
+  @include font-style($font-size-caption, $line-height-caption, $font-weight-regular);
+}
+
+@mixin font-body {
+  @include font-style($font-size-body, $line-height-body, $font-weight-regular);
+}
+
+@mixin font-subheading {
+  @include font-style($font-size-subheading, $line-height-subheading, $font-weight-regular);
+  margin-top: 0;
+  margin-bottom: $indent-small;
+}
+
+@mixin font-heading {
+  @include font-style($font-size-heading, $line-height-heading, $font-weight-regular);
+  margin-top: 0;
+  margin-bottom: $indent-small;
+}
+
+@mixin font-title {
+  @include font-style($font-size-title, $line-height-title, $font-weight-bold);
+  margin-top: 0;
+  margin-bottom: $indent-small;
+}
+
+@mixin font-headline {
+  @include font-style($font-size-headline, $line-height-headline, $font-weight-black);
+  margin-top: 0;
+  margin-bottom: $indent-small;
+}
+
+@mixin font-display-1 {
+  @include font-style($font-size-display-1, $line-height-display-1, $font-weight-black);
+  margin-top: 0;
+  margin-bottom: $indent-medium;
+}
+
+@mixin font-display-2 {
+  @include font-display-1;
+  @include font-style($font-size-display-2, $line-height-display-2, $font-weight-black);
+}
+
+
+
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+@mixin input-placeholder-color($color, $target-pseudo-colors: (), $addStyleContent: true) {
+  $pseudos: '::-webkit-input-placeholder', '::input-placeholder',
+    '::placeholder', ':-moz-placeholder', '::-moz-placeholder',
+    ':-ms-input-placeholder', '::-webkit-input-placeholder';
+
+  @each $pseudo in $pseudos {
+    &#{$pseudo} {
+      color: $color;
+      @if ($addStyleContent) {
+        @content;
+      }
+    }
+    @each $target-pseudo, $target-pseudo-color in $target-pseudo-colors {
+      &:#{$target-pseudo}#{$pseudo} {
+        color: $target-pseudo-color;
+      }
+    }
+  }
+}
+
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+@mixin media-query($media, $orientation: null, $device: screen) {
+  $custom-width: str-index(quote($media), px);
+  $custom-width-to: $orientation and str-index(quote($orientation), px);
+
+  @if $custom-width and $custom-width > 0 {
+    @if $orientation == "up" {
+      @media #{$device} and (min-width: $media) { @content; }
+    } @else if $orientation == "down" {
+      @media #{$device} and (max-width: $media) { @content; }
+    } @else if $custom-width-to {
+      @media #{$device} and (min-width: $media) and (max-width: $orientation) { @content; }
+    }
+  }
+  @else if $media == xs-only or $media == xs-and-down {
+    @if ($orientation) {
+      @media #{$device} and (max-width: $layout-breakpoint-xs - 1) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (max-width: $layout-breakpoint-xs - 1) { @content; }
+    }
+  }
+  @else if $media == xs-and-up {
+    @if ($orientation) {
+      @media #{$device} and (min-width: $layout-breakpoint-xs) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (min-width: $layout-breakpoint-xs) { @content; }
+    }
+  }
+  @else if $media == sm-only {
+    @if ($orientation) {
+      @media #{$device} and (min-width: $layout-breakpoint-xs) and (max-width: $layout-breakpoint-sm - 1) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (min-width: $layout-breakpoint-xs) and (max-width: $layout-breakpoint-sm - 1) { @content; }
+    }
+  }
+  @else if $media == sm-and-down {
+    @if ($orientation) {
+      @media #{$device} and (max-width: $layout-breakpoint-sm - 1) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (max-width: $layout-breakpoint-sm - 1) { @content; }
+    }
+  }
+  @else if $media == sm-and-up {
+    @if ($orientation) {
+      @media #{$device} and (min-width: $layout-breakpoint-sm) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (min-width: $layout-breakpoint-sm) { @content; }
+    }
+  }
+  @else if $media == md-only {
+    @if ($orientation) {
+      @media #{$device} and (min-width: $layout-breakpoint-sm) and (max-width: $layout-breakpoint-md - 1) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (min-width: $layout-breakpoint-sm) and (max-width: $layout-breakpoint-md - 1) { @content; }
+    }
+  }
+  @else if $media == md-and-down {
+    @if ($orientation) {
+      @media #{$device} and (max-width: $layout-breakpoint-md - 1) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (max-width: $layout-breakpoint-md - 1) { @content; }
+    }
+  }
+  @else if $media == md-and-up {
+    @if ($orientation) {
+      @media #{$device} and (min-width: $layout-breakpoint-md) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (min-width: $layout-breakpoint-md) { @content; }
+    }
+  }
+  @else if $media == lg-only {
+    @if ($orientation) {
+      @media #{$device} and (min-width: $layout-breakpoint-md) and (max-width: $layout-breakpoint-lg - 1) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (min-width: $layout-breakpoint-md) and (max-width: $layout-breakpoint-lg - 1) { @content; }
+    }
+  }
+  @else if $media == lg-and-down {
+    @if ($orientation) {
+      @media #{$device} and (max-width: $layout-breakpoint-lg - 1) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (max-width: $layout-breakpoint-lg - 1) { @content; }
+    }
+  }
+  @else if $media == lg-and-up or $media == xl-only {
+    @if ($orientation) {
+      @media #{$device} and (min-width: $layout-breakpoint-lg) and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} and (min-width: $layout-breakpoint-lg) { @content; }
+    }
+  }
+  @else {
+    @if ($orientation) {
+      @media #{$device} and (orientation: $orientation) { @content; }
+    } @else {
+      @media #{$device} { @content; }
+    }
+  }
+}
+
+/**
+ * Миксин для генерации теней
+ */
+@mixin shadow($z, $important: false, $shadow-color: black, $shadows-opacity: (
+  $shadow-key-umbra-opacity, $shadow-key-penumbra-opacity, $shadow-key-ambient-opacity
+)) {
+  $shadow-params: nth($shadow-key-umbra, $z + 1),
+    nth($shadow-key-penumbra, $z + 1),
+    nth($shadow-key-ambient, $z + 1);
+  $shadow-colors: ();
+  @each $opacity in $shadows-opacity {
+    $shadow-colors: append($shadow-colors, transparentize($shadow-color, 1 - $opacity));
+  }
+  $shadow-list: ();
+  @for $i from 0 to length($shadow-colors) {
+    $shadow: nth($shadow-params, $i + 1) nth($shadow-colors, $i + 1);
+    $shadow-list: append($shadow-list, $shadow, comma);
+  }
+  @if $important {
+    box-shadow: $shadow-list !important;
+  } @else {
+    box-shadow: $shadow-list;
+  }
+}
+
+/**
+ * Миксин для плавного перехода теней
+ */
+@mixin shadow-transition($duration: 280ms, $easing: get($transition, 'fast-out-slow-in')) {
+  transition: box-shadow $duration $easing;
+  will-change: box-shadow;
+}
+
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+@mixin theme-property($properties, $force-color: false, $hover: true, $color-alpha: 1, $scope: "&.", $own-selector: false, $important: false) {
+  @each $theme, $color in $themes {
+    $suffix: $scope;
+    @if $force-color {
+      $color: $force-color;
+    }
+    $selector: #{$suffix}#{$theme};
+    @if $own-selector == true {
+      $selector: str-replace($scope, "$theme$", $theme);
+    }
+    $color: transparentize($color, 1 - $color-alpha);
+    $importantPostfix: "";
+    @if $important == true {
+      $importantPostfix: " !important";
+    }
+    @at-root #{$selector} {
+      @each $property in $properties {
+        @if $property == border {
+          #{$property}: 1px solid $color#{$importantPostfix};
+        } @else {
+          #{$property}: $color#{$importantPostfix};
+        }
+        @if $property == fill {
+          & * {
+            #{$property}: $color#{$importantPostfix};
+          }
+        }
+      }
+    }
+    @if $hover == true {
+      @at-root #{$selector}:hover {
+        @each $property in $properties {
+          @if $property == border {
+            #{$property}: 1px solid darken($color, 5)#{$importantPostfix};
+          } @else {
+            #{$property}: darken($color, 5)#{$importantPostfix};
+          }
+          @if $property == fill {
+            & * {
+              #{$property}: darken($color, 5)#{$importantPostfix};
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+@mixin theme-property-text($properties, $force-color: false, $hover: false, $color-alpha: 1, $scope: "&.", $own-selector: false, $important: false) {
+  $selector: $scope + "text_";
+  @if $own-selector {
+    $selector: $scope;
+  }
+  @include theme-property($properties, $force-color, $hover, $color-alpha, $selector, $own-selector, $important);
+}
+
+/** Container layout */
+@mixin container {
+  margin: 0 auto;
+  padding: 0 $indent-medium;
+
+  @include media-query(xl-only) {
+    max-width: $layout-breakpoint-lg;
+  }
+
+  @include media-query(lg-and-down) {
+    max-width: $layout-breakpoint-md;
+  }
+
+  @include media-query(md-and-down) {
+    max-width: $layout-breakpoint-sm;
+  }
+
+  @include media-query(sm-and-down) {
+    max-width: $layout-breakpoint-xs;
+  }
+
+  @include media-query(xs-and-down) {
+    max-width: 100%;
+  }
+}
+
+/** Row */
+@mixin row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-left: -$indent-medium;
+  margin-right: -$indent-medium;
+}
+
+/** Cols */
+@mixin col($size) {
+  padding: 0 $indent-medium;
+  flex: 0 0 100% * $size / 12;
+  max-width: 100% * $size / 12;
+}

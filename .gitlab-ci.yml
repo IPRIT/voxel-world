@@ -1,0 +1,35 @@
+cache:
+  paths:
+  - node_modules/
+
+stages:
+  - test
+  # - deploy
+
+tests:
+  stage: test
+  script:
+    - pwd
+    - yarn install
+    - npm run test:coverage
+    - ssh "metricker@dashboard.rabota.space" "mkdir /srv/rabotify/$CI_BUILD_ID"
+    - scp -r coverage/lcov-report/* metricker@dashboard.rabota.space:/srv/rabotify/$CI_BUILD_ID
+    - ssh "metricker@dashboard.rabota.space" "ln -nfs /srv/rabotify/$CI_BUILD_ID /srv/rabotify/rabotify"
+  only:
+    - branches
+  artifacts:
+    paths:
+      - coverage/
+
+# pages:
+#   stage: deploy
+#   dependencies:
+#     - tests
+#   script:
+#     - mv coverage/ public/
+#   artifacts:
+#     paths:
+#       - public
+#     expire_in: 30 days
+#   only:
+#     - master

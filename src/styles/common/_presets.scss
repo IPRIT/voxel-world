@@ -1,0 +1,37 @@
+@import "../settings/index";
+@import "../tools/index";
+
+/** Themes */
+@include theme-property(background-color, false, false, 1, ".");
+@include theme-property-text(color fill, false, false, 1, ".");
+
+/** Shadows */
+@for $i from 0 through 24 {
+  .shadow-#{$i} {
+    @include shadow($i);
+  }
+}
+
+/** Display breakpoints */
+@each $size, $query in $layout-breakpoint-displays {
+  .hidden {
+    &-#{$size} {
+      @media #{$query} {
+        display: none !important;
+      }
+    }
+  }
+}
+
+/** Overflows */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.overflow-y-hidden {
+  overflow-y: hidden;
+}

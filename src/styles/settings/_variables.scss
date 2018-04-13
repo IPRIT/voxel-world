@@ -1,0 +1,376 @@
+/**
+ * Bem Constructor settings override
+ */
+$bem-use-namespaces: false;   // Defaults to true
+$bem-element-separator: '__'; // Defaults to '__'
+$bem-modifier-separator: '_'; // Defaults to '--'
+
+
+/******* Common *******/
+
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+$layout-breakpoints: (
+  xs: 480px,
+  sm: 720px,
+  md: 1024px,
+  lg: 1280px
+);
+
+$layout-breakpoint-xs: map_get($layout-breakpoints, xs) !default;
+$layout-breakpoint-sm: map_get($layout-breakpoints, sm) !default;
+$layout-breakpoint-md: map_get($layout-breakpoints, md) !default;
+$layout-breakpoint-lg: map_get($layout-breakpoints, lg) !default;
+
+$mobile-breakpoint: md-and-down;
+
+$layout-breakpoint-displays: (
+  xs: "screen and (max-width: #{$layout-breakpoint-xs - 1})",
+  xs-only: "screen and (max-width: #{$layout-breakpoint-xs - 1})",
+  xs-and-down: "screen and (max-width: #{$layout-breakpoint-xs - 1})",
+  xs-and-up: "screen and (min-width: #{$layout-breakpoint-xs})",
+
+  sm: "screen and (max-width: #{$layout-breakpoint-sm - 1})",
+  sm-only: "screen and (min-width: #{$layout-breakpoint-xs}) and (max-width: #{$layout-breakpoint-sm - 1})",
+  sm-and-down: "screen and (max-width: #{$layout-breakpoint-sm - 1})",
+  sm-and-up: "screen and (min-width: #{$layout-breakpoint-sm})",
+
+  md: "screen and (max-width: #{$layout-breakpoint-md - 1})",
+  md-only: "screen and (min-width: #{$layout-breakpoint-sm}) and (max-width: #{$layout-breakpoint-md - 1})",
+  md-and-down: "screen and (max-width: #{$layout-breakpoint-md - 1})",
+  md-and-up: "screen and (min-width: #{$layout-breakpoint-md})",
+
+  lg: "screen and (max-width: (#{$layout-breakpoint-lg - 1}))",
+  lg-only: "screen and (min-width: #{$layout-breakpoint-md}) and (max-width: #{$layout-breakpoint-lg - 1})",
+  lg-and-down: "screen and (max-width: (#{$layout-breakpoint-lg - 1}))",
+  lg-and-up: "screen and (min-width: #{$layout-breakpoint-lg})",
+
+  xl-only: "screen and (min-width: #{$layout-breakpoint-lg})"
+);
+
+/** Radius */
+$radius-small: 2px;
+$radius-medium: 4px;
+$radius-large: 8px;
+
+/** Indents */
+$indent-xsmall: 4px;
+$indent-small: 8px;
+$indent-medium: 16px;
+$indent-large: 24px;
+$indent-xlarge: 40px;
+$indent-xxlarge: 68px;
+$indent-xxxlarge: 72px;
+
+/** Grid */
+$grid-gutter: $indent-small;
+$grid-columns: 12;
+$grid-gutters: (
+  xs: ($grid-gutter / 4),
+  sm: ($grid-gutter / 2),
+  md: $grid-gutter,
+  lg: ($grid-gutter * 2),
+  xl: ($grid-gutter * 3)
+);
+
+/** Typography */
+$font-family-default: 'Open Sans', Arial, sans-serif;
+
+$font-size-caption: 12px;
+$font-size-body: 14px;
+$font-size-subheading: 16px;
+$font-size-heading: 18px;
+$font-size-title: 20px;
+$font-size-headline: 24px;
+$font-size-display-1: 34px;
+$font-size-display-2: 45px;
+
+$line-height-caption: 20px;
+$line-height-body: 24px;
+$line-height-subheading: 24px;
+$line-height-heading: 26px;
+$line-height-title: 28px;
+$line-height-headline: 32px;
+$line-height-display-1: 40px;
+$line-height-display-2: 48px;
+
+$font-weight-thin: 100;
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 600;
+$font-weight-black: 700;
+
+/** Transitions */
+$transition: (
+  fast-out-slow-in: cubic-bezier(0.4, 0.0, 0.2, 1),
+  linear-out-slow-in: cubic-bezier(0.0, 0.0, 0.2, 1),
+  fast-out-linear-in: cubic-bezier(0.4, 0.0, 1, 1),
+  ease-in-out: cubic-bezier(0.4, 0.0, 0.6, 1),
+  fast-in-fast-out: cubic-bezier(.25,.8,.25,1),
+  swing: cubic-bezier(.25,.8,.50,1)
+);
+
+$primary-transition-function: map_get($transition, 'swing');
+$primary-transition: .3s $primary-transition-function;
+$secondary-transition-function: map_get($transition, 'ease-in-out');
+$secondary-transition: .2s $secondary-transition-function;
+
+/** Shadows */
+$shadow-key-umbra-opacity: .1;
+$shadow-key-penumbra-opacity: .07;
+$shadow-key-ambient-opacity: .06;
+
+$shadow-key-umbra: (
+  0px 0px 0px 0px,
+  0px 2px 1px -1px,
+  0px 3px 1px -2px,
+  0px 3px 3px -2px,
+  0px 2px 4px -1px,
+  0px 3px 5px -1px,
+  0px 3px 5px -1px,
+  0px 4px 5px -2px,
+  0px 5px 5px -3px,
+  0px 5px 6px -3px,
+  0px 6px 6px -3px,
+  0px 6px 7px -4px,
+  0px 7px 8px -4px,
+  0px 7px 8px -4px,
+  0px 7px 9px -4px,
+  0px 8px 9px -5px,
+  0px 8px 10px -5px,
+  0px 8px 11px -5px,
+  0px 9px 11px -5px,
+  0px 9px 12px -6px,
+  0px 10px 13px -6px,
+  0px 10px 13px -6px,
+  0px 10px 14px -6px,
+  0px 11px 14px -7px,
+  0px 11px 15px -7px
+);
+
+$shadow-key-penumbra: (
+  0px 0px 0px 0px,
+  0px 1px 1px 0px,
+  0px 2px 2px 0px,
+  0px 3px 4px 0px,
+  0px 4px 5px 0px,
+  0px 5px 8px 0px,
+  0px 6px 10px 0px,
+  0px 7px 10px 1px,
+  0px 8px 10px 1px,
+  0px 9px 12px 1px,
+  0px 10px 14px 1px,
+  0px 11px 15px 1px,
+  0px 12px 17px 2px,
+  0px 13px 19px 2px,
+  0px 14px 21px 2px,
+  0px 15px 22px 2px,
+  0px 16px 24px 2px,
+  0px 17px 26px 2px,
+  0px 18px 28px 2px,
+  0px 19px 29px 2px,
+  0px 20px 31px 3px,
+  0px 21px 33px 3px,
+  0px 22px 35px 3px,
+  0px 23px 36px 3px,
+  0px 24px 38px 3px
+);
+
+$shadow-key-ambient: (
+  0px 0px 0px 0px,
+  0px 1px 3px 0px,
+  0px 1px 5px 0px,
+  0px 1px 8px 0px,
+  0px 1px 10px 0px,
+  0px 1px 14px 0px,
+  0px 1px 18px 0px,
+  0px 2px 16px 1px,
+  0px 3px 14px 2px,
+  0px 3px 16px 2px,
+  0px 4px 18px 3px,
+  0px 4px 20px 3px,
+  0px 5px 22px 4px,
+  0px 5px 24px 4px,
+  0px 5px 26px 4px,
+  0px 6px 28px 5px,
+  0px 6px 30px 5px,
+  0px 6px 32px 5px,
+  0px 7px 34px 6px,
+  0px 7px 36px 6px,
+  0px 8px 38px 7px,
+  0px 8px 40px 7px,
+  0px 8px 42px 7px,
+  0px 9px 44px 8px,
+  0px 9px 46px 8px
+);
+
+/** Ripple Animation */
+$ripple-animation-transition: .35s get($transition, 'linear-out-slow-in');
+$ripple-animation-visible-opacity: .2;
+
+
+/******* Components *******/
+
+/** Buttons */
+$button-border-radius: $radius-small;
+$button-height: 34px;
+$button-font-size: $font-size-body;
+$button-font-weight: $font-weight-bold;
+$button-min-width: 88px;
+$button-padding: 0 $indent-medium;
+$button-text-transform: uppercase;
+
+$button-small-height: 28px;
+$button-small-font-size: $font-size-caption;
+$button-small-padding: 0 $indent-small;
+
+$button-large-height: 44px;
+$button-large-font-size: $font-size-subheading;
+$button-large-padding: 0 $indent-large;
+
+/** Loading */
+$loading-circle-size: 10px;
+$loading-circle-large-size: $loading-circle-size + 3;
+$loading-circle-small-size: $loading-circle-size - 3;
+$loading-circles-number-max: 5;
+$loading-circle-animation-duration: .45s;
+$loading-circle-animation-delay: $loading-circle-animation-duration / 4;
+
+/** Icon */
+$icon-small-size: 20px;
+$icon-size: 24px;
+$icon-large-size: 28px;
+
+/** Dialog */
+$dialog-content-z-index: 6;
+$dialog-border-radius: $radius-medium;
+
+$dialog-padding-desktop: 56px;
+$dialog-padding-mobile: 32px;
+
+$dialog-actions-indent-top-bottom-desktop: 32px;
+$dialog-actions-indent-left-right-desktop: 56px;
+$dialog-actions-padding-desktop: $dialog-actions-indent-top-bottom-desktop $dialog-actions-indent-left-right-desktop;
+
+$dialog-actions-indent-top-bottom-mobile: 16px;
+$dialog-actions-indent-left-right-mobile: 32px;
+$dialog-actions-padding-mobile: $dialog-actions-indent-top-bottom-mobile $dialog-actions-indent-left-right-mobile;
+
+/** Overlay */
+$overlay-z-index: 5;
+
+/** Input Group */
+$input-group-padding: 18px 0 0;
+$input-font-size: $font-size-body;
+$input-height: 34px;
+$input-group-text-field-label-top: 18px;
+$input-group-text-field-label-left: 16px;
+
+/** Card */
+$card-border-radius: $radius-small;
+
+/** Toolbar */
+$toolbar-height: 56px;
+$toolbar-item-padding: 0 $indent-medium;
+$toolbar-padding-y: 0;
+$toolbar-padding-x: $indent-medium;
+
+/** Switch */
+$switch-width: 36px;
+$switch-height: 18px;
+$switch-small-width: $switch-width / 1.5;
+$switch-small-height: 14px;
+$switch-large-width: $switch-width * 1.75;
+$switch-large-height: $switch-height * 2;
+
+/** Checkbox */
+$checkbox-size: 18px;
+$checkbox-small-size: 16px;
+$checkbox-large-size: 20px;
+
+/** Radio buttons */
+$radio-size: 18px;
+$radio-small-size: 16px;
+$radio-large-size: 20px;
+
+/** Chip */
+$chip-border-radius: $radius-small;
+$chip-font-size: $font-size-body;
+$chip-close-margin: 0 -1px 0 12px;
+$chip-label-border-radius: $card-border-radius;
+$chip-icon-font-size: 20px;
+$chip-padding: 0 12px;
+$chip-removable-padding: 0 4px 0 12px;
+$chip-outline-background: white !important;
+$chip-height: $button-height - 2;
+$chip-margin: 2px;
+$chip-select-multi-margin: 1px 0 1px 2px;
+$chip-small-height: 26px;
+$chip-small-font-size: 20px;
+$chip-icon-offset: 12px;
+$chip-icon-negative-offset: -8px;
+
+/** Lists */
+
+// list fonts and weights
+$list-tile-font-size: $font-size-subheading;
+$list-tile-font-weight: $font-weight-regular;
+$list-action-text-font-size: $font-size-caption;
+$list-sub-title-font-size: ($list-tile-font-size - 2px);
+
+$subheader-height-font-size: ($list-tile-font-size - 2px);
+$subheader-font-weight: $font-weight-medium;
+
+// list spacings
+$list-left-padding: $indent-medium;
+$list-right-padding: $indent-medium;
+$list-top-padding: $indent-small;
+$list-bottom-padding: $indent-small;
+
+$list-item-right-margin: 56px;
+$list-item-left-padding: 72px;
+
+$list-item-single-height: 42px;
+$list-item-double-height: 72px;
+$list-item-triple-height: 88px;
+
+$subheader-inset-margin: $list-item-right-margin;
+
+// list dense overrides
+$list-item-dense-font-size: ($list-tile-font-size - 3px);
+$subheader-dense-font-size: $list-item-dense-font-size;
+$list-item-dense-icon-font-size: 22px;
+
+$list-item-dense-top-padding: $list-top-padding / 2;
+$list-item-dense-single-height: $list-item-single-height - 8px;   // 40px
+$list-item-dense-double-height: $list-item-double-height - 12px;  // 60px
+$list-item-dense-triple-height: $list-item-triple-height - 12px;  // 76px
+
+$list-item-dense-avatar-single-height: $list-item-single-height;  // 48px the dense concept was to take avatars to a normal single item height
+$list-item-dense-avatar-height: 38px;
+
+$list-dense-subheader-height: $list-item-dense-single-height;
+$list-dense-subheader-group-height: $list-dense-subheader-height; // the subheader under a group menu
+
+/** Divider */
+$divider-margin-left: 72px;
+
+/** Tabs */
+$tabs-color-active: rgba(#000, .87);
+
+/** Tab */
+$tab-text-transform: none;
+$tab-height: 48px;
+
+/** Page Header */
+$page-header-height: 70px;
+
+/** Mobile Header */
+$mobile-header-height: $page-header-height;
+
+/** Mobile Menu */
+$app-menu-shift: 300px !default;
+$app-menu-small-shift: 250px !default;

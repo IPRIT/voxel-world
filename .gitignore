@@ -1,0 +1,11 @@
+.DS_Store
+node_modules/
+.vscode/
+npm-debug.log
+.idea/
+coverage/
+report.html
+.vs/
+!dev/index.js
+!dev/router.js
+!dev/prepare-commit-message.js

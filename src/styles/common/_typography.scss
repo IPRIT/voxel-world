@@ -1,0 +1,68 @@
+@import "../settings/index";
+@import "../tools/index";
+
+.font-caption {
+  @include font-caption;
+}
+
+.font-body {
+  @include font-body;
+}
+
+.font-subheading {
+  @include font-subheading;
+}
+
+.font-heading {
+  @include font-heading;
+}
+
+.font-title {
+  @include font-title;
+}
+
+.font-headline {
+  @include font-headline;
+}
+
+.font-display-1 {
+  @include font-display-1;
+}
+
+.font-display-2 {
+  @include font-display-2;
+}
+
+small {
+  @include font-caption;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: $indent-medium;
+}
+
+h1 {
+  @include font-display-1;
+}
+
+h2 {
+  @include font-headline;
+}
+
+h3 {
+  @include font-title;
+}
+
+h4 {
+  @include font-heading;
+}
+
+h5 {
+  @include font-subheading;
+}
+
+h6 {
+  @include font-body;
+  margin-bottom: $indent-small;
+}

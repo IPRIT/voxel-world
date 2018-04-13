@@ -1,0 +1,1602 @@
+
+@charset "UTF-8";
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** Typography */
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+/**
+ * Миксин для генерации теней
+ */
+/**
+ * Миксин для плавного перехода теней
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/** Container layout */
+/** Row */
+/** Cols */
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  /* iOS 8+ */
+  height: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  /* All browsers without overlaying scrollbars */
+  overflow-y: scroll;
+}
+body {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+  font-family: "Open Sans", Arial, sans-serif !important;
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -moz-font-feature-settings: "liga" on;
+  letter-spacing: 0;
+}
+html, body {
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+*,
+::before,
+::after {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+::before,
+::after {
+  /* Inherit text-decoration and vertical align to ::before and ::after pseudo elements */
+  text-decoration: inherit;
+  vertical-align: inherit;
+}
+
+/* Remove margin, padding of all elements and set background-no-repeat as default */
+* {
+  /* Set `background-repeat: no-repeat` to all elements */
+  background-repeat: no-repeat;
+  /* Reset `padding` and `margin` of all elements */
+  padding: 0;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+a, button, input {
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: #275a95;
+  text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** Typography */
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+/**
+ * Миксин для генерации теней
+ */
+/**
+ * Миксин для плавного перехода теней
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/** Container layout */
+/** Row */
+/** Cols */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** Typography */
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+/**
+ * Миксин для генерации теней
+ */
+/**
+ * Миксин для плавного перехода теней
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/** Container layout */
+/** Row */
+/** Cols */
+.font-caption {
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+}
+.font-body {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+}
+.font-subheading {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.font-heading {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.font-title {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.font-headline {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.font-display-1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+.font-display-2 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 45px;
+  line-height: 48px;
+  font-weight: 700;
+}
+small {
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+h1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+h2 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+h3 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+h4 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+h5 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+h6 {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** Typography */
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+/**
+ * Миксин для генерации теней
+ */
+/**
+ * Миксин для плавного перехода теней
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/** Container layout */
+/** Row */
+/** Cols */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** Typography */
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+/**
+ * Миксин для генерации теней
+ */
+/**
+ * Миксин для плавного перехода теней
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/** Container layout */
+/** Row */
+/** Cols */
+/** Themes */
+.primary {
+  background-color: #ff5644;
+}
+.secondary {
+  background-color: #424b5c;
+}
+.accent {
+  background-color: #fbd91a;
+}
+.error {
+  background-color: #ff3928;
+}
+.success {
+  background-color: #00c853;
+}
+.info {
+  background-color: #00bcd4;
+}
+.warning {
+  background-color: #ffc107;
+}
+.gray {
+  background-color: #d5d5d5;
+}
+.gray-light {
+  background-color: #ebeced;
+}
+.gray-dark {
+  background-color: #878b92;
+}
+.white {
+  background-color: white;
+}
+.black {
+  background-color: black;
+}
+.text_primary {
+  color: #ff5644;
+  fill: #ff5644;
+}
+.text_primary * {
+    fill: #ff5644;
+}
+.text_secondary {
+  color: #424b5c;
+  fill: #424b5c;
+}
+.text_secondary * {
+    fill: #424b5c;
+}
+.text_accent {
+  color: #fbd91a;
+  fill: #fbd91a;
+}
+.text_accent * {
+    fill: #fbd91a;
+}
+.text_error {
+  color: #ff3928;
+  fill: #ff3928;
+}
+.text_error * {
+    fill: #ff3928;
+}
+.text_success {
+  color: #00c853;
+  fill: #00c853;
+}
+.text_success * {
+    fill: #00c853;
+}
+.text_info {
+  color: #00bcd4;
+  fill: #00bcd4;
+}
+.text_info * {
+    fill: #00bcd4;
+}
+.text_warning {
+  color: #ffc107;
+  fill: #ffc107;
+}
+.text_warning * {
+    fill: #ffc107;
+}
+.text_gray {
+  color: #d5d5d5;
+  fill: #d5d5d5;
+}
+.text_gray * {
+    fill: #d5d5d5;
+}
+.text_gray-light {
+  color: #ebeced;
+  fill: #ebeced;
+}
+.text_gray-light * {
+    fill: #ebeced;
+}
+.text_gray-dark {
+  color: #878b92;
+  fill: #878b92;
+}
+.text_gray-dark * {
+    fill: #878b92;
+}
+.text_white {
+  color: white;
+  fill: white;
+}
+.text_white * {
+    fill: white;
+}
+.text_black {
+  color: black;
+  fill: black;
+}
+.text_black * {
+    fill: black;
+}
+
+/** Shadows */
+.shadow-0 {
+  -webkit-box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 0px rgba(0, 0, 0, 0.07), 0px 0px 0px 0px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 0px rgba(0, 0, 0, 0.07), 0px 0px 0px 0px rgba(0, 0, 0, 0.06);
+}
+.shadow-1 {
+  -webkit-box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.06);
+}
+.shadow-2 {
+  -webkit-box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.1), 0px 2px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 5px 0px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.1), 0px 2px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 5px 0px rgba(0, 0, 0, 0.06);
+}
+.shadow-3 {
+  -webkit-box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.1), 0px 3px 4px 0px rgba(0, 0, 0, 0.07), 0px 1px 8px 0px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.1), 0px 3px 4px 0px rgba(0, 0, 0, 0.07), 0px 1px 8px 0px rgba(0, 0, 0, 0.06);
+}
+.shadow-4 {
+  -webkit-box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.1), 0px 4px 5px 0px rgba(0, 0, 0, 0.07), 0px 1px 10px 0px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.1), 0px 4px 5px 0px rgba(0, 0, 0, 0.07), 0px 1px 10px 0px rgba(0, 0, 0, 0.06);
+}
+.shadow-5 {
+  -webkit-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.1), 0px 5px 8px 0px rgba(0, 0, 0, 0.07), 0px 1px 14px 0px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.1), 0px 5px 8px 0px rgba(0, 0, 0, 0.07), 0px 1px 14px 0px rgba(0, 0, 0, 0.06);
+}
+.shadow-6 {
+  -webkit-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.1), 0px 6px 10px 0px rgba(0, 0, 0, 0.07), 0px 1px 18px 0px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.1), 0px 6px 10px 0px rgba(0, 0, 0, 0.07), 0px 1px 18px 0px rgba(0, 0, 0, 0.06);
+}
+.shadow-7 {
+  -webkit-box-shadow: 0px 4px 5px -2px rgba(0, 0, 0, 0.1), 0px 7px 10px 1px rgba(0, 0, 0, 0.07), 0px 2px 16px 1px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 4px 5px -2px rgba(0, 0, 0, 0.1), 0px 7px 10px 1px rgba(0, 0, 0, 0.07), 0px 2px 16px 1px rgba(0, 0, 0, 0.06);
+}
+.shadow-8 {
+  -webkit-box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.1), 0px 8px 10px 1px rgba(0, 0, 0, 0.07), 0px 3px 14px 2px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.1), 0px 8px 10px 1px rgba(0, 0, 0, 0.07), 0px 3px 14px 2px rgba(0, 0, 0, 0.06);
+}
+.shadow-9 {
+  -webkit-box-shadow: 0px 5px 6px -3px rgba(0, 0, 0, 0.1), 0px 9px 12px 1px rgba(0, 0, 0, 0.07), 0px 3px 16px 2px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 5px 6px -3px rgba(0, 0, 0, 0.1), 0px 9px 12px 1px rgba(0, 0, 0, 0.07), 0px 3px 16px 2px rgba(0, 0, 0, 0.06);
+}
+.shadow-10 {
+  -webkit-box-shadow: 0px 6px 6px -3px rgba(0, 0, 0, 0.1), 0px 10px 14px 1px rgba(0, 0, 0, 0.07), 0px 4px 18px 3px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 6px 6px -3px rgba(0, 0, 0, 0.1), 0px 10px 14px 1px rgba(0, 0, 0, 0.07), 0px 4px 18px 3px rgba(0, 0, 0, 0.06);
+}
+.shadow-11 {
+  -webkit-box-shadow: 0px 6px 7px -4px rgba(0, 0, 0, 0.1), 0px 11px 15px 1px rgba(0, 0, 0, 0.07), 0px 4px 20px 3px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 6px 7px -4px rgba(0, 0, 0, 0.1), 0px 11px 15px 1px rgba(0, 0, 0, 0.07), 0px 4px 20px 3px rgba(0, 0, 0, 0.06);
+}
+.shadow-12 {
+  -webkit-box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.1), 0px 12px 17px 2px rgba(0, 0, 0, 0.07), 0px 5px 22px 4px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.1), 0px 12px 17px 2px rgba(0, 0, 0, 0.07), 0px 5px 22px 4px rgba(0, 0, 0, 0.06);
+}
+.shadow-13 {
+  -webkit-box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.1), 0px 13px 19px 2px rgba(0, 0, 0, 0.07), 0px 5px 24px 4px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.1), 0px 13px 19px 2px rgba(0, 0, 0, 0.07), 0px 5px 24px 4px rgba(0, 0, 0, 0.06);
+}
+.shadow-14 {
+  -webkit-box-shadow: 0px 7px 9px -4px rgba(0, 0, 0, 0.1), 0px 14px 21px 2px rgba(0, 0, 0, 0.07), 0px 5px 26px 4px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 7px 9px -4px rgba(0, 0, 0, 0.1), 0px 14px 21px 2px rgba(0, 0, 0, 0.07), 0px 5px 26px 4px rgba(0, 0, 0, 0.06);
+}
+.shadow-15 {
+  -webkit-box-shadow: 0px 8px 9px -5px rgba(0, 0, 0, 0.1), 0px 15px 22px 2px rgba(0, 0, 0, 0.07), 0px 6px 28px 5px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 8px 9px -5px rgba(0, 0, 0, 0.1), 0px 15px 22px 2px rgba(0, 0, 0, 0.07), 0px 6px 28px 5px rgba(0, 0, 0, 0.06);
+}
+.shadow-16 {
+  -webkit-box-shadow: 0px 8px 10px -5px rgba(0, 0, 0, 0.1), 0px 16px 24px 2px rgba(0, 0, 0, 0.07), 0px 6px 30px 5px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 8px 10px -5px rgba(0, 0, 0, 0.1), 0px 16px 24px 2px rgba(0, 0, 0, 0.07), 0px 6px 30px 5px rgba(0, 0, 0, 0.06);
+}
+.shadow-17 {
+  -webkit-box-shadow: 0px 8px 11px -5px rgba(0, 0, 0, 0.1), 0px 17px 26px 2px rgba(0, 0, 0, 0.07), 0px 6px 32px 5px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 8px 11px -5px rgba(0, 0, 0, 0.1), 0px 17px 26px 2px rgba(0, 0, 0, 0.07), 0px 6px 32px 5px rgba(0, 0, 0, 0.06);
+}
+.shadow-18 {
+  -webkit-box-shadow: 0px 9px 11px -5px rgba(0, 0, 0, 0.1), 0px 18px 28px 2px rgba(0, 0, 0, 0.07), 0px 7px 34px 6px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 9px 11px -5px rgba(0, 0, 0, 0.1), 0px 18px 28px 2px rgba(0, 0, 0, 0.07), 0px 7px 34px 6px rgba(0, 0, 0, 0.06);
+}
+.shadow-19 {
+  -webkit-box-shadow: 0px 9px 12px -6px rgba(0, 0, 0, 0.1), 0px 19px 29px 2px rgba(0, 0, 0, 0.07), 0px 7px 36px 6px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 9px 12px -6px rgba(0, 0, 0, 0.1), 0px 19px 29px 2px rgba(0, 0, 0, 0.07), 0px 7px 36px 6px rgba(0, 0, 0, 0.06);
+}
+.shadow-20 {
+  -webkit-box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.1), 0px 20px 31px 3px rgba(0, 0, 0, 0.07), 0px 8px 38px 7px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.1), 0px 20px 31px 3px rgba(0, 0, 0, 0.07), 0px 8px 38px 7px rgba(0, 0, 0, 0.06);
+}
+.shadow-21 {
+  -webkit-box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.1), 0px 21px 33px 3px rgba(0, 0, 0, 0.07), 0px 8px 40px 7px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.1), 0px 21px 33px 3px rgba(0, 0, 0, 0.07), 0px 8px 40px 7px rgba(0, 0, 0, 0.06);
+}
+.shadow-22 {
+  -webkit-box-shadow: 0px 10px 14px -6px rgba(0, 0, 0, 0.1), 0px 22px 35px 3px rgba(0, 0, 0, 0.07), 0px 8px 42px 7px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 10px 14px -6px rgba(0, 0, 0, 0.1), 0px 22px 35px 3px rgba(0, 0, 0, 0.07), 0px 8px 42px 7px rgba(0, 0, 0, 0.06);
+}
+.shadow-23 {
+  -webkit-box-shadow: 0px 11px 14px -7px rgba(0, 0, 0, 0.1), 0px 23px 36px 3px rgba(0, 0, 0, 0.07), 0px 9px 44px 8px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 11px 14px -7px rgba(0, 0, 0, 0.1), 0px 23px 36px 3px rgba(0, 0, 0, 0.07), 0px 9px 44px 8px rgba(0, 0, 0, 0.06);
+}
+.shadow-24 {
+  -webkit-box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.1), 0px 24px 38px 3px rgba(0, 0, 0, 0.07), 0px 9px 46px 8px rgba(0, 0, 0, 0.06);
+          box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.1), 0px 24px 38px 3px rgba(0, 0, 0, 0.07), 0px 9px 46px 8px rgba(0, 0, 0, 0.06);
+}
+
+/** Display breakpoints */
+
+/** Overflows */
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+.overflow-y-hidden {
+  overflow-y: hidden;
+}
+@media screen and (max-width: 479px) {
+.hidden-xs {
+    display: none !important;
+}
+.hidden-xs-only {
+    display: none !important;
+}
+.hidden-xs-and-down {
+    display: none !important;
+}
+}
+@media screen and (min-width: 480px) {
+.hidden-xs-and-up {
+    display: none !important;
+}
+}
+@media screen and (max-width: 719px) {
+.hidden-sm {
+    display: none !important;
+}
+.hidden-sm-and-down {
+    display: none !important;
+}
+}
+@media screen and (min-width: 480px) and (max-width: 719px) {
+.hidden-sm-only {
+    display: none !important;
+}
+}
+@media screen and (min-width: 720px) {
+.hidden-sm-and-up {
+    display: none !important;
+}
+}
+@media screen and (max-width: 1023px) {
+.hidden-md {
+    display: none !important;
+}
+.hidden-md-and-down {
+    display: none !important;
+}
+}
+@media screen and (min-width: 720px) and (max-width: 1023px) {
+.hidden-md-only {
+    display: none !important;
+}
+}
+@media screen and (min-width: 1024px) {
+.hidden-md-and-up {
+    display: none !important;
+}
+}
+@media screen and (max-width: 1279px) {
+.hidden-lg {
+    display: none !important;
+}
+.hidden-lg-and-down {
+    display: none !important;
+}
+}
+@media screen and (min-width: 1024px) and (max-width: 1279px) {
+.hidden-lg-only {
+    display: none !important;
+}
+}
+@media screen and (min-width: 1280px) {
+.hidden-lg-and-up {
+    display: none !important;
+}
+.hidden-xl-only {
+    display: none !important;
+}
+}

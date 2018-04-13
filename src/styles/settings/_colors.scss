@@ -1,0 +1,74 @@
+// app colors
+$primary-color: #ff5644   !default;
+$secondary-color: #424b5c !default;
+$accent-color: #FBD91A    !default;
+$error-color: #ff3928     !default;
+$success-color: #00c853   !default;
+$info-color: #00bcd4      !default;
+$warning-color: #ffc107   !default;
+
+// text colors
+$primary-text: #000       !default;
+$secondary-text: #878b92  !default;
+$link-text: #275a95       !default;
+
+$border-color: #ccc       !default;
+
+// gray colors
+$color-gray-light: #ebeced;
+$color-gray: #d5d5d5;
+$color-gray-dark: #878b92;
+
+$themes: (
+  primary: $primary-color,
+  secondary: $secondary-color,
+  accent: $accent-color,
+  error: $error-color,
+  success: $success-color,
+  info: $info-color,
+  warning: $warning-color,
+  gray: $color-gray,
+  gray-light: $color-gray-light,
+  gray-dark: $color-gray-dark,
+  white: white,
+  black: black
+);
+
+/** App */
+$app-background: white;
+$app-text-color: $primary-text;
+$app-text-color-disabled: rgba(black, .38);
+$app-text-color-link: $link-text;
+
+/** Button */
+$button-background-color: white;
+$button-color-text: transparentize(black, .26);
+$button-border-color: $color-gray-dark;
+
+/** Loading */
+$loading-circle-colors: ( $primary-color, $accent-color, #275A95, $success-color, $info-color ); // revisit later
+
+/** Cards */
+$cards-background-color: white;
+
+/** Switch */
+$switch-track-inactive: $color-gray-dark;
+$switch-thumb-inactive: white;
+$switch-track-disabled: $color-gray;
+$switch-thumb-disabled: white;
+
+/** Text-field */
+$text-field-background: white;
+$text-field-placeholder-color: $app-text-color-disabled;
+$text-field-placeholder-color-focus: $color-gray-dark;
+
+/** Chip */
+$chip-background: $color-gray-light;
+$chip-color: $primary-text;
+$chip-outline-color: $primary-text;
+
+/** Lists */
+$list-action-text-font-color: $color-gray;
+
+/** Dividers */
+$divider-color: transparentize(black, .92);

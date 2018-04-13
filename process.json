@@ -1,0 +1,11 @@
+{
+  "apps" : [{
+    "name": "rabotify",
+    "script": "npm",
+    "args" : "start",
+    "exec_mode": "cluster",
+    "env": {
+      "NODE_ENV": "development"
+    }
+  }]
+}

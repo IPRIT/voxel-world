@@ -1,0 +1,69 @@
+@import "../settings/variables";
+@import "../settings/colors";
+@import "../tools/classes";
+
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%; /* iOS 8+ */
+  height: 100%;
+  box-sizing: border-box;
+  /* All browsers without overlaying scrollbars */
+  overflow-y: scroll;
+}
+
+body {
+  @include font-body;
+  font-family: $font-family-default !important;
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -moz-font-feature-settings: "liga" on;
+  letter-spacing: 0;
+}
+
+html, body {
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+::before,
+::after {
+  /* Inherit text-decoration and vertical align to ::before and ::after pseudo elements */
+  text-decoration: inherit;
+  vertical-align: inherit;
+}
+
+/* Remove margin, padding of all elements and set background-no-repeat as default */
+* {
+  /* Set `background-repeat: no-repeat` to all elements */
+  background-repeat: no-repeat;
+  /* Reset `padding` and `margin` of all elements */
+  padding: 0;
+  margin: 0;
+  -webkit-tap-highlight-color: transparentize(black, 1);
+}
+
+a, button, input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: $link-text;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -1,0 +1,73 @@
+@import "../settings/variables";
+
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+  @return $string;
+}
+
+@function str-split($string, $separator) {
+  // empty array/list
+  $split-arr: ();
+  // first index of separator in string
+  $index : str-index($string, $separator);
+  // loop through string
+  @while $index != null {
+    // get the substring from the first character to the separator
+    $item: str-slice($string, 1, $index - 1);
+    // push item to array
+    $split-arr: append($split-arr, $item);
+    // remove item and separator from string
+    $string: str-slice($string, $index + 1);
+    // find new index of separator
+    $index : str-index($string, $separator);
+  }
+  // add the remaining string to list (the last item)
+  $split-arr: append($split-arr, $string);
+
+  @return $split-arr;
+}
+
+@function get($map, $path) {
+  $split-keys: str-split($path, '.');
+  $keys: length($split-keys);
+  $value: $map;
+  $index: 1;
+  @while $index != $keys + 1 {
+    $value: map_get($map, unquote(nth($split-keys, $index)));
+    $map: $value;
+    $index: $index + 1;
+  }
+  @return $value;
+}
+
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+@function merge-fonts-stack($first-stack, $second-stack: $font-family-default) {
+  @return append($first-stack, $second-stack, comma);
+}
+
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+@function import-background-image($image-name, $path) {
+  @return unquote('url(#{$path}/#{unquote($image-name)})');
+}
+
+@function is-int($value) {
+  @return round($value) == $value;
+}
