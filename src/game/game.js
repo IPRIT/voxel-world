@@ -137,7 +137,7 @@ export default class Game {
     this._scene = new THREE.Scene();
 
     this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
-    this._camera.position.set( 26.03733840003578, 191.62122206489542, 46.682902241965227 );
+    this._camera.position.set( WORLD_SIZE / 2, 50, WORLD_SIZE / 2 );
     this._orbitControls = new OrbitControls(this._camera, this._renderer.domElement);
     this._orbitControls.target = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
     this._orbitControls.update();
@@ -169,18 +169,20 @@ export default class Game {
 
     const dirLight = new THREE.DirectionalLight( 0x999999, .5 );
     dirLight.color.setHSL( 0.1, 1, 0.95 );
-    dirLight.position.set(WORLD_SIZE / 2, 20, WORLD_SIZE / 2);
+    console.log(dirLight);
     dirLight.position.multiplyScalar( 10 );
 
     const dirLightHelper = new THREE.CameraHelper( dirLight.shadow.camera );
     this._scene.add( dirLight, dirLightHelper );
+
+    dirLight.position.set(WORLD_SIZE, 200, WORLD_SIZE);
 
     dirLight.castShadow = true;
 
     dirLight.shadow.mapSize.width = 1 << 11;
     dirLight.shadow.mapSize.height = 1 << 11; // 2048
 
-    const offset = 350;
+    const offset = 250;
 
     dirLight.shadow.camera.top = offset;
     dirLight.shadow.camera.right = offset;
@@ -200,6 +202,8 @@ export default class Game {
     // console.log(await vox.loadVoxData('/resources/models/deer-test.vox'));
 
     const map = await vox.loadVoxData('/resources/models/map-test.vox');
+
+    this._world.buildMap(map);
 
     polygon.debugVoxModel(map);
   }

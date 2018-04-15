@@ -1,10 +1,10 @@
 import { TYPE_CHUNK_FF, TYPE_CHUNK_OBJECT, WorldChunk } from "./world-chunk";
 import { TYPE_MAP } from "../vox";
 
-export const WORLD_SIZE = 1 << 6;
+export const WORLD_SIZE = 1 << 8;
 export const WORLD_BLOCK_SIZE = 1;
-export const WORLD_CHUNK_SIZE = 1 << 5;
-export const WORLD_HEIGHT = 1 << 4;
+export const WORLD_CHUNK_SIZE = 1 << 6;
+export const WORLD_HEIGHT = 1 << 7;
 
 export class World {
 
@@ -40,18 +40,30 @@ export class World {
 
     this.addBlock({ x: 0, y: 1, z: 0}, [200, 100, 200]);
 
+
+    function getY(x, z) {
+      return Math.ceil(Math.cos(x / 20) * Math.sin(z / 20) * 10) + 10;
+    }
+
     for (let x = 0; x < WORLD_SIZE; ++x) {
-      for (let y = 0; y < WORLD_HEIGHT; ++y) {
+      // for (let y = 0; y < WORLD_HEIGHT; ++y) {
         for (let z = 0; z < WORLD_SIZE; ++z) {
-          let maxY = Math.ceil(Math.cos(x / 100) * Math.sin(z / 100) * 5);
-          if (y <= maxY && this.isInsideWorld(x, y, z)) {
+          let y = getY(x, z);
+          if (/*y <= maxY && */this.isInsideWorld(x, y, z)) {
             this.addBlock({ x, y, z }, [100, 200, 100]);
           }
         }
+      // }
+    }
+
+    let maxY = 0;
+    for (let x = WORLD_SIZE / 2; x < WORLD_SIZE / 2 + 4; ++x) {
+      for (let z = WORLD_SIZE / 2; z < WORLD_SIZE / 2 + 6; ++z) {
+        maxY = Math.max(getY(x, z), maxY);
       }
     }
 
-    for (let y = 1; y <= 12; ++y) {
+    for (let y = maxY + 1; y <= maxY + 12; ++y) {
       for (let x = WORLD_SIZE / 2; x < WORLD_SIZE / 2 + 4; ++x) {
         for (let z = WORLD_SIZE / 2; z < WORLD_SIZE / 2 + 6; ++z) {
           this.addBlock({ x, y, z }, [200, 100, 200]);
@@ -63,7 +75,15 @@ export class World {
   }
 
   buildMap (voxelObject) {
-
+    let { XYZI, RGBA, SIZE } = voxelObject;
+    let color, colorArr;
+    for (let i = 0; i < XYZI.length; ++i) {
+      let {x, y, z, c} = XYZI[i];
+      color = RGBA[ c ];
+      colorArr = [ color.r, color.g, color.b ];
+      this.addBlock({ x: x + WORLD_SIZE / 2 - 20, y: z + 0, z: y + WORLD_SIZE / 2 - 20 }, colorArr);
+    }
+    this._rebuildDirtyChunks();
   }
 
   /**
@@ -777,8 +797,9 @@ export class World {
 
   _rebuildMaterial (wireframe = false) {
     this._wireframe = wireframe;
-    this._material = new THREE.MeshLambertMaterial({
+    this._material = new THREE.MeshPhongMaterial({
       vertexColors: THREE.VertexColors,
+      shininess: 100,
       wireframe: this._wireframe
     });
   }
