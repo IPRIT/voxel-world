@@ -1,6 +1,8 @@
-import * as THREE from 'three';
-import OrbitControls from 'three-orbitcontrols';
+import { Vox } from "./vox";
+const OrbitControls = require('three-orbit-controls')(THREE);
 import JsPerformanceStats from 'stats.js';
+import { Polygon } from "./polygon";
+import { World, WORLD_BLOCK_SIZE, WORLD_SIZE } from "./world";
 
 export default class Game {
 
@@ -29,7 +31,7 @@ export default class Game {
   };
 
   /**
-   * @type {OrbitControls}
+   * @type {THREE.OrbitControls}
    * @private
    */
   _orbitControls = null;
@@ -54,9 +56,9 @@ export default class Game {
   /**
    * Camera settings
    */
-  _fov = 50;
+  _fov = 60;
   _aspect = this._screenWidth / this._screenHeight;
-  _near = 10;
+  _near = 1;
   _far = 3000;
 
   _invertedMaxFps = 1 / 60;
@@ -96,9 +98,6 @@ export default class Game {
     this._theta = this._theta || 0;
     this._theta += .01;
 
-    this._rollOverMesh.rotation.z = Math.sin(this._theta) * 10;
-    this._rollOverMesh.position.y = Math.cos(this._theta) * 5;
-
     // this._camera.position.z = Math.sin(this._theta) * 30;
     // this._camera.position.x = Math.cos(this._theta) * 30;
 
@@ -117,6 +116,8 @@ export default class Game {
 
     this._addLights();
     this._addObjects();
+
+    this._initWorld();
   }
 
   _initRenderer () {
@@ -136,43 +137,50 @@ export default class Game {
     this._scene = new THREE.Scene();
 
     this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
-    this._camera.position.set( 13, 5, 15 );
+    this._camera.position.set( 26.03733840003578, 191.62122206489542, 46.682902241965227 );
     this._orbitControls = new OrbitControls(this._camera, this._renderer.domElement);
+    this._orbitControls.target = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
+    this._orbitControls.update();
 
     this._scene.add(this._camera);
   }
 
   _initFog () {
-    this._scene.fog = new THREE.Fog( 0xFF99AA, 100, 3000);
+    this._scene.fog = new THREE.Fog(0xffa1c1, 100, 1000);
   }
 
   _initGridHelper () {
-    this._scene.add(new THREE.GridHelper(50, 100, 0x666666, 0x444444));
+    this._gridHelper = new THREE.GridHelper(WORLD_SIZE, WORLD_SIZE / WORLD_BLOCK_SIZE, 0x666666, 0x999999);
+    this._gridHelper.position.set(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
+    this._scene.add(
+      this._gridHelper
+    );
   }
 
   _addLights () {
     const ambientLight = new THREE.AmbientLight( 0xEEB1C6 );
     this._scene.add( ambientLight );
 
-    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.4 );
     hemiLight.color.setHSL( 0.6, 1, 0.6 );
     hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
     hemiLight.position.set( 0, 500, 0 );
     this._scene.add( hemiLight );
 
-    const dirLight = new THREE.DirectionalLight( 0x999999, 0.4 );
+    const dirLight = new THREE.DirectionalLight( 0x999999, .5 );
     dirLight.color.setHSL( 0.1, 1, 0.95 );
-    dirLight.position.set( 23, 23, 10 );
+    dirLight.position.set(WORLD_SIZE / 2, 20, WORLD_SIZE / 2);
     dirLight.position.multiplyScalar( 10 );
-    this._scene.add( dirLight );
 
-    //dirLight.castShadow = false;
+    const dirLightHelper = new THREE.CameraHelper( dirLight.shadow.camera );
+    this._scene.add( dirLight, dirLightHelper );
+
     dirLight.castShadow = true;
 
-    dirLight.shadow.mapSize.width = 512;
-    dirLight.shadow.mapSize.height = 512; // 2048
+    dirLight.shadow.mapSize.width = 1 << 11;
+    dirLight.shadow.mapSize.height = 1 << 11; // 2048
 
-    const offset = 150;
+    const offset = 350;
 
     dirLight.shadow.camera.top = offset;
     dirLight.shadow.camera.right = offset;
@@ -184,93 +192,21 @@ export default class Game {
     dirLight.shadow.camera.darkness = 0.45;
   }
 
-  _addObjects () {
-    const path = "images/";
-    const format = '.jpg';
-    const urls = [
-      path + 'posx' + format, path + 'negx' + format,
-      path + 'posy' + format, path + 'negy' + format,
-      path + 'posz' + format, path + 'negz' + format
-    ];
-    const textureCube = new THREE.CubeTextureLoader().load( urls );
-    textureCube.format = THREE.RGBFormat;
-    this._scene.background = textureCube;
-    this._scene.matrixAutoUpdate = false;
+  async _addObjects () {
+    const polygon = new Polygon(this);
+    const vox = new Vox();
 
-    const shader = {
-      uniforms: {
-        "mRefractionRatio": { value: 1.02 },
-        "mFresnelBias": { value: 0.1 },
-        "mFresnelPower": { value: 2.0 },
-        "mFresnelScale": { value: 1.0 },
-        "tCube": { value: null }
-      },
-      vertexShader: [
-        "uniform float mRefractionRatio;",
-        "uniform float mFresnelBias;",
-        "uniform float mFresnelScale;",
-        "uniform float mFresnelPower;",
+    // console.log(await vox.loadVoxData('/resources/models/vox-test.vox'));
+    // console.log(await vox.loadVoxData('/resources/models/deer-test.vox'));
 
-        "varying vec3 vReflect;",
-        "varying vec3 vRefract[3];",
-        "varying float vReflectionFactor;",
+    const map = await vox.loadVoxData('/resources/models/map-test.vox');
 
-        "void main() {",
+    polygon.debugVoxModel(map);
+  }
 
-        "vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-        "vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
-
-        "vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
-
-        "vec3 I = worldPosition.xyz - cameraPosition;",
-
-        "vReflect = reflect( I, worldNormal );",
-        "vRefract[0] = refract( normalize( I ), worldNormal, mRefractionRatio );",
-        "vRefract[1] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.99 );",
-        "vRefract[2] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.98 );",
-        "vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower );",
-
-        "gl_Position = projectionMatrix * mvPosition;",
-
-        "}"
-      ].join( "\n" ),
-      fragmentShader: [
-        "uniform samplerCube tCube;",
-
-        "varying vec3 vReflect;",
-        "varying vec3 vRefract[3];",
-        "varying float vReflectionFactor;",
-
-        "void main() {",
-
-        "vec4 reflectedColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-        "vec4 refractedColor = vec4( 1.0 );",
-
-        "refractedColor.r = textureCube( tCube, vec3( -vRefract[0].x, vRefract[0].yz ) ).r;",
-        "refractedColor.g = textureCube( tCube, vec3( -vRefract[1].x, vRefract[1].yz ) ).g;",
-        "refractedColor.b = textureCube( tCube, vec3( -vRefract[2].x, vRefract[2].yz ) ).b;",
-
-        "gl_FragColor = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );",
-
-        "}"
-      ].join( "\n" )
-    };
-    const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-    uniforms[ "tCube" ].value = textureCube;
-    console.log(textureCube);
-
-    const rollOverGeo = new THREE.SphereGeometry(2, 100, 100);
-    const rollOverMaterial = new THREE.ShaderMaterial( {
-      uniforms: uniforms,
-      vertexShader: shader.vertexShader,
-      fragmentShader: shader.fragmentShader
-    });
-    console.log(rollOverMaterial);
-    this._rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-    this._rollOverMesh.position.y = 2;
-    this._rollOverMesh.position.x = 0;
-    this._rollOverMesh.add(new THREE.AxesHelper(2));
-    this._scene.add( this._rollOverMesh );
+  _initWorld () {
+    this._world = new World(this);
+    this._world.init();
   }
 
   _initEventListeners () {

@@ -46,7 +46,7 @@ function genConfig (opts) {
       new webpack.optimize.UglifyJsPlugin({
         sourceMap: false
       }),
-      new OptimizeCssAssetsPlugin({
+      /* new OptimizeCssAssetsPlugin({
         assetNameRegExp: /\.css$/g,
         cssProcessor: require('cssnano'),
         cssProcessorOptions: {
@@ -54,7 +54,7 @@ function genConfig (opts) {
           postcssZindex: false
         },
         canPrint: false
-      }),
+      }),*/
       new webpack.BannerPlugin({
         banner: `/* Rabotify v${version} */`,
         raw: true,

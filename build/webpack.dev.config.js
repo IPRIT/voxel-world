@@ -1,10 +1,6 @@
 require('dotenv').config();
-const merge = require('webpack-merge');
-const baseWebpackConfig = require('./webpack.base.config');
-const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WriteFilePlugin = require('write-file-webpack-plugin');
 const webpack = require('webpack');
 
@@ -21,7 +17,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     path: resolve('../dev'),
-    publicPath: '/dev/',
+    publicPath: '/',
     library: 'GameApp'
   },
   resolve: {
@@ -62,8 +58,8 @@ module.exports = {
     hints: false
   },
   devServer: {
-    contentBase: resolve('../dev'),
-    publicPath: '/dev/',
+    contentBase: resolve('../'),
+    publicPath: '/',
     host: process.env.HOST || 'localhost',
     port: process.env.PORT || '3200',
     disableHostCheck: true

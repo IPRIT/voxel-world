@@ -108,9 +108,10 @@
   "dependencies": {
     "md-svg-vue": "^1.0.6",
     "normalize.css": "^8.0.0",
+    "parse-magica-voxel": "^1.0.3",
     "stats.js": "^0.17.0",
     "three": "^0.91.0",
-    "three-orbitcontrols": "^2.0.0",
+    "three-orbit-controls": "^82.1.0",
     "vue-virtual-repeater": "^1.1.10"
   },
   "peerDependencies": {
