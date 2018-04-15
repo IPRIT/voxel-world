@@ -74,6 +74,7 @@ export class World {
     this._rebuildDirtyChunks();
   }
 
+
   buildMap (voxelObject) {
     let { XYZI, RGBA, SIZE } = voxelObject;
     let color, colorArr;
