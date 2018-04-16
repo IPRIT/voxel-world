@@ -1,48 +1,68 @@
-import parseMagicaVoxel from 'parse-magica-voxel';
+import { VoxLoader } from "./vox-loader";
 
 export class Vox {
 
-  constructor () {
-  }
+  /**
+   * @type {VoxModel}
+   * @private
+   */
+  _model = null;
 
-  loadVoxData (file) {
-    return this._loadRequest(file).then(req => {
-      console.log(`Loaded vox model: ${req.responseURL}`);
-      return this._parseVoxelBuffer( req.response );
-    });
-  }
+  /**
+   * @type {string}
+   * @private
+   */
+  _url = '';
 
-  _loadRequest (path) {
-    const req = new XMLHttpRequest();
-    req.open("GET", path, true);
-    req.responseType = 'arraybuffer';
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _loaded = false;
 
-    req.send(null);
+  /**
+   * @class VoxType
+   * @type {number}
+   * @private
+   */
+  _type;
 
-    return new Promise((resolve, reject) => {
-      req.onload = event => resolve(req, event);
-      req.onerror = event => reject(req, event);
-    });
+  /**
+   * @param url
+   * @param {number} type
+   * @returns {Promise<Vox>}
+   */
+  async load (url, type) {
+    try {
+      this._model = await VoxLoader.getLoader().load(url);
+      this._url = url;
+      this._loaded = true;
+      this._type = type;
+    } catch (e) {
+      console.log(`Can\'t load model: ${url}`, e);
+    }
+
+    return this;
   }
 
   /**
-   * @param {ArrayBuffer} voxelBuffer
-   * @returns {*}
-   * @private
+   * @returns {boolean}
    */
-  _parseVoxelBuffer (voxelBuffer) {
-    /**
-     *  MagicaVoxel .vox File Format [10/18/2016]
-     *
-     *  File Structure : RIFF style
-     *  -------------------------------------------------------------------------------
-     *  # Bytes  | Type       | Value
-     *  -------------------------------------------------------------------------------
-     *  1x4      | char       | id 'VOX ' : 'V' 'O' 'X' 'space', 'V' is first
-     *  4        | int        | version number : 150
-     *
-     *  @see https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
-     */
-    return parseMagicaVoxel(voxelBuffer);
+  get loaded () {
+    return this._loaded;
+  }
+
+  /**
+   * @returns {VoxModel}
+   */
+  get model () {
+    return this._model;
+  }
+
+  /**
+   * @returns {number}
+   */
+  get type () {
+    return this._type;
   }
 }

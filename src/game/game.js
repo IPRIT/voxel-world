@@ -1,4 +1,4 @@
-import { Vox } from "./vox";
+import { Vox, VoxType } from "./vox";
 const OrbitControls = require('three-orbit-controls')(THREE);
 import JsPerformanceStats from 'stats.js';
 import { Polygon } from "./polygon";
@@ -58,8 +58,8 @@ export default class Game {
    */
   _fov = 60;
   _aspect = this._screenWidth / this._screenHeight;
-  _near = 1;
-  _far = 3000;
+  _near = 1 * WORLD_BLOCK_SIZE;
+  _far = 3000 * WORLD_BLOCK_SIZE;
 
   _invertedMaxFps = 1 / 60;
 
@@ -115,7 +115,6 @@ export default class Game {
     this._initEventListeners();
 
     this._addLights();
-    this._addObjects();
 
     this._initWorld();
   }
@@ -137,21 +136,21 @@ export default class Game {
     this._scene = new THREE.Scene();
 
     this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
-    this._camera.position.set( WORLD_SIZE / 2, 50, WORLD_SIZE / 2 );
+    this._camera.position.set( WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 50 * WORLD_BLOCK_SIZE, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
     this._orbitControls = new OrbitControls(this._camera, this._renderer.domElement);
-    this._orbitControls.target = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
+    this._orbitControls.target = new THREE.Vector3(WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 0, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
     this._orbitControls.update();
 
     this._scene.add(this._camera);
   }
 
   _initFog () {
-    this._scene.fog = new THREE.Fog(0xffa1c1, 100, 1000);
+    this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_BLOCK_SIZE, 1000 * WORLD_BLOCK_SIZE);
   }
 
   _initGridHelper () {
-    this._gridHelper = new THREE.GridHelper(WORLD_SIZE, WORLD_SIZE / WORLD_BLOCK_SIZE, 0x666666, 0x999999);
-    this._gridHelper.position.set(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
+    this._gridHelper = new THREE.GridHelper(WORLD_SIZE * WORLD_BLOCK_SIZE, WORLD_SIZE / WORLD_BLOCK_SIZE, 0x666666, 0x999999);
+    this._gridHelper.position.set(WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 0, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
     this._scene.add(
       this._gridHelper
     );
@@ -161,51 +160,91 @@ export default class Game {
     const ambientLight = new THREE.AmbientLight( 0xEEB1C6 );
     this._scene.add( ambientLight );
 
-    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.4 );
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.5 );
     hemiLight.color.setHSL( 0.6, 1, 0.6 );
     hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-    hemiLight.position.set( 0, 500, 0 );
-    this._scene.add( hemiLight );
+    hemiLight.position.set(
+      WORLD_SIZE / 2 * WORLD_BLOCK_SIZE,
+      500 * WORLD_BLOCK_SIZE,
+      WORLD_SIZE / 2 * WORLD_BLOCK_SIZE
+    );
 
+    const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 5);
+    this._scene.add(hemiLight, hemiLightHelper);
+
+    // this._addWorldSpotLight();
+    this._addWorldDirectionalLight();
+  }
+
+  _addWorldSpotLight () {
+    const spotLight = new THREE.SpotLight(0x999999, .6, 0, Math.PI / 2 - .4);
+    spotLight.color.setHSL( 0.1, 1, 0.95 );
+
+    const lightHelper = new THREE.CameraHelper( spotLight.shadow.camera );
+    this._scene.add( spotLight, lightHelper );
+
+    spotLight.position.set(
+      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.5,
+      WORLD_BLOCK_SIZE * 200,
+      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.5
+    );
+
+    spotLight.penumbra = 0;
+    spotLight.decay = 2;
+
+    this._addShadows(spotLight);
+
+    const targetObject = new THREE.Object3D();
+    this._scene.add(targetObject);
+
+    spotLight.target = targetObject;
+    targetObject.position.set(
+      WORLD_BLOCK_SIZE * WORLD_SIZE / 2, 0, WORLD_BLOCK_SIZE * WORLD_SIZE / 2
+    );
+  }
+
+  _addWorldDirectionalLight () {
     const dirLight = new THREE.DirectionalLight( 0x999999, .5 );
     dirLight.color.setHSL( 0.1, 1, 0.95 );
-    console.log(dirLight);
-    dirLight.position.multiplyScalar( 10 );
 
     const dirLightHelper = new THREE.CameraHelper( dirLight.shadow.camera );
     this._scene.add( dirLight, dirLightHelper );
 
-    dirLight.position.set(WORLD_SIZE, 200, WORLD_SIZE);
+    dirLight.position.set(
+      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.2,
+      WORLD_BLOCK_SIZE * 300,
+      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.2
+    );
 
-    dirLight.castShadow = true;
+    this._addShadows(dirLight);
 
-    dirLight.shadow.mapSize.width = 1 << 11;
-    dirLight.shadow.mapSize.height = 1 << 11; // 2048
+    const targetObject = new THREE.Object3D();
+    this._scene.add(targetObject);
 
-    const offset = 250;
-
-    dirLight.shadow.camera.top = offset;
-    dirLight.shadow.camera.right = offset;
-    dirLight.shadow.camera.bottom = -offset;
-    dirLight.shadow.camera.left = -offset;
-
-    dirLight.shadow.camera.far = 3500;
-    dirLight.shadow.camera.bias = -0.0001;
-    dirLight.shadow.camera.darkness = 0.45;
+    dirLight.target = targetObject;
+    targetObject.position.set(
+      WORLD_BLOCK_SIZE * WORLD_SIZE / 2 * 1.2,
+      0,
+      WORLD_BLOCK_SIZE * WORLD_SIZE / 2 * 1.2
+    );
   }
 
-  async _addObjects () {
-    const polygon = new Polygon(this);
-    const vox = new Vox();
+  _addShadows (light) {
+    light.castShadow = true;
 
-    // console.log(await vox.loadVoxData('/resources/models/vox-test.vox'));
-    // console.log(await vox.loadVoxData('/resources/models/deer-test.vox'));
+    light.shadow.mapSize.width = 1 << 11;
+    light.shadow.mapSize.height = 1 << 11;
 
-    const map = await vox.loadVoxData('/resources/models/map-test.vox');
+    const offset = 200 * WORLD_BLOCK_SIZE;
 
-    this._world.buildMap(map);
+    light.shadow.camera.top = offset;
+    light.shadow.camera.right = offset;
+    light.shadow.camera.bottom = -offset;
+    light.shadow.camera.left = -offset;
 
-    polygon.debugVoxModel(map);
+    light.shadow.camera.far = 3500;
+    light.shadow.camera.bias = -0.0001;
+    light.shadow.camera.darkness = 0.45;
   }
 
   _initWorld () {

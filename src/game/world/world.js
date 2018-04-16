@@ -1,9 +1,10 @@
-import { TYPE_CHUNK_FF, TYPE_CHUNK_OBJECT, WorldChunk } from "./world-chunk";
-import { TYPE_MAP } from "../vox";
+import { WorldChunk } from "./world-chunk";
+import { WorldChunkType } from "./world-chunk-type";
+import { Vox, VoxType } from "../vox";
 
 export const WORLD_SIZE = 1 << 8;
-export const WORLD_BLOCK_SIZE = 1;
-export const WORLD_CHUNK_SIZE = 1 << 6;
+export const WORLD_BLOCK_SIZE = 2;
+export const WORLD_CHUNK_SIZE = 1 << 5;
 export const WORLD_HEIGHT = 1 << 7;
 
 export class World {
@@ -24,22 +25,18 @@ export class World {
     this._game = game;
   }
 
-  init () {
+  async init () {
     this._initBlocksArray();
     this._initChunks();
 
     this._buildGroundPlate();
 
-    this._rebuildMaterial();
+    this._rebuildMaterial(this._wireframe);
     this._rebuildDirtyChunks(true);
 
-    // ok
-    // this.addBlock({ x: 0, y: 1, z: 0}, [100, 200, 100]);
-    // this.addBlock({ x: 1, y: 0, z: 0}, [100, 200, 100]);
-    // this.addBlock({ x: 0, y: 0, z: 1}, [100, 200, 100]);
-
-    this.addBlock({ x: 0, y: 1, z: 0}, [200, 100, 200]);
-
+    for (let y = 0; y < WORLD_HEIGHT; ++y) {
+      this.addBlock({ x: 0, y, z: 0}, [ 200, 100, 200 ]);
+    }
 
     function getY(x, z) {
       return Math.ceil(Math.cos(x / 20) * Math.sin(z / 20) * 10) + 10;
@@ -57,34 +54,59 @@ export class World {
     }
 
     let maxY = 0;
-    for (let x = WORLD_SIZE / 2; x < WORLD_SIZE / 2 + 4; ++x) {
-      for (let z = WORLD_SIZE / 2; z < WORLD_SIZE / 2 + 6; ++z) {
+    for (let x = WORLD_SIZE / 2 - 30; x < WORLD_SIZE / 2 + 30; ++x) {
+      for (let z = WORLD_SIZE / 2 - 30; z < WORLD_SIZE / 2 + 30; ++z) {
         maxY = Math.max(getY(x, z), maxY);
       }
     }
 
-    for (let y = maxY + 1; y <= maxY + 12; ++y) {
-      for (let x = WORLD_SIZE / 2; x < WORLD_SIZE / 2 + 4; ++x) {
-        for (let z = WORLD_SIZE / 2; z < WORLD_SIZE / 2 + 6; ++z) {
-          this.addBlock({ x, y, z }, [200, 100, 200]);
-        }
-      }
+    // const voxTest = new Vox();
+    // await voxTest.load('/resources/models/vox-test.vox', VoxType.TYPE_MAP);
+
+    // const mapTest = new Vox();
+    // await mapTest.load('/resources/models/map-test.vox', VoxType.TYPE_MAP);
+
+    const map = new Vox();
+    const deer = new Vox();
+    const fox = new Vox();
+    const dragon = new Vox();
+    const tRex = new Vox();
+
+    try {
+      await map.load('/resources/models/world-chunk-1.vox', VoxType.TYPE_MAP);
+      await deer.load('/resources/models/deer-test.vox', VoxType.TYPE_OBJECT);
+      await fox.load('/resources/models/chr_fox.vox', VoxType.TYPE_OBJECT);
+      await dragon.load('/resources/models/dragon.vox', VoxType.TYPE_OBJECT);
+      await tRex.load('/resources/models/t-rex.vox', VoxType.TYPE_OBJECT);
+    } catch (e) {
+      console.log(e);
     }
+
+    this.buildMap(map, new THREE.Vector3(WORLD_SIZE / 2, maxY + 1, WORLD_SIZE / 2));
+    this.buildMap(deer, new THREE.Vector3(WORLD_SIZE / 2 - 24, maxY + 3, WORLD_SIZE / 2));
+    this.buildMap(fox, new THREE.Vector3(WORLD_SIZE / 2 + 10, maxY + 3, WORLD_SIZE / 2 + 10));
+    this.buildMap(dragon, new THREE.Vector3(WORLD_SIZE / 2 - 80, maxY + 1, WORLD_SIZE / 2 - 80));
+    this.buildMap(tRex, new THREE.Vector3(WORLD_SIZE / 2 + 60, maxY + 1, WORLD_SIZE / 2 + 80));
 
     this._rebuildDirtyChunks();
   }
 
+  /**
+   * @param {Vox} vox
+   * @param {THREE.Vector3} offsetVector
+   */
+  buildMap (vox, offsetVector) {
+    let model = vox.model;
+    let blocks = model.getBlocks();
 
-  buildMap (voxelObject) {
-    let { XYZI, RGBA, SIZE } = voxelObject;
-    let color, colorArr;
-    for (let i = 0; i < XYZI.length; ++i) {
-      let {x, y, z, c} = XYZI[i];
-      color = RGBA[ c ];
-      colorArr = [ color.r, color.g, color.b ];
-      this.addBlock({ x: x + WORLD_SIZE / 2 - 20, y: z + 0, z: y + WORLD_SIZE / 2 - 20 }, colorArr);
+    for (let i = 0; i < blocks.length; ++i) {
+      let block = blocks[i];
+      this.addBlock({
+        x: block.x + offsetVector.x,
+        y: block.y + offsetVector.y,
+        z: block.z + offsetVector.z
+      }, blocks[i].color);
     }
-    this._rebuildDirtyChunks();
   }
 
   /**
@@ -130,7 +152,6 @@ export class World {
       const z = t1 % zSize;
       const y = (t1 - z) / zSize;
       const x = (index - t1) / yz;
-      return [x, y, z];
     */
     const yz = WORLD_HEIGHT * WORLD_SIZE;
     const t1 = index % yz;
@@ -163,7 +184,7 @@ export class World {
   }
 
   addBlock ({ x, y, z }, color) {
-    const size = 1 / WORLD_BLOCK_SIZE;
+    const size = 1;
 
     if (!this.isInsideWorld(x, y, z)) {
       return;
@@ -190,12 +211,12 @@ export class World {
     for (let x = 0; x < maxChunkNumber; ++x) {
       for (let z = 0; z < maxChunkNumber; ++z) {
         const chunk = new WorldChunk();
-        chunk.type = TYPE_MAP;
+        chunk.type = VoxType.TYPE_MAP;
         chunk.fromY = 0;
         chunk.toY = WORLD_HEIGHT;
-        chunk.fromX = x * WORLD_BLOCK_SIZE * WORLD_CHUNK_SIZE;
+        chunk.fromX = x * WORLD_CHUNK_SIZE;
         chunk.toX = chunk.fromX + WORLD_CHUNK_SIZE;
-        chunk.fromZ = z * WORLD_BLOCK_SIZE * WORLD_CHUNK_SIZE;
+        chunk.fromZ = z * WORLD_CHUNK_SIZE;
         chunk.toZ = chunk.fromZ + WORLD_CHUNK_SIZE;
         chunk.x = x;
         chunk.z = z;
@@ -210,15 +231,15 @@ export class World {
   _buildGroundPlate () {
     let geo = new THREE.BoxGeometry(
       WORLD_BLOCK_SIZE * WORLD_SIZE - 2,
-      2,
+      WORLD_BLOCK_SIZE * 2,
       WORLD_BLOCK_SIZE * WORLD_SIZE - 2
     );
     let mat = new THREE.MeshPhongMaterial({ color: 0x444444, shininess: 100 });
     let mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(
-      WORLD_SIZE / 2,
-      -1.01, // to prevent collisions with grid helper
-      WORLD_SIZE / 2
+      WORLD_BLOCK_SIZE * WORLD_SIZE / 2,
+      WORLD_BLOCK_SIZE * -1.01, // to prevent collisions with grid helper
+      WORLD_BLOCK_SIZE * WORLD_SIZE / 2
     );
     mesh.receiveShadow = true;
     mesh.castShadow = true;
@@ -227,16 +248,16 @@ export class World {
     // base
     geo = new THREE.BoxGeometry(
       WORLD_BLOCK_SIZE * WORLD_SIZE,
-      1000,
+      WORLD_BLOCK_SIZE * 1000,
       WORLD_BLOCK_SIZE * WORLD_SIZE
     );
     mat = new THREE.MeshPhongMaterial({ color: 0xd56e00 });
     mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
     mesh.position.set(
-      WORLD_SIZE / 2,
-      -1000 / 2 - 1,
-      WORLD_SIZE / 2
+      WORLD_BLOCK_SIZE * WORLD_SIZE / 2,
+      WORLD_BLOCK_SIZE * -1000 / 2 - 1,
+      WORLD_BLOCK_SIZE * WORLD_SIZE / 2
     );
     this._game._scene.add(mesh);
   }
@@ -311,7 +332,7 @@ export class World {
             continue;
           }
 
-          if (chunk.type === TYPE_CHUNK_FF) {
+          if (chunk.type === WorldChunkType.TYPE_CHUNK_FF) {
             // make sure we only use blocks that we should build as mesh. (floodfill only)
             if ((this.blocks[ blockIndex ] & 0x20) === 0
               && (this.blocks[ blockIndex ] & 0x40) === 0) {
@@ -346,7 +367,8 @@ export class World {
             right === 1 && above === 1 &&
             back === 1) {
             // If we are building a standalone mesh, remove invisible
-            if (chunk.type === TYPE_CHUNK_OBJECT || chunk.type === TYPE_CHUNK_FF) {
+            if (chunk.type === WorldChunkType.TYPE_CHUNK_OBJECT
+              || chunk.type === WorldChunkType.TYPE_CHUNK_FF) {
               this.blocks[ blockIndex ] = 0;
             }
             continue; // block is hidden
@@ -392,37 +414,13 @@ export class World {
               maxX--;
               maxZ--;
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxZ)
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxZ)
-              ]);
+              vertices.push([x + maxX, y, z + maxZ]);
+              vertices.push([x - 1, y, z - 1]);
+              vertices.push([x - 1, y, z + maxZ]);
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxZ)
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
+              vertices.push([x + maxX, y, z + maxZ]);
+              vertices.push([x + maxX, y, z - 1]);
+              vertices.push([x - 1, y, z - 1]);
 
               sides += 6;
               for (let n = 0; n < 6; n++) {
@@ -471,37 +469,13 @@ export class World {
               }
               maxX--;
               maxY--;
-              vertices.push([
-                x * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
+              vertices.push([x + maxX, y + maxY, z - 1]);
+              vertices.push([x + maxX, y - 1, z - 1]);
+              vertices.push([x - 1, y - 1, z - 1]);
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE + (WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE - WORLD_BLOCK_SIZE
-              ]);
+              vertices.push([x + (maxX), y + (maxY), z - 1]);
+              vertices.push([x - 1, y - 1, z - 1]);
+              vertices.push([x - 1, y + (maxY), z - 1]);
 
               sides += 6;
               for (let n = 0; n < 6; n++) {
@@ -551,37 +525,13 @@ export class World {
               maxX--;
               maxY--;
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE
-              ]);
+              vertices.push([x+(maxX), y+(maxY), z]);
+              vertices.push([x-1, y+(maxY), z]);
+              vertices.push([x+(maxX), y-1, z]);
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxX),
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE
-              ]);
+              vertices.push([x-1, y+(maxY), z]);
+              vertices.push([x-1, y-1, z]);
+              vertices.push([x+(maxX), y-1, z]);
               sides += 6;
               for (let n = 0; n < 6; n++) {
                 colors.push([
@@ -629,37 +579,13 @@ export class World {
               maxZ--;
               maxY--;
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxZ)
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxZ)
-              ]);
+              vertices.push([x-1, y-1, z-1]);
+              vertices.push([x-1, y-1, z+(maxZ)]);
+              vertices.push([x-1, y+(maxY), z+(maxZ)]);
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxZ)
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE
-              ]);
+              vertices.push([x-1, y-1, z-1]);
+              vertices.push([x-1, y+(maxY), z+(maxZ)]);
+              vertices.push([x-1, y+(maxY), z-1]);
 
               sides += 6;
               for (let n = 0; n < 6; n++) {
@@ -708,37 +634,13 @@ export class World {
               maxZ--;
               maxY--;
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxZ)
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxZ)
-              ]);
+              vertices.push([x, y-1, z-1]);
+              vertices.push([x, y+(maxY), z+(maxZ)]);
+              vertices.push([x, y-1, z+(maxZ)]);
 
-              vertices.push([
-                x * WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxZ)
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE,
-                z * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE
-              ]);
-              vertices.push([
-                x * WORLD_BLOCK_SIZE,
-                y * WORLD_BLOCK_SIZE+(WORLD_BLOCK_SIZE * maxY),
-                z * WORLD_BLOCK_SIZE-WORLD_BLOCK_SIZE
-              ]);
+              vertices.push([x, y+(maxY), z + maxZ]);
+              vertices.push([x, y-1, z-1]);
+              vertices.push([x, y+(maxY), z-1]);
 
               sides += 6;
               for (let n = 0; n < 6; n++) {
@@ -751,7 +653,8 @@ export class World {
             }
           }
 
-          if (chunk.type === TYPE_CHUNK_OBJECT || chunk.type === TYPE_CHUNK_FF) {
+          if (chunk.type === WorldChunkType.TYPE_CHUNK_OBJECT
+            || chunk.type === WorldChunkType.TYPE_CHUNK_FF) {
             this.blocks[ blockIndex ] = 0;
           }
         }
@@ -763,13 +666,20 @@ export class World {
     let geometry = new THREE.BufferGeometry();
     let v = new THREE.BufferAttribute( new Float32Array(vertices.length * 3), 3 );
     for (let i = 0; i < vertices.length; i++) {
-      v.setXYZ(i, vertices[i][0], vertices[i][1], vertices[i][2]);
+      v.setXYZ(
+        i,
+        vertices[i][0] * WORLD_BLOCK_SIZE,
+        vertices[i][1] * WORLD_BLOCK_SIZE,
+        vertices[i][2] * WORLD_BLOCK_SIZE
+      );
     }
     geometry.addAttribute( 'position', v );
 
     let c = new THREE.BufferAttribute( new Float32Array(colors.length * 3), 3 );
     for (let i = 0; i < colors.length; i++) {
-      c.setXYZW(i, colors[i][0] / 255, colors[i][1] / 255, colors[i][2] / 255, 1);
+      c.setXYZW(
+        i, colors[i][0] / 255, colors[i][1] / 255, colors[i][2] / 255, 1
+      );
     }
     geometry.addAttribute( 'color', c );
 
@@ -782,9 +692,9 @@ export class World {
     chunk.mesh = new THREE.Mesh(geometry, this._material);
 
     chunk.mesh.position.set(
-      chunk.fromX / WORLD_CHUNK_SIZE - WORLD_BLOCK_SIZE * chunk.fromX / WORLD_CHUNK_SIZE,
+      WORLD_BLOCK_SIZE * (chunk.fromX / WORLD_CHUNK_SIZE - chunk.fromX / WORLD_CHUNK_SIZE),
       WORLD_BLOCK_SIZE,
-      chunk.fromZ / WORLD_CHUNK_SIZE - WORLD_BLOCK_SIZE * chunk.fromZ / WORLD_CHUNK_SIZE
+      WORLD_BLOCK_SIZE * (chunk.fromZ / WORLD_CHUNK_SIZE - chunk.fromZ / WORLD_CHUNK_SIZE)
     );
 
     chunk.mesh.receiveShadow = true;
@@ -798,11 +708,17 @@ export class World {
 
   _rebuildMaterial (wireframe = false) {
     this._wireframe = wireframe;
-    this._material = new THREE.MeshPhongMaterial({
+
+    this._material = new THREE.MeshLambertMaterial({
+      vertexColors: THREE.VertexColors,
+      wireframe: this._wireframe
+    });
+
+    /* this._material = new THREE.MeshPhongMaterial({
       vertexColors: THREE.VertexColors,
       shininess: 100,
       wireframe: this._wireframe
-    });
+    });*/
   }
 
   _blockHiddenSides (x, y, z) {
@@ -868,22 +784,24 @@ export class World {
     const mat = new THREE.MeshPhongMaterial({ color: 0x00bcd4, wireframe: false, transparent: true, opacity: .2 });
     mat.side = THREE.DoubleSide;
     const geo = new THREE.BoxGeometry(
-      WORLD_BLOCK_SIZE * WORLD_CHUNK_SIZE - .01,
+      WORLD_BLOCK_SIZE * (WORLD_CHUNK_SIZE - .01),
       WORLD_BLOCK_SIZE * WORLD_HEIGHT,
-      WORLD_BLOCK_SIZE * WORLD_CHUNK_SIZE - .01
+      WORLD_BLOCK_SIZE * (WORLD_CHUNK_SIZE - .01)
     );
     const mesh = new THREE.Mesh(geo, mat);
 
-    mesh.position.x = chunk.fromX + WORLD_CHUNK_SIZE * WORLD_BLOCK_SIZE / 2 + .01;
-    mesh.position.z = chunk.fromZ + WORLD_CHUNK_SIZE * WORLD_BLOCK_SIZE / 2 + .01;
+    mesh.position.x = WORLD_BLOCK_SIZE * (chunk.fromX + WORLD_CHUNK_SIZE / 2 + .01);
+    mesh.position.z = WORLD_BLOCK_SIZE * (chunk.fromZ + WORLD_CHUNK_SIZE / 2 + .01);
     mesh.position.y = WORLD_BLOCK_SIZE * WORLD_HEIGHT / 2;
 
     this._game._scene.add(mesh);
 
+    return;
+
     this._createText(chunk.chunkIndex, {
-      position: new THREE.Vector3(mesh.position.x, 1.1, mesh.position.z),
+      position: new THREE.Vector3(mesh.position.x * WORLD_BLOCK_SIZE, 1.1 * WORLD_BLOCK_SIZE, mesh.position.z * WORLD_BLOCK_SIZE),
       rotation: new THREE.Vector3(-Math.PI / 2, 0, 0),
-      size: 2
+      size: 2 * WORLD_BLOCK_SIZE
     });
 
     return;

@@ -1,8 +1,4 @@
-import { TYPE_OBJECT } from "../vox";
-
-export const TYPE_CHUNK_WORLD = 0;
-export const TYPE_CHUNK_OBJECT = 1;
-export const TYPE_CHUNK_FF = 2;
+import { WorldChunkType } from "./world-chunk-type";
 
 export class WorldChunk {
 
@@ -22,7 +18,7 @@ export class WorldChunk {
   y = 0;
   z = 0;
 
-  type = TYPE_CHUNK_WORLD;
+  type = WorldChunkType.TYPE_CHUNK_WORLD;
 
   blocks = [];
   voxBlocksNumber = 0;
