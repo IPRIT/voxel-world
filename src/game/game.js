@@ -136,9 +136,15 @@ export default class Game {
     this._scene = new THREE.Scene();
 
     this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
-    this._camera.position.set( WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 50 * WORLD_BLOCK_SIZE, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
+    this._camera.position.set(198, 80, 220);
+    // this._camera.position.set( WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 50 * WORLD_BLOCK_SIZE, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
     this._orbitControls = new OrbitControls(this._camera, this._renderer.domElement);
-    this._orbitControls.target = new THREE.Vector3(WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 0, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
+
+    let targetObject = new THREE.Object3D();
+    targetObject.position.set(WORLD_BLOCK_SIZE * WORLD_SIZE, WORLD_BLOCK_SIZE * 10, WORLD_BLOCK_SIZE * WORLD_SIZE);
+    this._camera.target = targetObject;
+
+    this._orbitControls.target = targetObject.position;
     this._orbitControls.update();
 
     this._scene.add(this._camera);
