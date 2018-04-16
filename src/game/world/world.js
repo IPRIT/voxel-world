@@ -47,7 +47,7 @@ export class World {
         for (let z = 0; z < WORLD_SIZE; ++z) {
           let y = getY(x, z);
           if (/*y <= maxY && */this.isInsideWorld(x, y, z)) {
-            this.addBlock({ x, y, z }, [100, 200, 100]);
+            this.addBlock({ x, y: 0, z }, [100, 200, 100]);
           }
         }
       // }
@@ -83,7 +83,7 @@ export class World {
     }
 
     // this.buildMap(map, new THREE.Vector3(WORLD_SIZE / 2, maxY + 1, WORLD_SIZE / 2));
-    this.buildMap(deer, new THREE.Vector3(WORLD_SIZE / 2 - 24, maxY + 3, WORLD_SIZE / 2));
+    this.buildMap(deer, new THREE.Vector3(WORLD_SIZE / 2 - 24, 1, WORLD_SIZE / 2));
     // this.buildMap(fox, new THREE.Vector3(WORLD_SIZE / 2 + 10, maxY + 3, WORLD_SIZE / 2 + 10));
     // this.buildMap(dragon, new THREE.Vector3(WORLD_SIZE / 2 - 80, maxY + 1, WORLD_SIZE / 2 - 80));
     // this.buildMap(tRex, new THREE.Vector3(WORLD_SIZE / 2 + 60, maxY + 1, WORLD_SIZE / 2 + 80));
