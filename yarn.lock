@@ -5405,9 +5405,9 @@ parse-json@^2.2.0:
   dependencies:
     error-ex "^1.2.0"
 
-parse-magica-voxel@^1.0.3:
+"parse-magica-voxel@http://github.com/IPRIT/parse-magica-voxel.git":
   version "1.0.3"
-  resolved "https://registry.yarnpkg.com/parse-magica-voxel/-/parse-magica-voxel-1.0.3.tgz#579c2f9d8e61f8008742d0fd1133111b5a242fad"
+  resolved "http://github.com/IPRIT/parse-magica-voxel.git#e004ee068811ebb9647031c637c2120129975df3"
   dependencies:
     buffer "^5.0.2"
     is-buffer "^1.1.4"

@@ -73,20 +73,20 @@ export class World {
     const tRex = new Vox();
 
     try {
-      await map.load('/resources/models/world-chunk-1.vox', VoxType.TYPE_MAP);
+      // await map.load('/resources/models/world-chunk-1.vox', VoxType.TYPE_MAP);
       await deer.load('/resources/models/deer-test.vox', VoxType.TYPE_OBJECT);
-      await fox.load('/resources/models/chr_fox.vox', VoxType.TYPE_OBJECT);
-      await dragon.load('/resources/models/dragon.vox', VoxType.TYPE_OBJECT);
-      await tRex.load('/resources/models/t-rex.vox', VoxType.TYPE_OBJECT);
+      // await fox.load('/resources/models/chr_fox.vox', VoxType.TYPE_OBJECT);
+      // await dragon.load('/resources/models/dragon.vox', VoxType.TYPE_OBJECT);
+      // await tRex.load('/resources/models/t-rex.vox', VoxType.TYPE_OBJECT);
     } catch (e) {
       console.log(e);
     }
 
-    this.buildMap(map, new THREE.Vector3(WORLD_SIZE / 2, maxY + 1, WORLD_SIZE / 2));
+    // this.buildMap(map, new THREE.Vector3(WORLD_SIZE / 2, maxY + 1, WORLD_SIZE / 2));
     this.buildMap(deer, new THREE.Vector3(WORLD_SIZE / 2 - 24, maxY + 3, WORLD_SIZE / 2));
-    this.buildMap(fox, new THREE.Vector3(WORLD_SIZE / 2 + 10, maxY + 3, WORLD_SIZE / 2 + 10));
-    this.buildMap(dragon, new THREE.Vector3(WORLD_SIZE / 2 - 80, maxY + 1, WORLD_SIZE / 2 - 80));
-    this.buildMap(tRex, new THREE.Vector3(WORLD_SIZE / 2 + 60, maxY + 1, WORLD_SIZE / 2 + 80));
+    // this.buildMap(fox, new THREE.Vector3(WORLD_SIZE / 2 + 10, maxY + 3, WORLD_SIZE / 2 + 10));
+    // this.buildMap(dragon, new THREE.Vector3(WORLD_SIZE / 2 - 80, maxY + 1, WORLD_SIZE / 2 - 80));
+    // this.buildMap(tRex, new THREE.Vector3(WORLD_SIZE / 2 + 60, maxY + 1, WORLD_SIZE / 2 + 80));
 
     this._rebuildDirtyChunks();
   }
