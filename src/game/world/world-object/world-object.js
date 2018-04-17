@@ -68,7 +68,7 @@ export class WorldObject extends THREE.Group {
   _objectType;
 
   /**
-   * @type {WorldChunkMap|WorldChunkObject}
+   * @type {WorldChunkMap|WorldChunkObject|WorldChunkBase}
    * @private
    */
   _chunk = null;
