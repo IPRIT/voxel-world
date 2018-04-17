@@ -1,3 +1,5 @@
+import { rgbToInt } from "../../utils";
+
 export class WorldChunkBase {
 
   /**
@@ -71,6 +73,7 @@ export class WorldChunkBase {
    */
   init () {
     this._createBlocksBuffer();
+    this._buildModel();
     this._inited = true;
   }
 
@@ -91,6 +94,97 @@ export class WorldChunkBase {
     return x * this.size.y * this.size.z
       + y * this.size.z
       + z;
+  }
+
+  /**
+   * @param {number} index
+   * @returns {{x: number, y: number, z: number}}
+   */
+  blockPosition (index) {
+    const yz = this.size.y * this.size.z;
+    const t1 = index % yz;
+    const z = t1 % this.size.z;
+    const y = (t1 - z) / this.size.z;
+    const x = (index - t1) / yz;
+    return { x, y, z };
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @param color
+   */
+  addBlock ({ x, y, z }, color) {
+    if (typeof color !== 'number') {
+      if (Array.isArray(color)) {
+        color = rgbToInt( color )
+      } else {
+        color = 0;
+      }
+    }
+
+    if (!this.inside(x, y, z)) {
+      return;
+    }
+
+    const blockIndex = this.blockIndex(x, y, z);
+    if (this.blocks[ blockIndex ] === 0) {
+      this._voxBlocksNumber ++;
+    }
+    this.blocks[ blockIndex ] = color;
+    this.needsUpdate = true;
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {number}
+   */
+  getBlock ({ x, y, z }) {
+    if (!this.inside(x, y, z)) {
+      return 0;
+    }
+    return this._blocks[ this.blockIndex(x, y, z) ];
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   */
+  removeBlock ({ x, y, z }) {
+    if (!this.inside(x, y, z)) {
+      return;
+    }
+    const blockIndex = this.blockIndex(x, y, z);
+    this.blocks[ blockIndex ] = 0;
+    this.needsUpdate = true;
+  }
+
+  /**
+   * Gets world coordinates
+   * @param {number|THREE.Vector3} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {boolean}
+   */
+  inside (x, y, z) {
+    if (typeof x === 'object') {
+      const position = x;
+      x = position.x;
+      y = position.y;
+      z = position.z;
+    }
+    let limits = {
+      x: [0, this.size.x],
+      y: [0, this.size.y],
+      z: [0, this.size.z]
+    };
+    return x > limits.x[0] && x < limits.x[1] &&
+      y >= limits.y[0] && y < limits.y[1] &&
+      z > limits.z[0] && z < limits.z[1];
   }
 
   /**
@@ -140,10 +234,29 @@ export class WorldChunkBase {
   }
 
   /**
+   * @returns {number}
+   */
+  get type () {
+    return this._type;
+  }
+
+  /**
    * @returns {Uint32Array}
    * @private
    */
   _createBlocksBuffer () {
     return (this._blocks = new Uint32Array( this.bufferSize ));
+  }
+
+  /**
+   * @private
+   */
+  _buildModel () {
+    let model = this._model;
+    let blocks = model.getBlocks();
+
+    for (let i = 0; i < blocks.length; ++i) {
+      this.addBlock( blocks[i], blocks[i].color );
+    }
   }
 }

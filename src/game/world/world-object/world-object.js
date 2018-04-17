@@ -1,6 +1,7 @@
 import { WorldObjectType } from "./world-object-type";
 import { WorldChunkMap, WorldChunkBase, WorldChunkObject } from "../chunks";
 import { WorldObjectMesher } from "./world-object-mesher";
+import { WORLD_MAP_BLOCK_SIZE } from "../world-map";
 
 let WORLD_GLOBAL_OBJECT_ID = 1;
 
@@ -96,9 +97,9 @@ export class WorldObject extends THREE.Group {
   /**
    * @param {*} options
    */
-  init (options) {
+  init (options = {}) {
     this._options = options;
-    this._createChunk(options);
+    this._createChunk();
     this._createMesh();
 
     this.add(this._mesh);
@@ -112,6 +113,27 @@ export class WorldObject extends THREE.Group {
       return;
     }
     this._mesher.createOrUpdateMesh();
+  }
+
+  addBlock (...args) {
+    if (!this.chunkInited) {
+      return;
+    }
+    this._chunk.addBlock( ...args );
+  }
+
+  getBlock (...args) {
+    if (!this.chunkInited) {
+      return 0;
+    }
+    this._chunk.getBlock( ...args );
+  }
+
+  removeBlock (...args) {
+    if (!this.chunkInited) {
+      return;
+    }
+    this._chunk.removeBlock( ...args );
   }
 
   /**
@@ -133,6 +155,13 @@ export class WorldObject extends THREE.Group {
    */
   get mesh () {
     return this._mesh;
+  }
+
+  /**
+   * @param {THREE.Mesh} value
+   */
+  set mesh (value) {
+    this._mesh = value;
   }
 
   /**
@@ -207,13 +236,15 @@ export class WorldObject extends THREE.Group {
   /**
    * @private
    */
-  _createChunk (options) {
+  _createChunk () {
     if (this._chunk || !this._model) {
       return;
     }
     switch (this._objectType) {
       case WorldObjectType.MAP:
-        this._chunk = new WorldChunkMap(this._model, options);
+        this._chunk = new WorldChunkMap(this._model, {
+          worldPosition: this.position.multiplyScalar(1 / WORLD_MAP_BLOCK_SIZE)
+        });
         break;
       case WorldObjectType.OBJECT:
         this._chunk = new WorldChunkObject(this._model, options);
@@ -223,6 +254,9 @@ export class WorldObject extends THREE.Group {
     this._chunk.init();
   }
 
+  /**
+   * @private
+   */
   _createMesh () {
     this._mesher = new WorldObjectMesher(this);
     this._mesher.createOrUpdateMesh();

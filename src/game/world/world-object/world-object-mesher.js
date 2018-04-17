@@ -32,7 +32,7 @@ export class WorldObjectMesher {
       for (let i = 0; i < chunk.blocks.length; i++) {
         if (chunk.blocks[ i ] !== 0) {
           startingBlocks++;
-          chunk.blocks[ i ] &= 0xFFFFFFE0;
+          chunk.blocks[ i ] &= 0xFFFFFFE0; // why 0xFFFFFFE0? why not 0xFFFFFFC0?
         }
       }
 
@@ -60,8 +60,8 @@ export class WorldObjectMesher {
       colorsAttribute = new THREE.BufferAttribute(new Float32Array(colors.length * 3), 3);
 
       for (let i = 0; i < vertices.length; i++) {
-        worldObject.vertices.setXYZ(i, vertices[i][0], vertices[i][1], vertices[i][2]);
-        worldObject.colors.setXYZW(i, colors[i][0], colors[i][1], colors[i][2], 1);
+        verticesAttribute.setXYZ(i, vertices[i][0], vertices[i][1], vertices[i][2]);
+        colorsAttribute.setXYZW(i, colors[i][0], colors[i][1], colors[i][2], 1);
       }
       geometry = new THREE.BufferGeometry();
       geometry.dynamic = true;
@@ -91,6 +91,7 @@ export class WorldObjectMesher {
 
     this.resetFaces();
     const { vertices, colors } = this.computeVertices();
+    console.log(vertices, colors);
     const geometry = this.createOrUpdateGeometry(vertices, colors);
 
     let mesh = worldObject.mesh;
@@ -100,7 +101,7 @@ export class WorldObjectMesher {
       mesh.geometry = geometry;
     }
 
-    return (worldObject.mesh = mesh);
+    return (this._worldObject.mesh = mesh);
   }
 
   /**

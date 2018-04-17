@@ -1,8 +1,8 @@
-import { Vox, VoxType } from "./vox";
-const OrbitControls = require('three-orbit-controls')(THREE);
+import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./world/world-map";
 import JsPerformanceStats from 'stats.js';
-import { Polygon } from "./polygon";
-import { World, WORLD_BLOCK_SIZE, WORLD_SIZE } from "./world";
+import { World } from "./world";
+
+const OrbitControls = require('three-orbit-controls')(THREE);
 
 export default class Game {
 
@@ -37,7 +37,7 @@ export default class Game {
   _orbitControls = null;
 
   /**
-   * @type {Scene}
+   * @type {THREE.Scene}
    * @private
    */
   _scene = null;
@@ -58,8 +58,8 @@ export default class Game {
    */
   _fov = 60;
   _aspect = this._screenWidth / this._screenHeight;
-  _near = 1 * WORLD_BLOCK_SIZE;
-  _far = 3000 * WORLD_BLOCK_SIZE;
+  _near = 1 * WORLD_MAP_BLOCK_SIZE;
+  _far = 3000 * WORLD_MAP_BLOCK_SIZE;
 
   _invertedMaxFps = 1 / 60;
 
@@ -86,6 +86,13 @@ export default class Game {
    */
   get world () {
     return this._world;
+  }
+
+  /**
+   * @returns {THREE.Scene}
+   */
+  get scene () {
+    return this._scene;
   }
 
   _animate () {
@@ -144,11 +151,11 @@ export default class Game {
 
     this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
     // this._camera.worldPosition.set(198, 80, 220);
-    this._camera.position.set( WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 50 * WORLD_BLOCK_SIZE, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
+    this._camera.position.set( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 50 * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
     this._orbitControls = new OrbitControls(this._camera, this._renderer.domElement);
 
     let targetObject = new THREE.Object3D();
-    targetObject.position.set(WORLD_BLOCK_SIZE * WORLD_SIZE / 2, WORLD_BLOCK_SIZE * 10, WORLD_BLOCK_SIZE * WORLD_SIZE / 2);
+    targetObject.position.set(WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2, WORLD_MAP_BLOCK_SIZE * 10, WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2);
     this._camera.target = targetObject;
 
     this._orbitControls.target = targetObject.position;
@@ -158,12 +165,12 @@ export default class Game {
   }
 
   _initFog () {
-    this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_BLOCK_SIZE, 1000 * WORLD_BLOCK_SIZE);
+    this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);
   }
 
   _initGridHelper () {
-    this._gridHelper = new THREE.GridHelper(WORLD_SIZE * WORLD_BLOCK_SIZE, WORLD_SIZE / WORLD_BLOCK_SIZE, 0x666666, 0x999999);
-    this._gridHelper.position.set(WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 0, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
+    this._gridHelper = new THREE.GridHelper(WORLD_MAP_SIZE * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / WORLD_MAP_BLOCK_SIZE, 0x666666, 0x999999);
+    this._gridHelper.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 0, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
     this._scene.add(
       this._gridHelper
     );
@@ -177,9 +184,9 @@ export default class Game {
     hemiLight.color.setHSL( 0.6, 1, 0.6 );
     hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
     hemiLight.position.set(
-      WORLD_SIZE / 2 * WORLD_BLOCK_SIZE,
-      500 * WORLD_BLOCK_SIZE,
-      WORLD_SIZE / 2 * WORLD_BLOCK_SIZE
+      WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE,
+      500 * WORLD_MAP_BLOCK_SIZE,
+      WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE
     );
 
     const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 5);
@@ -197,9 +204,9 @@ export default class Game {
     this._scene.add( spotLight, lightHelper );
 
     spotLight.position.set(
-      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.5,
-      WORLD_BLOCK_SIZE * 200,
-      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.5
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.5,
+      WORLD_MAP_BLOCK_SIZE * 200,
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.5
     );
 
     spotLight.penumbra = 0;
@@ -212,7 +219,7 @@ export default class Game {
 
     spotLight.target = targetObject;
     targetObject.position.set(
-      WORLD_BLOCK_SIZE * WORLD_SIZE / 2, 0, WORLD_BLOCK_SIZE * WORLD_SIZE / 2
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2, 0, WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
     );
   }
 
@@ -224,9 +231,9 @@ export default class Game {
     this._scene.add( dirLight, dirLightHelper );
 
     dirLight.position.set(
-      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.2,
-      WORLD_BLOCK_SIZE * 300,
-      WORLD_BLOCK_SIZE * WORLD_SIZE * 1.2
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.2,
+      WORLD_MAP_BLOCK_SIZE * 300,
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.2
     );
 
     this._addShadows(dirLight);
@@ -236,9 +243,9 @@ export default class Game {
 
     dirLight.target = targetObject;
     targetObject.position.set(
-      WORLD_BLOCK_SIZE * WORLD_SIZE / 2 * 1.2,
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 * 1.2,
       0,
-      WORLD_BLOCK_SIZE * WORLD_SIZE / 2 * 1.2
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 * 1.2
     );
   }
 
@@ -248,7 +255,7 @@ export default class Game {
     light.shadow.mapSize.width = 1 << 11;
     light.shadow.mapSize.height = 1 << 11;
 
-    const offset = 200 * WORLD_BLOCK_SIZE;
+    const offset = 200 * WORLD_MAP_BLOCK_SIZE;
 
     light.shadow.camera.top = offset;
     light.shadow.camera.right = offset;

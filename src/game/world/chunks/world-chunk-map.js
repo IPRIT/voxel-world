@@ -3,6 +3,7 @@ import { WorldChunkType } from "./world-chunk-type";
 
 export const WORLD_MAP_CHUNK_SIZE = 1 << 5;
 export const WORLD_MAP_CHUNK_HEIGHT = 1 << 6;
+export const WORLD_MAP_CHUNK_DISTANCE = 2;
 
 export class WorldChunkMap extends WorldChunkBase {
 
@@ -53,6 +54,30 @@ export class WorldChunkMap extends WorldChunkBase {
       y: y + this._fromY,
       z: z + this._fromZ
     };
+  }
+
+  /**
+   * Gets world coordinates
+   * @param {number|THREE.Vector3} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {boolean}
+   */
+  inside (x, y, z) {
+    if (typeof x === 'object') {
+      const position = x;
+      x = position.x;
+      y = position.y;
+      z = position.z;
+    }
+    let limits = {
+      x: [this._fromX, this._toX],
+      y: [this._fromY, this._toY],
+      z: [this._fromZ, this._toZ]
+    };
+    return x > limits.x[0] && x < limits.x[1] &&
+      y >= limits.y[0] && y < limits.y[1] &&
+      z > limits.z[0] && z < limits.z[1];
   }
 
   /**
