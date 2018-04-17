@@ -1,11 +1,10 @@
-import { WorldChunk } from "./world-chunk";
-import { WorldChunkType } from "./world-chunk-type";
+import { WorldChunkBase } from "./chunks/world-chunk-base";
+import { WorldChunkType } from "./chunks/world-chunk-type";
 import { Vox, VoxType } from "../vox";
 
 export const WORLD_SIZE = 1 << 8;
+export const WORLD_MAP_SIZE = 1 << 8;
 export const WORLD_BLOCK_SIZE = 2;
-export const WORLD_CHUNK_SIZE = 1 << 5;
-export const WORLD_HEIGHT = 1 << 7;
 
 export class World {
 
@@ -210,7 +209,7 @@ export class World {
     const maxChunkNumber = this.chunksSideNumber;
     for (let x = 0; x < maxChunkNumber; ++x) {
       for (let z = 0; z < maxChunkNumber; ++z) {
-        const chunk = new WorldChunk();
+        const chunk = new WorldChunkBase();
         chunk.type = VoxType.TYPE_MAP;
         chunk.fromY = 0;
         chunk.toY = WORLD_HEIGHT;
@@ -278,7 +277,7 @@ export class World {
   }
 
   /**
-   * @param {WorldChunk} chunk
+   * @param {WorldChunkBase} chunk
    * @private
    */
   _rebuildChunk (chunk) {
@@ -777,7 +776,7 @@ export class World {
   }
 
   /**
-   * @param {WorldChunk} chunk
+   * @param {WorldChunkBase} chunk
    * @private
    */
   _debugChunk (chunk) {

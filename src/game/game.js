@@ -81,6 +81,13 @@ export default class Game {
     this._pauseOpaqueToken = true;
   }
 
+  /**
+   * @returns {World}
+   */
+  get world () {
+    return this._world;
+  }
+
   _animate () {
     if (this._pauseOpaqueToken) {
       return;
@@ -98,10 +105,10 @@ export default class Game {
     this._theta = this._theta || 0;
     this._theta += .01;
 
-    // this._camera.position.z = Math.sin(this._theta) * 30;
-    // this._camera.position.x = Math.cos(this._theta) * 30;
+    // this._camera.worldPosition.z = Math.sin(this._theta) * 30;
+    // this._camera.worldPosition.x = Math.cos(this._theta) * 30;
 
-    // this._camera.lookAt(this._rollOverMesh.position);
+    // this._camera.lookAt(this._rollOverMesh.worldPosition);
   }
 
   _init () {
@@ -136,12 +143,12 @@ export default class Game {
     this._scene = new THREE.Scene();
 
     this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
-    this._camera.position.set(198, 80, 220);
-    // this._camera.position.set( WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 50 * WORLD_BLOCK_SIZE, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
+    // this._camera.worldPosition.set(198, 80, 220);
+    this._camera.position.set( WORLD_SIZE / 2 * WORLD_BLOCK_SIZE, 50 * WORLD_BLOCK_SIZE, WORLD_SIZE / 2 * WORLD_BLOCK_SIZE);
     this._orbitControls = new OrbitControls(this._camera, this._renderer.domElement);
 
     let targetObject = new THREE.Object3D();
-    targetObject.position.set(WORLD_BLOCK_SIZE * WORLD_SIZE, WORLD_BLOCK_SIZE * 10, WORLD_BLOCK_SIZE * WORLD_SIZE);
+    targetObject.position.set(WORLD_BLOCK_SIZE * WORLD_SIZE / 2, WORLD_BLOCK_SIZE * 10, WORLD_BLOCK_SIZE * WORLD_SIZE / 2);
     this._camera.target = targetObject;
 
     this._orbitControls.target = targetObject.position;
