@@ -85,6 +85,7 @@ export class WorldChunkBase {
   }
 
   /**
+   * Computes buffer offset
    * @param {number} x
    * @param {number} y
    * @param {number} z
