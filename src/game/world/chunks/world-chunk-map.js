@@ -57,13 +57,13 @@ export class WorldChunkMap extends WorldChunkBase {
   }
 
   /**
-   * Gets world coordinates
+   * Check world coordinates
    * @param {number|THREE.Vector3} x
    * @param {number} y
    * @param {number} z
    * @returns {boolean}
    */
-  inside (x, y, z) {
+  insideChunk (x, y, z) {
     if (typeof x === 'object') {
       const position = x;
       x = position.x;

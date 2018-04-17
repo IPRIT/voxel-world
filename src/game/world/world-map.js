@@ -2,7 +2,7 @@ import { WORLD_MAP_CHUNK_HEIGHT, WORLD_MAP_CHUNK_SIZE } from "./chunks";
 import { WorldObject, WorldObjectType } from "./world-object";
 
 export const WORLD_MAP_SIZE = 1 << 8;
-export const WORLD_MAP_BLOCK_SIZE = 2;
+export const WORLD_MAP_BLOCK_SIZE = 1;
 
 export class WorldMap extends THREE.Group {
 
@@ -27,7 +27,7 @@ export class WorldMap extends THREE.Group {
       for (let z = 0; z < maxChunkNumber; ++z) {
         this.attach(
           this.createWorldObject(
-            model, { x, y: 20, z }
+            model, { x, y: 1, z }
           )
         );
       }
@@ -86,7 +86,6 @@ export class WorldMap extends THREE.Group {
    * @returns {WorldObject}
    */
   createWorldObject (model, { x, y, z }) {
-    console.log(x, y, z);
     const mapChunkObject = new WorldObject(model, WorldObjectType.MAP);
     mapChunkObject.position.set(
       x * WORLD_MAP_CHUNK_SIZE,

@@ -1,5 +1,7 @@
 import { Vox, VoxType } from "../vox";
-import { WorldMap } from "./world-map";
+import { WORLD_MAP_SIZE, WorldMap } from "./world-map";
+import { WORLD_MAP_CHUNK_HEIGHT } from "./chunks";
+import { rgbToInt } from "../utils";
 
 export class World {
 
@@ -40,7 +42,7 @@ export class World {
 
     this._game.scene.add( map );
 
-    /* function getY(x, z) {
+    function getY(x, z) {
       return Math.ceil(Math.cos(x / 20) * Math.sin(z / 20) * 10) + 10;
     }
 
@@ -53,7 +55,7 @@ export class World {
           }
         }
       }
-    }*/
+    }
   }
 
   /**

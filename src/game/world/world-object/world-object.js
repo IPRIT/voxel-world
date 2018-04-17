@@ -11,7 +11,7 @@ export class WorldObject extends THREE.Group {
    * @type {number}
    * @private
    */
-  _id = WORLD_GLOBAL_OBJECT_ID++;
+  _id = 0;
 
   /**
    * @type {VoxModel}
@@ -90,6 +90,7 @@ export class WorldObject extends THREE.Group {
       throw new Error(`Unsupported object type. Expected: WorldObjectType, got: ${type}`);
     }
     super();
+    this._id = WORLD_GLOBAL_OBJECT_ID++;
     this._model = model;
     this._objectType = type;
   }
