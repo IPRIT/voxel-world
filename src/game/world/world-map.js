@@ -117,7 +117,7 @@ export class WorldMap extends THREE.Group {
     mesh.receiveShadow = true;
     mesh.castShadow = true;
 
-    game.scene.add( mesh );
+    this.add( mesh );
 
     // base
     geo = new THREE.BoxGeometry(
@@ -134,7 +134,7 @@ export class WorldMap extends THREE.Group {
     );
     mesh.receiveShadow = true;
 
-    game.scene.add( mesh );
+    this.add( mesh );
   }
 
   /**

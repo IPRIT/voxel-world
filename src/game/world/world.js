@@ -38,8 +38,6 @@ export class World {
 
     map.init( voxChunk.model );
 
-    console.log(map);
-
     this._game.scene.add( map );
 
     function getY(x, z) {
@@ -47,14 +45,14 @@ export class World {
     }
 
     for (let x = 0; x < WORLD_MAP_SIZE; ++x) {
-      for (let y = 0; y < WORLD_MAP_CHUNK_HEIGHT; ++y) {
+      // for (let y = 0; y < WORLD_MAP_CHUNK_HEIGHT; ++y) {
         for (let z = 0; z < WORLD_MAP_SIZE; ++z) {
           let y = getY(x, z);
           if (map.inside(x, y, z)) {
             map.addBlock({ x, y, z }, rgbToInt([ 100, 200, 100 ]));
           }
         }
-      }
+      // }
     }
   }
 

@@ -219,10 +219,7 @@ export class WorldObject extends THREE.Group {
    */
   get material () {
     if (!this._material) {
-      this._material = new THREE.MeshLambertMaterial({
-        vertexColors: THREE.VertexColors,
-        wireframe: this._wireframe
-      })
+      this._rebuildMaterial();
     }
     return this._material;
   }
@@ -261,5 +258,15 @@ export class WorldObject extends THREE.Group {
   _createMesh () {
     this._mesher = new WorldObjectMesher(this);
     this._mesher.createOrUpdateMesh();
+  }
+
+  /**
+   * @private
+   */
+  _rebuildMaterial () {
+    this._material = new THREE.MeshLambertMaterial({
+      vertexColors: THREE.VertexColors,
+      wireframe: this._wireframe
+    });
   }
 }

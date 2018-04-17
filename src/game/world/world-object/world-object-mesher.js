@@ -99,6 +99,8 @@ export class WorldObjectMesher {
     let mesh = worldObject.mesh;
     if (!mesh) {
       mesh = new THREE.Mesh(geometry, worldObject.material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
     } else {
       mesh.geometry = geometry;
     }

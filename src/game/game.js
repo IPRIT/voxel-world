@@ -48,8 +48,6 @@ export default class Game {
    */
   _camera = null;
 
-  _rollOverMesh = null;
-
   _screenWidth = window.innerWidth;
   _screenHeight = window.innerHeight;
 
@@ -58,7 +56,7 @@ export default class Game {
    */
   _fov = 60;
   _aspect = this._screenWidth / this._screenHeight;
-  _near = 1 * WORLD_MAP_BLOCK_SIZE;
+  _near = WORLD_MAP_BLOCK_SIZE;
   _far = 3000 * WORLD_MAP_BLOCK_SIZE;
 
   _invertedMaxFps = 1 / 60;
@@ -110,7 +108,13 @@ export default class Game {
 
   _update () {
     this._theta = this._theta || 0;
-    this._theta += .01;
+    this._theta += .005;
+    // this._dirLight.rotation.z = Math.cos(this._theta);
+
+    this._dirLight.position.z = WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * Math.sin(this._theta);
+    this._dirLight.position.x = WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * Math.cos(this._theta);
+
+    let object3D = this._world.map.getMapChunkAt({ x: 0, y: 1, z: 2});
 
     // this._camera.worldPosition.z = Math.sin(this._theta) * 30;
     // this._camera.worldPosition.x = Math.cos(this._theta) * 30;
@@ -180,7 +184,7 @@ export default class Game {
     const ambientLight = new THREE.AmbientLight( 0xEEB1C6 );
     this._scene.add( ambientLight );
 
-    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.5 );
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.3 );
     hemiLight.color.setHSL( 0.6, 1, 0.6 );
     hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
     hemiLight.position.set(
@@ -189,7 +193,7 @@ export default class Game {
       WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE
     );
 
-    const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 5);
+    const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 50);
     this._scene.add(hemiLight, hemiLightHelper);
 
     // this._addWorldSpotLight();
@@ -243,19 +247,21 @@ export default class Game {
 
     dirLight.target = targetObject;
     targetObject.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 * 1.2,
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
       0,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 * 1.2
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
     );
+
+    this._dirLight = dirLight;
   }
 
   _addShadows (light) {
     light.castShadow = true;
 
-    light.shadow.mapSize.width = 1 << 11;
-    light.shadow.mapSize.height = 1 << 11;
+    light.shadow.mapSize.width = 1 << 10;
+    light.shadow.mapSize.height = 1 << 10;
 
-    const offset = 200 * WORLD_MAP_BLOCK_SIZE;
+    const offset = 90 * WORLD_MAP_BLOCK_SIZE;
 
     light.shadow.camera.top = offset;
     light.shadow.camera.right = offset;
