@@ -84,9 +84,7 @@ export class WorldObject extends THREE.Group {
    * @param {number} type - @type WorldObjectType
    */
   constructor (model, type) {
-    if (!model) {
-      throw new Error(`Unsupported model data. Expected: VoxModel, got: ${model}`);
-    } else if (typeof type === 'undefined') {
+    if (typeof type === 'undefined') {
       throw new Error(`Unsupported object type. Expected: WorldObjectType, got: ${type}`);
     }
     super();
@@ -235,7 +233,7 @@ export class WorldObject extends THREE.Group {
    * @private
    */
   _createChunk () {
-    if (this._chunk || !this._model) {
+    if (this._chunk) {
       return;
     }
     switch (this._objectType) {
@@ -264,6 +262,7 @@ export class WorldObject extends THREE.Group {
    * @private
    */
   _rebuildMaterial () {
+    // this._material = shaderMaterial;
     this._material = new THREE.MeshLambertMaterial({
       vertexColors: THREE.VertexColors,
       wireframe: this._wireframe

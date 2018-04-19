@@ -11,7 +11,7 @@
   },
   "scripts": {
     "watch": "cross-env TARGET=development webpack --config build/config.js --progress --hide-modules --watch",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.dev.config.js --open --hot",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.dev.config.js --open",
     "dev-external": "cross-env NODE_ENV=development HOST=0.0.0.0 webpack-dev-server --config build/webpack.dev.config.js --open --hot",
     "start": "npm run dev",
     "build": "npm run build:dist && npm run build:es5",

@@ -35,6 +35,19 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
+   * @param force
+   */
+  update (force = false) {
+    /**
+     * @type {WorldObject[]}
+     */
+    let chunks = [ ...this._map.values() ];
+    for (let i = 0; i < chunks.length; ++i) {
+      chunks[i].update( force );
+    }
+  }
+
+  /**
    * @param {THREE.Vector3|*} position
    * @param {number|number[]} color
    */
@@ -43,7 +56,11 @@ export class WorldMap extends THREE.Group {
     if (!worldChunkObject) {
       return;
     }
-    worldChunkObject.addBlock( position, color );
+    const fromPosition = worldChunkObject.chunk.fromPosition;
+    const x = position.x - fromPosition.x;
+    const y = position.y - fromPosition.y;
+    const z = position.z - fromPosition.z;
+    worldChunkObject.addBlock( { x, y, z }, color );
   }
 
   /**
@@ -55,7 +72,11 @@ export class WorldMap extends THREE.Group {
     if (!worldChunkObject) {
       return 0;
     }
-    return worldChunkObject.getBlock( position );
+    const fromPosition = worldChunkObject.chunk.fromPosition;
+    const x = position.x - fromPosition.x;
+    const y = position.y - fromPosition.y;
+    const z = position.z - fromPosition.z;
+    return worldChunkObject.getBlock( { x, y, z } );
   }
 
   /**
@@ -66,7 +87,11 @@ export class WorldMap extends THREE.Group {
     if (!worldChunkObject) {
       return;
     }
-    return worldChunkObject.removeBlock( position );
+    const fromPosition = worldChunkObject.chunk.fromPosition;
+    const x = position.x - fromPosition.x;
+    const y = position.y - fromPosition.y;
+    const z = position.z - fromPosition.z;
+    return worldChunkObject.removeBlock( { x, y, z } );
   }
 
   /**
@@ -74,6 +99,9 @@ export class WorldMap extends THREE.Group {
    * @returns {WorldObject}
    */
   getMapChunkAt (position) {
+    if (!this.inside(position.x, position.y, position.z)) {
+      return null;
+    }
     let chunkIndex = this._computeChunkIndex(position);
     return this._map.get( chunkIndex );
   }

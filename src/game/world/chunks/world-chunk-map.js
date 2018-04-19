@@ -2,8 +2,7 @@ import { WorldChunkBase } from "./world-chunk-base";
 import { WorldChunkType } from "./world-chunk-type";
 
 export const WORLD_MAP_CHUNK_SIZE = 1 << 5;
-export const WORLD_MAP_CHUNK_HEIGHT = 1 << 4;
-export const WORLD_MAP_CHUNK_DISTANCE = 2;
+export const WORLD_MAP_CHUNK_HEIGHT = 1 << 5;
 
 export class WorldChunkMap extends WorldChunkBase {
 

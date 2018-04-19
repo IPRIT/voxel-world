@@ -118,11 +118,9 @@ export class WorldChunkBase {
    */
   addBlock ({ x, y, z }, color) {
     if (typeof color !== 'number') {
-      if (Array.isArray(color)) {
-        color = rgbToInt( color )
-      } else {
-        color = 0;
-      }
+      color = Array.isArray(color)
+        ? rgbToInt( color )
+        : 0;
     }
 
     if (!this.inside(x, y, z)) {
@@ -165,7 +163,6 @@ export class WorldChunkBase {
   }
 
   /**
-   * Gets world coordinates
    * @param {number|THREE.Vector3} x
    * @param {number} y
    * @param {number} z
@@ -183,9 +180,9 @@ export class WorldChunkBase {
       y: [0, this.size.y],
       z: [0, this.size.z]
     };
-    return x > limits.x[0] && x < limits.x[1] &&
+    return x >= limits.x[0] && x < limits.x[1] &&
       y >= limits.y[0] && y < limits.y[1] &&
-      z > limits.z[0] && z < limits.z[1];
+      z >= limits.z[0] && z < limits.z[1];
   }
 
   /**
@@ -253,6 +250,9 @@ export class WorldChunkBase {
    * @private
    */
   _buildModel () {
+    if (!this._model) {
+      return;
+    }
     let model = this._model;
     let blocks = model.getBlocks();
 
