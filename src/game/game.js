@@ -132,6 +132,11 @@ export default class Game {
     // this._addObjects(); // shader
 
     this._initWorld();
+
+    if (!this._mouse) {
+      this._mouse = new THREE.Vector2();
+      this._raycaster = new THREE.Raycaster();
+    }
   }
 
   _initRenderer () {
@@ -160,6 +165,11 @@ export default class Game {
     this._camera.target = targetObject;
 
     this._orbitControls.target = targetObject.position;
+    this._orbitControls.enableKeys = false;
+    this._orbitControls.enablePan = false;
+    this._orbitControls.zoomSpeed = 2;
+    this._orbitControls.maxPolarAngle = Math.PI / 2;
+    this._orbitControls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
     this._orbitControls.update();
 
     this._scene.add(this._camera);
@@ -277,6 +287,9 @@ export default class Game {
 
   _initEventListeners () {
     window.addEventListener( 'resize', this._onWindowResize.bind(this), false );
+    window.addEventListener( 'mousedown', this._onMouseDown.bind(this), false );
+    window.addEventListener( 'mouseup', this._onMouseUp.bind(this), false );
+    window.addEventListener( 'mousemove', this._onMouseMove.bind(this), false );
   }
 
   _initStats () {
@@ -385,5 +398,41 @@ export default class Game {
     this._camera.updateProjectionMatrix();
 
     this._renderer.setSize( this._screenWidth, this._screenHeight );
+  }
+
+  /**
+   * @param {MouseEvent} event
+   * @private
+   */
+  _onMouseDown (event) {
+    this._mousePressedDown = event.which === 1;
+  }
+
+  _onMouseUp (event) {
+    this._mousePressedDown = false;
+  }
+
+  _onMouseMove (event) {
+    if (!this._mousePressedDown) {
+      return;
+    }
+    this._mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    this._mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    // update the picking ray with the camera and mouse position
+    this._raycaster.setFromCamera( this._mouse, this._camera );
+    // calculate objects intersecting the picking ray
+    const intersects = this._raycaster.intersectObjects(
+      this.world.map.getMeshes()
+    );
+
+    // console.log(intersects, intersects.length);
+
+    for (let i = 0; i < intersects.length; i++) {
+      let x = ((intersects[i].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+      let y = ((intersects[i].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+      let z = ((intersects[i].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+      this.world.map.addBlock({ x, y, z }, [ 200, 200, 100 ]);
+    }
+    this.world.map.update();
   }
 }

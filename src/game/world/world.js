@@ -50,11 +50,11 @@ export class World {
 
     function model(x, z) {
       let y = getY2(x, z) | 0;
-      return [{ x, y, z }, [ 200, 200, 100 ]];
+      return [{ x, y, z }, [ 200, (y * 10) % 256, 100 ]];
     }
 
-    // map.init( model );
-    map.init( voxChunk.model );
+    map.init( model );
+    // map.init( voxChunk.model );
 
     this._game.scene.add( map );
 

@@ -26,7 +26,7 @@ export class WorldMap extends THREE.Group {
     for (let x = 0; x < maxChunkNumber; ++x) {
       for (let z = 0; z < maxChunkNumber; ++z) {
         this.attach(
-          this.createWorldObject(
+          this.createWorldChunk(
             model, { x, y: 0, z }
           )
         );
@@ -80,6 +80,22 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
+   * @return {WorldObject[]}
+   */
+  getChunks () {
+    return [ ...this._map.values() ];
+  }
+
+  /**
+   * @return {THREE.Mesh[]}
+   */
+  getMeshes () {
+    return this.getChunks().map(worldObject => {
+      return worldObject.mesh;
+    });
+  }
+
+  /**
    * @param {THREE.Vector3|*} position
    */
   removeBlock (position) {
@@ -113,7 +129,7 @@ export class WorldMap extends THREE.Group {
    * @param {number} z
    * @returns {WorldObject}
    */
-  createWorldObject (model, { x, y, z }) {
+  createWorldChunk (model, { x, y, z }) {
     const mapChunkObject = new WorldObject(model, WorldObjectType.MAP);
     mapChunkObject.position.set(
       x * WORLD_MAP_CHUNK_SIZE,
@@ -227,6 +243,13 @@ export class WorldMap extends THREE.Group {
    */
   get chunksSideNumber () {
     return Math.ceil(WORLD_MAP_SIZE / WORLD_MAP_CHUNK_SIZE);
+  }
+
+  /**
+   * @return {Map<string, WorldObject>}
+   */
+  get chunksMap () {
+    return this._map;
   }
 
   /**
