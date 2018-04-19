@@ -8,3 +8,14 @@ export function rgbToInt(colorArray) {
     | ((colorArray[2] & 0xFF) << 8)
     | (0 & 0xFF);
 }
+
+/**
+ * @param {THREE.Vector3} vector
+ * @returns {THREE.Vector3}
+ */
+export function resetDecimal (vector) {
+  vector.x |= 0;
+  vector.y |= 0;
+  vector.z |= 0;
+  return vector;
+}

@@ -1,5 +1,11 @@
-import { WORLD_MAP_CHUNK_HEIGHT, WORLD_MAP_CHUNK_SIZE } from "./chunks";
+import {
+  WORLD_MAP_CHUNK_HEIGHT,
+  WORLD_MAP_CHUNK_SIZE,
+  WORLD_MAP_CHUNK_SIZE_VECTOR,
+  WORLD_MAP_CHUNK_VIEW_DISTANCE
+} from "./chunks";
 import { WorldObject, WorldObjectType } from "./world-object";
+import { resetDecimal } from "../utils";
 
 export const WORLD_MAP_SIZE = 1 << 8;
 export const WORLD_MAP_BLOCK_SIZE = 2;
@@ -32,6 +38,90 @@ export class WorldMap extends THREE.Group {
         );
       }
     }
+  }
+
+  /**
+   * @param {THREE.Vector3} position
+   */
+  updateAtPosition (position) {
+    let viewArea = this.getVisibleBoxAt( position );
+  }
+
+  /**
+   * @param {THREE.Vector3} position
+   */
+  getVisibleBoxAt (position) {
+    position = new THREE.Vector3(position.x, position.y, position.z);
+
+    let worldBorders = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(WORLD_MAP_SIZE, WORLD_MAP_CHUNK_HEIGHT, WORLD_MAP_SIZE)
+    ];
+
+    let chunkSize = WORLD_MAP_CHUNK_SIZE_VECTOR.clone();
+
+    let viewAreaBoxFrom = new THREE.Vector3(
+      -WORLD_MAP_CHUNK_SIZE * WORLD_MAP_CHUNK_VIEW_DISTANCE,
+      0,
+      -WORLD_MAP_CHUNK_SIZE * WORLD_MAP_CHUNK_VIEW_DISTANCE
+    );
+    let viewAreaBoxTo = new THREE.Vector3(
+      WORLD_MAP_CHUNK_SIZE * WORLD_MAP_CHUNK_VIEW_DISTANCE,
+      WORLD_MAP_CHUNK_HEIGHT,
+      WORLD_MAP_CHUNK_SIZE * WORLD_MAP_CHUNK_VIEW_DISTANCE
+    );
+
+    /**
+     * @type {THREE.Vector3}
+     */
+    let viewBorderFrom = position.clone()
+      .add( viewAreaBoxFrom )
+      .max( worldBorders[0] )
+      .divide( chunkSize );
+
+    /**
+     * @type {THREE.Vector3}
+     */
+    let viewBorderTo = position.clone()
+      .add( viewAreaBoxTo )
+      .min( worldBorders[1] )
+      .add( chunkSize.clone().divideScalar(1.1) )
+      .divide( chunkSize );
+
+    resetDecimal( viewBorderFrom );
+    resetDecimal( viewBorderTo );
+
+    viewBorderFrom.multiply( chunkSize );
+    viewBorderTo.multiply( chunkSize );
+
+    return {
+      from: viewBorderFrom,
+      to: viewBorderTo
+    };
+  }
+
+  /**
+   * @param {THREE.Vector3} position
+   */
+  getVisibleChunksBoxAt (position) {
+    position = new THREE.Vector3(position.x, position.y, position.z);
+    let visibleBox = this.getVisibleBoxAt( position );
+    let chunkSize = WORLD_MAP_CHUNK_SIZE_VECTOR.clone();
+
+    return {
+      from: visibleBox.from.divide( chunkSize ).setY(0),
+      to: visibleBox.to.divide( chunkSize ).setY(0)
+    }
+  }
+
+  /**
+   * @param {THREE.Vector3} position
+   * @returns {string[]}
+   */
+  getVisibleChunksAt (position) {
+    position = new THREE.Vector3(position.x, position.y, position.z);
+    let visibleChunksBox = this.getVisibleChunksBoxAt( position );
+
   }
 
   /**

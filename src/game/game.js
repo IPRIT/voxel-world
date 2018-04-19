@@ -406,6 +406,46 @@ export default class Game {
    */
   _onMouseDown (event) {
     this._mousePressedDown = event.which === 1;
+
+    this._mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    this._mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    // update the picking ray with the camera and mouse position
+    this._raycaster.setFromCamera( this._mouse, this._camera );
+    // calculate objects intersecting the picking ray
+    const intersects = this._raycaster.intersectObjects(
+      this.world.map.getMeshes()
+    );
+
+    let x = ((intersects[0].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+
+    console.log( this.world.map.getVisibleChunksBoxAt({ x, y, z }) );
+
+    let box = this.world.map.getVisibleBoxAt({ x, y, z });
+
+    if (this._debugTimeout) {
+      return;
+    }
+
+    let blocks = [];
+    for (let x = box.from.x; x < box.to.x; ++x) {
+      for (let z = box.from.z; z < box.to.z; ++z) {
+        let coord = { x, y: 10, z };
+        blocks.push(coord);
+        this.world.map.addBlock(coord, [ 255, 255, 100 ]);
+      }
+    }
+
+    this.world.map.update();
+
+    this._debugTimeout = setTimeout(_ => {
+      for (let i = 0; i < blocks.length; ++i) {
+        this.world.map.removeBlock( blocks[i] );
+      }
+      this.world.map.update();
+      this._debugTimeout = null;
+    }, 2000);
   }
 
   _onMouseUp (event) {
@@ -425,13 +465,11 @@ export default class Game {
       this.world.map.getMeshes()
     );
 
-    // console.log(intersects, intersects.length);
-
     for (let i = 0; i < intersects.length; i++) {
       let x = ((intersects[i].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
       let y = ((intersects[i].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
       let z = ((intersects[i].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-      this.world.map.addBlock({ x, y, z }, [ 200, 200, 100 ]);
+      // this.world.map.addBlock({ x, y, z }, [ 200, 200, 100 ]);
     }
     this.world.map.update();
   }
