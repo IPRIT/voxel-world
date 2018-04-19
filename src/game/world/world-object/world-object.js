@@ -14,7 +14,7 @@ export class WorldObject extends THREE.Group {
   _id = 0;
 
   /**
-   * @type {VoxModel}
+   * @type {VoxModel|function|null}
    * @private
    */
   _model = null;
@@ -80,7 +80,7 @@ export class WorldObject extends THREE.Group {
   _wireframe = false;
 
   /**
-   * @param {VoxModel} model
+   * @param {VoxModel|function|null} model
    * @param {number} type - @type WorldObjectType
    */
   constructor (model, type) {
@@ -239,7 +239,7 @@ export class WorldObject extends THREE.Group {
     switch (this._objectType) {
       case WorldObjectType.MAP:
         this._chunk = new WorldChunkMap(this._model, {
-          worldPosition: this.position.multiplyScalar(1 / WORLD_MAP_BLOCK_SIZE)
+          worldPosition: this.position.clone().multiplyScalar(1 / WORLD_MAP_BLOCK_SIZE)
         });
         break;
       case WorldObjectType.OBJECT:

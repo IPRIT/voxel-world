@@ -2,7 +2,7 @@ import { WORLD_MAP_CHUNK_HEIGHT, WORLD_MAP_CHUNK_SIZE } from "./chunks";
 import { WorldObject, WorldObjectType } from "./world-object";
 
 export const WORLD_MAP_SIZE = 1 << 8;
-export const WORLD_MAP_BLOCK_SIZE = 1;
+export const WORLD_MAP_BLOCK_SIZE = 2;
 
 export class WorldMap extends THREE.Group {
 
@@ -17,7 +17,7 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {VoxModel|null} model
+   * @param {VoxModel|function|null} model
    */
   init (model = null) {
     this.placeGroundPlate();
@@ -27,7 +27,7 @@ export class WorldMap extends THREE.Group {
       for (let z = 0; z < maxChunkNumber; ++z) {
         this.attach(
           this.createWorldObject(
-            model, { x, y: 1, z }
+            model, { x, y: 0, z }
           )
         );
       }
@@ -107,7 +107,7 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {VoxModel} model
+   * @param {VoxModel|function|null} model
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -131,15 +131,15 @@ export class WorldMap extends THREE.Group {
    */
   placeGroundPlate () {
     let geo = new THREE.BoxGeometry(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE - 2,
+      WORLD_MAP_BLOCK_SIZE * (WORLD_MAP_SIZE - 2),
       WORLD_MAP_BLOCK_SIZE * 2,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE - 2
+      WORLD_MAP_BLOCK_SIZE * (WORLD_MAP_SIZE - 2)
     );
     let mat = new THREE.MeshPhongMaterial({ color: 0x444444, shininess: 100 });
     let mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
-      WORLD_MAP_BLOCK_SIZE * -1.01, // to prevent collisions with grid helper
+      WORLD_MAP_BLOCK_SIZE * -2.01, // to prevent collisions with grid helper
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
     );
     mesh.receiveShadow = true;
@@ -157,7 +157,7 @@ export class WorldMap extends THREE.Group {
     mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
-      WORLD_MAP_BLOCK_SIZE * -1000 / 2 - 1,
+      WORLD_MAP_BLOCK_SIZE * (-1000 / 2 - 2),
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
     );
     mesh.receiveShadow = true;

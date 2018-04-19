@@ -170,8 +170,8 @@ export default class Game {
   }
 
   _initGridHelper () {
-    this._gridHelper = new THREE.GridHelper(WORLD_MAP_SIZE * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / WORLD_MAP_BLOCK_SIZE, 0x666666, 0x999999);
-    this._gridHelper.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 0, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
+    this._gridHelper = new THREE.GridHelper(WORLD_MAP_SIZE * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE, 0x666666, 0x999999);
+    this._gridHelper.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, -.01, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
     this._scene.add(
       this._gridHelper
     );

@@ -51,7 +51,7 @@ export class WorldObjectMesher {
       geometry = worldObject.geometry;
 
       for (let i = 0; i < vertices.length; i++) {
-        verticesAttribute.setXYZ(i, vertices[i][0] * bs, vertices[i][1] * bs, vertices[i][2] * bs);
+        verticesAttribute.setXYZ(i, vertices[i][0], vertices[i][1], vertices[i][2]);
         colorsAttribute.setXYZW(i, colors[i][0], colors[i][1], colors[i][2], 1);
       }
       geometry.setDrawRange(0, vertices.length);
@@ -63,7 +63,7 @@ export class WorldObjectMesher {
       colorsAttribute = new THREE.BufferAttribute(new Float32Array(colors.length * 3), 3);
 
       for (let i = 0; i < vertices.length; i++) {
-        verticesAttribute.setXYZ(i, vertices[i][0] * bs, vertices[i][1] * bs, vertices[i][2] * bs);
+        verticesAttribute.setXYZ(i, vertices[i][0], vertices[i][1], vertices[i][2]);
         colorsAttribute.setXYZW(i, colors[i][0], colors[i][1], colors[i][2], 1);
       }
       geometry = new THREE.BufferGeometry();
@@ -89,11 +89,11 @@ export class WorldObjectMesher {
   /**
    * @returns {THREE.Mesh}
    */
-  createOrUpdateMesh () {
+  createOrUpdateMesh (bs = WORLD_MAP_BLOCK_SIZE) {
     const worldObject = this._worldObject;
 
     this.resetFaces();
-    const { vertices, colors } = this.computeVertices();
+    const { vertices, colors } = this.computeVertices(bs);
     const geometry = this.createOrUpdateGeometry(vertices, colors);
 
     let mesh = worldObject.mesh;
@@ -126,7 +126,7 @@ export class WorldObjectMesher {
    * @returns {{vertices: number[][], colors: number[][]}}
    * @private
    */
-  computeVertices () {
+  computeVertices (bs) {
     let worldObject = this._worldObject;
     let chunk = worldObject.chunk;
 
@@ -495,6 +495,12 @@ export class WorldObjectMesher {
           }
         }
       }
+    }
+
+    for (let i = 0; i < vertices.length; ++i) {
+      vertices[i][0] *= bs;
+      vertices[i][1] *= bs;
+      vertices[i][2] *= bs;
     }
 
     return {

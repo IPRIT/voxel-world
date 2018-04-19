@@ -18,6 +18,10 @@ export class WorldChunkMap extends WorldChunkBase {
   _toY = 0;
   _toZ = 0;
 
+  /**
+   * @param {VoxModel|function|null} model
+   * @param {THREE.Vector3} worldPosition
+   */
   constructor (model, { worldPosition }) {
     super(model);
     this.setType(WorldChunkType.MAP_CHUNK);

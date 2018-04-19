@@ -1,4 +1,5 @@
 import { rgbToInt } from "../../utils";
+import { WorldChunkType } from "./world-chunk-type";
 
 export class WorldChunkBase {
 
@@ -253,11 +254,27 @@ export class WorldChunkBase {
     if (!this._model) {
       return;
     }
+    const isModelFunction = typeof this._model === 'function';
+    const isMapChunk = this._type === WorldChunkType.MAP_CHUNK;
     let model = this._model;
-    let blocks = model.getBlocks();
+    if (isModelFunction && isMapChunk) {
+      // build chunk by function
+      let offsets = this.fromPosition;
+      for (let x = 0; x < this.size.x; ++x) {
+        for (let z = 0; z < this.size.z; ++z) {
+          let [ position, color ] = model(x + offsets.x, z + offsets.z);
+          position.x -= offsets.x;
+          position.z -= offsets.z;
+          this.addBlock( position, color );
+        }
+      }
+    } else {
+      // build chunk by model
+      let blocks = model.getBlocks();
 
-    for (let i = 0; i < blocks.length; ++i) {
-      this.addBlock( blocks[i], blocks[i].color );
+      for (let i = 0; i < blocks.length; ++i) {
+        this.addBlock( blocks[i], blocks[i].color );
+      }
     }
   }
 }
