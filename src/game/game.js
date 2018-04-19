@@ -420,7 +420,7 @@ export default class Game {
     let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
 
-    console.log( this.world.map.getVisibleChunksBoxAt({ x, y, z }) );
+    console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
 
     let box = this.world.map.getVisibleBoxAt({ x, y, z });
 

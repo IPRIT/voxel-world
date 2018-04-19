@@ -121,7 +121,13 @@ export class WorldMap extends THREE.Group {
   getVisibleChunksAt (position) {
     position = new THREE.Vector3(position.x, position.y, position.z);
     let visibleChunksBox = this.getVisibleChunksBoxAt( position );
-
+    let chunksIndicies = [];
+    for (let xIndex = visibleChunksBox.from.x; xIndex <= visibleChunksBox.to.x; ++xIndex) {
+      for (let zIndex = visibleChunksBox.from.z; zIndex <= visibleChunksBox.to.z; ++zIndex) {
+        chunksIndicies.push( this._buildChunkStringIndex(xIndex, zIndex) );
+      }
+    }
+    return chunksIndicies;
   }
 
   /**
@@ -351,7 +357,17 @@ export class WorldMap extends THREE.Group {
     const { x, z } = position;
     const chunkIndexX = (x / WORLD_MAP_CHUNK_SIZE) | 0;
     const chunkIndexZ = (z / WORLD_MAP_CHUNK_SIZE) | 0;
-    return `${chunkIndexX}|${chunkIndexZ}`;
+    return this._buildChunkStringIndex(chunkIndexX, chunkIndexZ);
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} z
+   * @returns {string}
+   * @private
+   */
+  _buildChunkStringIndex (x, z) {
+    return `${x}|${z}`;
   }
 }
 
