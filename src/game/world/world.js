@@ -57,13 +57,13 @@ export class World {
         for (let z = 0; z < WORLD_MAP_SIZE; ++z) {
           let y = getY2(x, z) | 0;
           if (map.inside(x, y, z)) {
-            map.addBlock({ x, y, z }, [ 200, (y * 10) % 256, 100 ]);
+            // map.addBlock({ x, y, z }, [ 200, (y * 10) % 256, 100 ]);
           }
         }
       // }
     }
 
-    map.update( true );
+    // map.update( true );
   }
 
   /**

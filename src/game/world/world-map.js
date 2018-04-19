@@ -17,9 +17,9 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {VoxModel} model
+   * @param {VoxModel|null} model
    */
-  init (model) {
+  init (model = null) {
     this.placeGroundPlate();
 
     const maxChunkNumber = this.chunksSideNumber;
