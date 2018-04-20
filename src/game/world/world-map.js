@@ -85,7 +85,7 @@ export class WorldMap extends THREE.Group {
     let viewBorderTo = position.clone()
       .add( viewAreaBoxTo )
       .min( worldBorders[1] )
-      .add( chunkSize.clone().divideScalar(1.1) )
+      .add( chunkSize.clone().subScalar(1) )
       .divide( chunkSize );
 
     resetDecimal( viewBorderFrom );
