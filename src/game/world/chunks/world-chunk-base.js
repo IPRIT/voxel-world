@@ -269,6 +269,7 @@ export class WorldChunkBase {
         }
       }
     } else {
+      console.log(this._model, this._type === WorldChunkType.MAP_CHUNK);
       // build chunk by model
       let blocks = model.getBlocks();
 

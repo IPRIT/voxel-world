@@ -168,7 +168,7 @@ export default class Game {
     this._orbitControls.enableKeys = false;
     this._orbitControls.enablePan = false;
     this._orbitControls.zoomSpeed = 2;
-    this._orbitControls.maxPolarAngle = Math.PI / 2;
+    // this._orbitControls.maxPolarAngle = Math.PI / 2;
     this._orbitControls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
     this._orbitControls.update();
 
@@ -176,15 +176,19 @@ export default class Game {
   }
 
   _initFog () {
-    this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);
+    // for game
+    // this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 400 * WORLD_MAP_BLOCK_SIZE);
+
+    // for debug
+    // this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);
   }
 
   _initGridHelper () {
-    this._gridHelper = new THREE.GridHelper(WORLD_MAP_SIZE * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE, 0x666666, 0x999999);
-    this._gridHelper.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, -.01, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
+    /*this._gridHelper = new THREE.GridHelper(WORLD_MAP_SIZE * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE, 0x666666, 0x999999);
+    this._gridHelper.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, .01, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
     this._scene.add(
       this._gridHelper
-    );
+    );*/
   }
 
   _addLights () {
@@ -407,45 +411,26 @@ export default class Game {
   _onMouseDown (event) {
     this._mousePressedDown = event.which === 1;
 
+    if (!this._mousePressedDown) {
+      return;
+    }
+
     this._mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     this._mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     // update the picking ray with the camera and mouse position
     this._raycaster.setFromCamera( this._mouse, this._camera );
     // calculate objects intersecting the picking ray
     const intersects = this._raycaster.intersectObjects(
-      this.world.map.getMeshes()
+      [ ...this.world.map.getMeshes(), this.world.map.groundPlate.children[0] ]
     );
 
     let x = ((intersects[0].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
 
-    console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
+    // console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
 
-    let box = this.world.map.getVisibleBoxAt({ x, y, z });
-
-    if (this._debugTimeout) {
-      return;
-    }
-
-    let blocks = [];
-    for (let x = box.from.x; x < box.to.x; ++x) {
-      for (let z = box.from.z; z < box.to.z; ++z) {
-        let coord = { x, y: 10, z };
-        blocks.push(coord);
-        this.world.map.addBlock(coord, [ 255, 255, 100 ]);
-      }
-    }
-
-    this.world.map.update();
-
-    this._debugTimeout = setTimeout(_ => {
-      for (let i = 0; i < blocks.length; ++i) {
-        this.world.map.removeBlock( blocks[i] );
-      }
-      this.world.map.update();
-      this._debugTimeout = null;
-    }, 2000);
+    // this.world.map.updateAtPosition({ x, y, z });
   }
 
   _onMouseUp (event) {
@@ -462,15 +447,15 @@ export default class Game {
     this._raycaster.setFromCamera( this._mouse, this._camera );
     // calculate objects intersecting the picking ray
     const intersects = this._raycaster.intersectObjects(
-      this.world.map.getMeshes()
+      [ ...this.world.map.getMeshes(), this.world.map.groundPlate.children[0] ]
     );
 
-    for (let i = 0; i < intersects.length; i++) {
-      let x = ((intersects[i].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-      let y = ((intersects[i].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-      let z = ((intersects[i].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-      // this.world.map.addBlock({ x, y, z }, [ 200, 200, 100 ]);
-    }
-    this.world.map.update();
+    let x = ((intersects[0].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+
+    // console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
+
+    this.world.map.updateAtPosition({ x, y, z });
   }
 }
