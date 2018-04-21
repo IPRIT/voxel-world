@@ -1,7 +1,4 @@
-import { Vox, VoxType } from "../vox";
-import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE, WorldMap } from "./world-map";
-import { WORLD_MAP_CHUNK_HEIGHT } from "./chunks";
-import { rgbToInt } from "../utils";
+import { WorldMap } from "./map/world-map";
 
 export class World {
 
@@ -18,6 +15,12 @@ export class World {
   _map = null;
 
   /**
+   * @type {Map<string|number, Player>}
+   * @private
+   */
+  // _players = new Map();
+
+  /**
    * @param {Game} game
    */
   constructor (game) {
@@ -25,18 +28,11 @@ export class World {
   }
 
   async init () {
-    this._map = new WorldMap();
-    let map = this._map;
+    let map = new WorldMap();
     map.init();
+
     this._game.scene.add( map );
-
-    // const voxChunk = new Vox();
-
-    try {
-      // await voxChunk.load('/resources/models/world-chunk-1.vox', VoxType.TYPE_MAP);
-    } catch (e) {
-      console.log(e);
-    }
+    this._map = map;
   }
 
   /**

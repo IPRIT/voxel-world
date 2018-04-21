@@ -1,5 +1,5 @@
 import { rgbToInt } from "../../utils";
-import { WorldChunkType } from "./world-chunk-type";
+import { WorldChunkHeightMap } from "./world-chunk-height-map";
 
 export class WorldChunkBase {
 
@@ -63,6 +63,12 @@ export class WorldChunkBase {
   startingBlocks = 0;
 
   /**
+   * @type {WorldChunkHeightMap}
+   * @private
+   */
+  _heightMap = null;
+
+  /**
    * @param {VoxModel} model
    */
   constructor (model) {
@@ -74,8 +80,32 @@ export class WorldChunkBase {
    */
   init () {
     this._createBlocksBuffer();
-    this._buildModel();
+    this._createHeightMap();
+    this.buildModel();
     this._inited = true;
+  }
+
+  buildModel () {
+    if (!this._model) {
+      return;
+    }
+    let model = this._model;
+    let blocks = model.getBlocks();
+
+    for (let i = 0; i < blocks.length; ++i) {
+      this.addBlock( blocks[i], blocks[i].color );
+    }
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {number}
+   */
+  getHeight ({ x, y, z }) {
+    console.log({ x, y, z });
+    return this._heightMap.getHeight({ x, y, z });
   }
 
   /**
@@ -133,6 +163,7 @@ export class WorldChunkBase {
       this._voxBlocksNumber ++;
     }
     this.blocks[ blockIndex ] = color;
+    this.heightMap.updateHeight({ x, y, z });
     this.needsUpdate = true;
   }
 
@@ -160,6 +191,7 @@ export class WorldChunkBase {
     }
     const blockIndex = this.blockIndex(x, y, z);
     this.blocks[ blockIndex ] = 0;
+    this.heightMap.resetHeight({ x, y, z }); // todo: needs to update properly
     this.needsUpdate = true;
   }
 
@@ -208,6 +240,20 @@ export class WorldChunkBase {
   }
 
   /**
+   * @returns {VoxModel|function}
+   */
+  get model () {
+    return this._model;
+  }
+
+  /**
+   * @returns {WorldChunkHeightMap}
+   */
+  get heightMap () {
+    return this._heightMap;
+  }
+
+  /**
    * @returns {boolean}
    */
   get inited () {
@@ -248,34 +294,10 @@ export class WorldChunkBase {
   }
 
   /**
+   * @returns {WorldChunkHeightMap}
    * @private
    */
-  _buildModel () {
-    if (!this._model) {
-      return;
-    }
-    const isModelFunction = typeof this._model === 'function';
-    const isMapChunk = this._type === WorldChunkType.MAP_CHUNK;
-    let model = this._model;
-    if (isModelFunction && isMapChunk) {
-      // build chunk by function
-      let offsets = this.fromPosition;
-      for (let x = 0; x < this.size.x; ++x) {
-        for (let z = 0; z < this.size.z; ++z) {
-          let [ position, color ] = model(x + offsets.x, z + offsets.z);
-          position.x -= offsets.x;
-          position.z -= offsets.z;
-          this.addBlock( position, color );
-        }
-      }
-    } else {
-      console.log(this._model, this._type === WorldChunkType.MAP_CHUNK);
-      // build chunk by model
-      let blocks = model.getBlocks();
-
-      for (let i = 0; i < blocks.length; ++i) {
-        this.addBlock( blocks[i], blocks[i].color );
-      }
-    }
+  _createHeightMap () {
+    return (this._heightMap = new WorldChunkHeightMap( this.size ));
   }
 }

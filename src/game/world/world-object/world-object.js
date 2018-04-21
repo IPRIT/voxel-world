@@ -1,7 +1,7 @@
 import { WorldObjectType } from "./world-object-type";
 import { WorldChunkMap, WorldChunkBase, WorldChunkObject } from "../chunks";
 import { WorldObjectMesher } from "./world-object-mesher";
-import { WORLD_MAP_BLOCK_SIZE } from "../world-map";
+import { WORLD_MAP_BLOCK_SIZE } from "../map/world-map";
 
 let WORLD_GLOBAL_OBJECT_ID = 1;
 
@@ -102,6 +102,14 @@ export class WorldObject extends THREE.Group {
     this._createMesh();
 
     this.add(this._mesh);
+  }
+
+  /**
+   * @param {VoxModel|function} model
+   */
+  setModel (model) {
+    this._model = model;
+    return this;
   }
 
   /**

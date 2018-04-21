@@ -1,4 +1,4 @@
-export class WorldMapCache {
+export class WorldObjectCache {
 
   /**
    * @type {number}
@@ -36,16 +36,14 @@ export class WorldMapCache {
   /**
    * @param {string} key
    * @param {WorldObject} chunk
-   * @returns {WorldMapCache}
+   * @returns {WorldObjectCache}
    */
   addEntry (key, chunk) {
     if (!this.hasEntry( key )) {
       this._cache[ key ] = chunk;
       this._cacheHistory.push( key );
     }
-    while (this._cacheHistory.length > this._maxEntriesNumber) {
-      this.removeEntry( this._cacheHistory.shift() );
-    }
+    this._freeOldEntries();
     return this;
   }
 
@@ -59,7 +57,7 @@ export class WorldMapCache {
 
   /**
    * @param {string} key
-   * @returns {WorldMapCache}
+   * @returns {WorldObjectCache}
    */
   removeEntry (key) {
     if (this.hasEntry( key )) {
@@ -75,5 +73,14 @@ export class WorldMapCache {
    */
   get size () {
     return Object.keys( this._cache || {} ).length;
+  }
+
+  /**
+   * @private
+   */
+  _freeOldEntries () {
+    while (this._cacheHistory.length > this._maxEntriesNumber) {
+      this.removeEntry( this._cacheHistory.shift() );
+    }
   }
 }

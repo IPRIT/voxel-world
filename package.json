@@ -106,6 +106,7 @@
     "write-file-webpack-plugin": "4.2.0"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "dat.gui": "^0.7.1",
     "md-svg-vue": "^1.0.6",
     "normalize.css": "^8.0.0",

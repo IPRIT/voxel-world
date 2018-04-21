@@ -1,5 +1,5 @@
 import { WorldChunkType } from "../chunks";
-import { WORLD_MAP_BLOCK_SIZE } from "../world-map";
+import { WORLD_MAP_BLOCK_SIZE } from "../map/world-map";
 
 export class WorldObjectMesher {
 

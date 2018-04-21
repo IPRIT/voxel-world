@@ -3,12 +3,12 @@ import {
   WORLD_MAP_CHUNK_SIZE,
   WORLD_MAP_CHUNK_SIZE_VECTOR,
   WORLD_MAP_CHUNK_VIEW_DISTANCE
-} from "./chunks";
-import { WorldObject, WorldObjectType } from "./world-object";
-import { resetDecimal } from "../utils";
-import { WorldMapLoader } from "./map/world-map-loader";
+} from "../chunks/index";
+import { WorldObject, WorldObjectType } from "../world-object/index";
+import { resetDecimal } from "../../utils/index";
+import { WorldMapLoader } from "./world-map-loader";
 
-export const WORLD_MAP_SIZE = 1 << 9;
+export const WORLD_MAP_SIZE = 1 << 11;
 export const WORLD_MAP_BLOCK_SIZE = 2;
 
 export class WorldMap extends THREE.Group {
@@ -78,15 +78,17 @@ export class WorldMap extends THREE.Group {
       let loadingEntry = this.loadChunkModel( chunkToLoad ).then(data => {
         let { cached, model = null, worldObject = null } = data || {};
         if (cached && worldObject) {
-          // if cached just attach object was created before
+          // if cached attach object was created before
           this.attach( worldObject );
-        } else {
+        } else if (model) {
           // if not cached just create a chunk with a received model
           worldObject = this.createWorldChunk( model, { x, y: 0, z } );
+        } else {
+          throw new Error('Can\'t load a model');
         }
         this.attach( worldObject );
       }).catch(_ => {
-        console.error(_);
+        console.log('Using fallback chunk because error:', _);
         // using default function to render a chunk when we have an error
         let newChunk = this.createWorldChunk(
           this._dummyModelFunction,
@@ -106,7 +108,7 @@ export class WorldMap extends THREE.Group {
 
     await Promise.all( loadings );
 
-    // unloading the rest of array
+    // unload the rest
     this.unloadChunks( chunksToUnload );
 
     this._chunksLoading = false;

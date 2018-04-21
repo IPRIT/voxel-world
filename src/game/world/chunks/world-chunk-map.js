@@ -3,7 +3,7 @@ import { WorldChunkType } from "./world-chunk-type";
 
 export const WORLD_MAP_CHUNK_SIZE = 1 << 5;
 export const WORLD_MAP_CHUNK_HEIGHT = 1 << 5;
-export const WORLD_MAP_CHUNK_VIEW_DISTANCE = 2;
+export const WORLD_MAP_CHUNK_VIEW_DISTANCE = 1;
 
 export const WORLD_MAP_CHUNK_SIZE_VECTOR = new THREE.Vector3(
   WORLD_MAP_CHUNK_SIZE,
@@ -30,9 +30,21 @@ export class WorldChunkMap extends WorldChunkBase {
    * @param {THREE.Vector3} worldPosition
    */
   constructor (model, { worldPosition }) {
-    super(model);
-    this.setType(WorldChunkType.MAP_CHUNK);
-    this.setWorldPosition(worldPosition);
+    super( model );
+    this.setType( WorldChunkType.MAP_CHUNK );
+    this.setWorldPosition( worldPosition );
+  }
+
+  buildModel () {
+    if (!this.model) {
+      return;
+    }
+    const isModelFunction = typeof this.model === 'function';
+    if (isModelFunction) {
+      this._buildModelByFunction();
+    } else {
+      super.buildModel();
+    }
   }
 
   /**
@@ -139,20 +151,20 @@ export class WorldChunkMap extends WorldChunkBase {
   }
 
   /**
-   * @param {THREE.Vector3} worldPosition
-   * @returns {THREE.Vector3}
    * @private
    */
-  _getChunkRelativePosition (worldPosition) {
-    return worldPosition.add( this.fromPosition.negate() );
-  }
+  _buildModelByFunction () {
+    const model = this.model;
 
-  /**
-   * @param {number} axisValue
-   * @returns {number}
-   * @private
-   */
-  _getChunkRelativeAxis (axisValue) {
-    return (axisValue / WORLD_MAP_CHUNK_SIZE) | 0;
+    // build chunk by function
+    let offsets = this.fromPosition;
+    for (let x = 0; x < this.size.x; ++x) {
+      for (let z = 0; z < this.size.z; ++z) {
+        let [ position, color ] = model(x + offsets.x, z + offsets.z);
+        position.x -= offsets.x;
+        position.z -= offsets.z;
+        this.addBlock( position, color );
+      }
+    }
   }
 }

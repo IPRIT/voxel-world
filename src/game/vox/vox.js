@@ -21,26 +21,13 @@ export class Vox {
   _loaded = false;
 
   /**
-   * @class VoxType
-   * @type {number}
-   * @private
-   */
-  _type;
-
-  /**
    * @param url
-   * @param {number} type
    * @returns {Promise<Vox>}
    */
-  async load (url, type) {
-    try {
-      this._model = await VoxLoader.getLoader().load(url);
-      this._url = url;
-      this._loaded = true;
-      this._type = type;
-    } catch (e) {
-      console.log(`Can\'t load model: ${url}`, e);
-    }
+  async load (url) {
+    this._model = await VoxLoader.getLoader().load(url);
+    this._url = url;
+    this._loaded = true;
 
     return this;
   }
@@ -57,12 +44,5 @@ export class Vox {
    */
   get model () {
     return this._model;
-  }
-
-  /**
-   * @returns {number}
-   */
-  get type () {
-    return this._type;
   }
 }
