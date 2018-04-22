@@ -1,4 +1,6 @@
 import { WorldMap } from "./map/world-map";
+import { PlayerMe } from "../player/me/player-me";
+import { PlayerClassType } from "../player/player-class-types";
 
 export class World {
 
@@ -15,10 +17,10 @@ export class World {
   _map = null;
 
   /**
-   * @type {Map<string|number, Player>}
+   * @type {PlayerMe}
    * @private
    */
-  // _players = new Map();
+  _me = null;
 
   /**
    * @param {Game} game
@@ -30,9 +32,18 @@ export class World {
   async init () {
     let map = new WorldMap();
     map.init();
-
     this._game.scene.add( map );
     this._map = map;
+
+    let me = new PlayerMe();
+    this._me = me;
+    console.log(me);
+    me.init({
+      classType: PlayerClassType.MYSTIC
+    }).then(_ => {
+      me.position.setY(10);
+      this._game.scene.add( me );
+    });
   }
 
   /**

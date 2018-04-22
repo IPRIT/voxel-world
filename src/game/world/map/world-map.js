@@ -75,7 +75,7 @@ export class WorldMap extends THREE.Group {
     for (let chunkToLoad of chunksToLoad) {
       let [ x, z ] = this._parseChunkIndex( chunkToLoad );
 
-      let loadingEntry = this.loadChunkModel( chunkToLoad ).then(data => {
+      let loadingEntity = this.loadChunkModel( chunkToLoad ).then(data => {
         let { cached, model = null, worldObject = null } = data || {};
         if (cached && worldObject) {
           // if cached attach object was created before
@@ -84,6 +84,7 @@ export class WorldMap extends THREE.Group {
           // if not cached just create a chunk with a received model
           worldObject = this.createWorldChunk( model, { x, y: 0, z } );
         } else {
+          console.log(data.cached, data.worldObject);
           throw new Error('Can\'t load a model');
         }
         this.attach( worldObject );
@@ -103,7 +104,7 @@ export class WorldMap extends THREE.Group {
         }
       });
 
-      loadings.push( loadingEntry );
+      loadings.push( loadingEntity );
     }
 
     await Promise.all( loadings );

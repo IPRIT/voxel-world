@@ -83,7 +83,7 @@ export class WorldObject extends THREE.Group {
    * @param {VoxModel|function|null} model
    * @param {number} type - @type WorldObjectType
    */
-  constructor (model, type) {
+  constructor (model = null, type = WorldObjectType.OBJECT) {
     if (typeof type === 'undefined') {
       throw new Error(`Unsupported object type. Expected: WorldObjectType, got: ${type}`);
     }
@@ -251,7 +251,7 @@ export class WorldObject extends THREE.Group {
         });
         break;
       case WorldObjectType.OBJECT:
-        this._chunk = new WorldChunkObject(this._model, options);
+        this._chunk = new WorldChunkObject(this._model);
         break;
     }
     // creating chunk buffer

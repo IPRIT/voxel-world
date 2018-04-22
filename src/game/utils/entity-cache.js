@@ -1,10 +1,10 @@
-export class WorldObjectCache {
+export class EntityCache {
 
   /**
    * @type {number}
    * @private
    */
-  _maxEntriesNumber = 0;
+  _maxEntitiesNumber = 0;
 
   /**
    * @type {*}
@@ -19,31 +19,31 @@ export class WorldObjectCache {
   _cacheHistory = [];
 
   /**
-   * @param {number} maxEntriesNumber
+   * @param {number} maxEntitiesNumber
    */
-  constructor (maxEntriesNumber) {
-    this._maxEntriesNumber = maxEntriesNumber;
+  constructor (maxEntitiesNumber) {
+    this._maxEntitiesNumber = maxEntitiesNumber;
   }
 
   /**
    * @param {string} key
-   * @returns {WorldObject|null}
+   * @returns {*|null}
    */
-  getEntry (key) {
+  getEntity (key) {
     return this._cache[ key ] || null;
   }
 
   /**
    * @param {string} key
-   * @param {WorldObject} chunk
-   * @returns {WorldObjectCache}
+   * @param {*} entity
+   * @returns {EntityCache}
    */
-  addEntry (key, chunk) {
-    if (!this.hasEntry( key )) {
-      this._cache[ key ] = chunk;
+  addEntity (key, entity) {
+    if (!this.hasEntity( key )) {
+      this._cache[ key ] = entity;
       this._cacheHistory.push( key );
     }
-    this._freeOldEntries();
+    this._freeOldEntities();
     return this;
   }
 
@@ -51,16 +51,16 @@ export class WorldObjectCache {
    * @param {string} key
    * @returns {boolean}
    */
-  hasEntry (key) {
+  hasEntity (key) {
     return !!this._cache[ key ];
   }
 
   /**
    * @param {string} key
-   * @returns {WorldObjectCache}
+   * @returns {EntityCache}
    */
-  removeEntry (key) {
-    if (this.hasEntry( key )) {
+  removeEntity (key) {
+    if (this.hasEntity( key )) {
       this._cache[ key ].remove && this._cache[ key ].remove();
       this._cache[ key ] = null;
       delete this._cache[ key ];
@@ -78,9 +78,9 @@ export class WorldObjectCache {
   /**
    * @private
    */
-  _freeOldEntries () {
-    while (this._cacheHistory.length > this._maxEntriesNumber) {
-      this.removeEntry( this._cacheHistory.shift() );
+  _freeOldEntities () {
+    while (this._cacheHistory.length > this._maxEntitiesNumber) {
+      this.removeEntity( this._cacheHistory.shift() );
     }
   }
 }

@@ -9,10 +9,6 @@ export class WorldMapLoader extends WorldObjectLoader {
    */
   static _instance = null;
 
-  constructor (maxCacheEntries = 500) {
-    super( maxCacheEntries );
-  }
-
   /**
    * @returns {WorldMapLoader}
    */
@@ -20,7 +16,7 @@ export class WorldMapLoader extends WorldObjectLoader {
     if (this._instance) {
       return this._instance;
     }
-    return (this._instance = new WorldMapLoader());
+    return (this._instance = new WorldMapLoader( 500 ));
   }
 
   /**
