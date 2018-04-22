@@ -3,8 +3,6 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./world/map/world-map";
 import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
 
-const OrbitControls = require('three-orbit-controls')(THREE);
-
 function getY(x, z) {
   x -= WORLD_MAP_SIZE / 2;
   z -= WORLD_MAP_SIZE / 2;
@@ -64,6 +62,12 @@ export default class Game {
    */
   _camera = null;
 
+  /**
+   * @type {PerspectiveCamera}
+   * @private
+   */
+  _activeCamera = null;
+
   _screenWidth = window.innerWidth;
   _screenHeight = window.innerHeight;
 
@@ -119,7 +123,7 @@ export default class Game {
   }
 
   _render () {
-    this._renderer.render(this._scene, this._camera);
+    this._renderer.render(this._scene, this._activeCamera);
   }
 
   _update () {
@@ -131,6 +135,10 @@ export default class Game {
     // this._camera.worldPosition.x = Math.cos(this._theta) * 30;
 
     // this._camera.lookAt(this._rollOverMesh.worldPosition);
+
+    this.world.update();
+    this._dirLight.position.z -= .2;
+    this._dirLight.target.position.z -= .2;
   }
 
   _init () {
@@ -171,29 +179,15 @@ export default class Game {
   _initScene () {
     this._scene = new THREE.Scene();
 
-    this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
-    // this._camera.worldPosition.set(198, 80, 220);
+    this._activeCamera = this._camera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
     this._camera.position.set( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 50 * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
-    this._orbitControls = new OrbitControls(this._camera, this._renderer.domElement);
-
-    let targetObject = new THREE.Object3D();
-    targetObject.position.set(WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2, WORLD_MAP_BLOCK_SIZE * 10, WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2);
-    this._camera.target = targetObject;
-
-    this._orbitControls.target = targetObject.position;
-    this._orbitControls.enableKeys = false;
-    this._orbitControls.enablePan = false;
-    this._orbitControls.zoomSpeed = 2;
-    // this._orbitControls.maxPolarAngle = Math.PI / 2;
-    this._orbitControls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
-    this._orbitControls.update();
 
     this._scene.add(this._camera);
   }
 
   _initFog () {
     // for game
-    // this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 400 * WORLD_MAP_BLOCK_SIZE);
+    this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
 
     // for debug
     // this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);
@@ -211,7 +205,7 @@ export default class Game {
     const ambientLight = new THREE.AmbientLight( 0xEEB1C6 );
     this._scene.add( ambientLight );
 
-    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.3 );
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
     hemiLight.color.setHSL( 0.6, 1, 0.6 );
     hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
     hemiLight.position.set(
@@ -255,16 +249,16 @@ export default class Game {
   }
 
   _addWorldDirectionalLight () {
-    const dirLight = new THREE.DirectionalLight( 0x999999, .5 );
-    dirLight.color.setHSL( 0.1, 1, 0.95 );
+    const dirLight = new THREE.DirectionalLight( 0x999999, .4 );
+    // dirLight.color.setHSL( 0.1, 1, 0.95 );
 
     const dirLightHelper = new THREE.CameraHelper( dirLight.shadow.camera );
     this._scene.add( dirLight, dirLightHelper );
 
     dirLight.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.2,
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 + 300,
       WORLD_MAP_BLOCK_SIZE * 300,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.2
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 + 300
     );
 
     this._addShadows(dirLight);
@@ -288,7 +282,7 @@ export default class Game {
     light.shadow.mapSize.width = 1 << 10;
     light.shadow.mapSize.height = 1 << 10;
 
-    const offset = 90 * WORLD_MAP_BLOCK_SIZE;
+    const offset = 50 * WORLD_MAP_BLOCK_SIZE;
 
     light.shadow.camera.top = offset;
     light.shadow.camera.right = offset;
@@ -414,8 +408,8 @@ export default class Game {
   _onWindowResize() {
     this._screenWidth = window.innerWidth;
     this._screenHeight = window.innerHeight;
-    this._camera.aspect = this._screenWidth / this._screenHeight;
-    this._camera.updateProjectionMatrix();
+    this._activeCamera.aspect = this._screenWidth / this._screenHeight;
+    this._activeCamera.updateProjectionMatrix();
 
     this._renderer.setSize( this._screenWidth, this._screenHeight );
   }
@@ -434,7 +428,7 @@ export default class Game {
     this._mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     this._mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     // update the picking ray with the camera and mouse position
-    this._raycaster.setFromCamera( this._mouse, this._camera );
+    this._raycaster.setFromCamera( this._mouse, this._activeCamera );
     // calculate objects intersecting the picking ray
     const intersects = this._raycaster.intersectObjects(
       [ ...this.world.map.getMeshes(), this.world.map.groundPlate.children[0] ]
@@ -443,6 +437,7 @@ export default class Game {
     let x = ((intersects[0].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    console.log(x, y, z);
 
     // console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
 
@@ -460,7 +455,7 @@ export default class Game {
     this._mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     this._mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     // update the picking ray with the camera and mouse position
-    this._raycaster.setFromCamera( this._mouse, this._camera );
+    this._raycaster.setFromCamera( this._mouse, this._activeCamera );
     // calculate objects intersecting the picking ray
     const intersects = this._raycaster.intersectObjects(
       [ ...this.world.map.getMeshes(), this.world.map.groundPlate.children[0] ]

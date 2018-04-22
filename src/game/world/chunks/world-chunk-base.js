@@ -104,7 +104,6 @@ export class WorldChunkBase {
    * @returns {number}
    */
   getHeight ({ x, y, z }) {
-    console.log({ x, y, z });
     return this._heightMap.getHeight({ x, y, z });
   }
 

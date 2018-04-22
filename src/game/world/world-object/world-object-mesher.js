@@ -25,8 +25,6 @@ export class WorldObjectMesher {
     const worldObject = this._worldObject;
     const chunk = this._worldObject.chunk;
 
-    const bs = WORLD_MAP_BLOCK_SIZE;
-
     chunk.triangles = vertices.length / 3;
 
     if (!worldObject.mesh) {

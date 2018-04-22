@@ -104,6 +104,10 @@ export class VoxModel {
       rotatedXyzi.push({ x: x, y: z, z: y, c });
     }
     this._voxelData.XYZI = rotatedXyzi;
+    let newSizeY = this.size.z;
+    let newSizeZ = this.size.y;
+    this._voxelData.SIZE.y = newSizeY;
+    this._voxelData.SIZE.z = newSizeZ;
     this._rotated = true;
   }
 }

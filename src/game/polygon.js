@@ -1,5 +1,3 @@
-import { WORLD_BLOCK_SIZE, WORLD_CHUNK_SIZE, WORLD_SIZE } from "./world";
-
 export class Polygon {
 
   /**

@@ -8,7 +8,7 @@ import { WorldObject, WorldObjectType } from "../world-object/index";
 import { resetDecimal } from "../../utils/index";
 import { WorldMapLoader } from "./world-map-loader";
 
-export const WORLD_MAP_SIZE = 1 << 11;
+export const WORLD_MAP_SIZE = 1 << 12;
 export const WORLD_MAP_BLOCK_SIZE = 2;
 
 export class WorldMap extends THREE.Group {
@@ -84,7 +84,6 @@ export class WorldMap extends THREE.Group {
           // if not cached just create a chunk with a received model
           worldObject = this.createWorldChunk( model, { x, y: 0, z } );
         } else {
-          console.log(data.cached, data.worldObject);
           throw new Error('Can\'t load a model');
         }
         this.attach( worldObject );

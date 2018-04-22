@@ -79,6 +79,8 @@ export class WorldObject extends THREE.Group {
    */
   _wireframe = false;
 
+  _bs = WORLD_MAP_BLOCK_SIZE;
+
   /**
    * @param {VoxModel|function|null} model
    * @param {number} type - @type WorldObjectType
@@ -91,6 +93,8 @@ export class WorldObject extends THREE.Group {
     this._id = WORLD_GLOBAL_OBJECT_ID++;
     this._model = model;
     this._objectType = type;
+    this._bs = this._objectType === WorldObjectType.MAP
+      ? WORLD_MAP_BLOCK_SIZE : .2 * WORLD_MAP_BLOCK_SIZE;
   }
 
   /**
@@ -100,6 +104,16 @@ export class WorldObject extends THREE.Group {
     this._options = options;
     this._createChunk();
     this._createMesh();
+
+    if (this._objectType === WorldObjectType.OBJECT && this.model) {
+
+      this._mesh.position.sub(
+        new THREE.Vector3(
+          this.model.size.x / 2 * this._bs - this._bs,
+          0, this.model.size.z / 2 * this._bs
+        )
+      );
+    }
 
     this.add(this._mesh);
   }
@@ -119,7 +133,7 @@ export class WorldObject extends THREE.Group {
     if (!force && !this._chunk.needsUpdate) {
       return;
     }
-    this._mesher.createOrUpdateMesh();
+    this._mesher.createOrUpdateMesh( this._bs );
   }
 
   addBlock (...args) {
@@ -263,7 +277,7 @@ export class WorldObject extends THREE.Group {
    */
   _createMesh () {
     this._mesher = new WorldObjectMesher(this);
-    this._mesher.createOrUpdateMesh();
+    this._mesher.createOrUpdateMesh( this._bs );
   }
 
   /**
