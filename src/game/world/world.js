@@ -45,16 +45,52 @@ export class World {
       console.log('Me:', me);
       me.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE + 2, 2.4, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
       this._game.scene.add( me );
+
+      let loader = new THREE.ObjectLoader();
+      loader.load( 'resources/models/skinned/animation-model.json', scene => {
+        let object = scene.children[0];
+        console.log(object);
+
+        let material = scene.children[0].material;
+        let geometry = scene.children[0].geometry;
+
+        console.log(material, geometry);
+
+        let skinnedMesh = new THREE.SkinnedMesh( geometry, material );
+        skinnedMesh.scale.set( 1, 1, 1 );
+        skinnedMesh.position.setY(7);
+        this._me.add( skinnedMesh );
+
+        this._mixer = new THREE.AnimationMixer( skinnedMesh );
+        console.log('Animations:', skinnedMesh.geometry.animations);
+
+        let k = 1;
+        this._mixerAction = this._mixer.clipAction( skinnedMesh.geometry.animations[ k ] );
+
+        setTimeout(_ => {
+          this._mixerAction.play();
+        }, 0);
+
+        setInterval(_ => {
+          this._mixerAction.stop();
+          this._mixerAction = this._mixer.clipAction( skinnedMesh.geometry.animations[ k++ % 2 ] );
+          this._mixerAction.play();
+        }, 3000)
+      });
     });
   }
 
-  update () {
+  update (clock) {
     if (this._me) {
       this._me.update();
       // this._me.position.x += -.2;
       this._me.position.z -= .2;
       this.map.updateAtPosition( this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE ) );
       // this._me.rotation.y += .01;
+
+      if ( this._mixer ) {
+        this._mixer.update( clock.getDelta() );
+      }
     }
   }
 

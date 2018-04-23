@@ -136,7 +136,7 @@ export default class Game {
 
     // this._camera.lookAt(this._rollOverMesh.worldPosition);
 
-    this.world.update();
+    this.world.update( this._clock );
     this._dirLight.position.z -= .2;
     this._dirLight.target.position.z -= .2;
   }

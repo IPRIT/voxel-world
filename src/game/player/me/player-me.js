@@ -1,6 +1,5 @@
 import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
-import { WORLD_MAP_BLOCK_SIZE } from "../../world/map/world-map";
 
 export class PlayerMe extends Player {
 
