@@ -66,10 +66,7 @@ export class World {
 
         let k = 1;
         this._mixerAction = this._mixer.clipAction( skinnedMesh.geometry.animations[ k ] );
-
-        setTimeout(_ => {
-          this._mixerAction.play();
-        }, 0);
+        this._mixerAction.play();
 
         setInterval(_ => {
           this._mixerAction.stop();
