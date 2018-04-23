@@ -47,21 +47,28 @@ export class World {
       this._game.scene.add( me );
 
       let loader = new THREE.ObjectLoader();
-      loader.load( 'resources/models/skinned/animation-model.json', scene => {
+      loader.load( 'resources/models/skinned/animation-model2.json', scene => {
         let object = scene.children[0];
-        console.log(object);
 
-        let material = scene.children[0].material;
-        let geometry = scene.children[0].geometry;
+        let material = object.material;
+        let geometry = object.geometry;
 
         console.log(material, geometry);
 
-        let skinnedMesh = new THREE.SkinnedMesh( geometry, material );
-        skinnedMesh.scale.set( 1, 1, 1 );
-        skinnedMesh.position.setY(7);
+        let skinnedMesh = new THREE.Mesh( geometry, material );
+        skinnedMesh.scale.set( .4, .4, .4 );
+        skinnedMesh.position.set(0, 7, 0);
+        skinnedMesh.rotation.z += Math.PI;
+        skinnedMesh.rotation.y -= Math.PI;
+        skinnedMesh.castShadow = true;
+        skinnedMesh.receiveShadow = true;
+        // let helper = new THREE.SkeletonHelper( skinnedMesh );
+        // helper.material.linewidth = 3;
+        // helper.visible = true;
         this._me.add( skinnedMesh );
+        console.log(skinnedMesh);
 
-        this._mixer = new THREE.AnimationMixer( skinnedMesh );
+        /* this._mixer = new THREE.AnimationMixer( skinnedMesh );
         console.log('Animations:', skinnedMesh.geometry.animations);
 
         let k = 1;
@@ -72,7 +79,7 @@ export class World {
           this._mixerAction.stop();
           this._mixerAction = this._mixer.clipAction( skinnedMesh.geometry.animations[ k++ % 2 ] );
           this._mixerAction.play();
-        }, 3000)
+        }, 3000)*/
       });
     });
   }
