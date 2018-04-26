@@ -1,5 +1,5 @@
 import 'bluebird';
-import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./world/map/world-map";
+import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./settings";
 import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
 
@@ -137,8 +137,6 @@ export default class Game {
     // this._camera.lookAt(this._rollOverMesh.worldPosition);
 
     this.world.update( this._clock );
-    this._dirLight.position.z -= .2;
-    this._dirLight.target.position.z -= .2;
   }
 
   _init () {

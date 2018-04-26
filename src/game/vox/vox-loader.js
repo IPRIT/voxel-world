@@ -33,11 +33,6 @@ export class VoxLoader {
   }
 
   _loadRequest (url) {
-    if (url.includes('?')) {
-      // url += '&r=' + Math.random();
-    } else {
-      // url += '?r=' + Math.random();
-    }
     const req = new XMLHttpRequest();
     req.open("GET", url, true);
     req.responseType = 'arraybuffer';

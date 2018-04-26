@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
-import { ModelLoader } from "../../model/model-loader";
+import { SkinnedModelLoader } from "../../model/loaders";
 
-export class PlayerModelLoader extends ModelLoader {
+export class PlayerModelLoader extends SkinnedModelLoader {
 
   /**
    * @type {PlayerModelLoader}
@@ -21,11 +21,11 @@ export class PlayerModelLoader extends ModelLoader {
 
   /**
    * @param {string} modelName
-   * @returns {Promise<{cached: boolean, model: VoxModel}>}
+   * @returns {Promise<{cached: boolean, skinnedMesh?: THREE.SkinnedMesh, model?: {geometry: *, material: *}}>}
    */
   async load (modelName) {
-    let fileName = `${modelName}.vox`;
-    let pathToFile = `resources/models/classes/`;
+    let fileName = `${modelName}.json`;
+    let pathToFile = `resources/models/skinned/`;
     let modelUrl = `${pathToFile}${fileName}`;
 
     return super.load( fileName, modelUrl, 15 );

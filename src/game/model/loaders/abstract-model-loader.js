@@ -1,8 +1,7 @@
 import Promise from 'bluebird';
-import { EntityCache } from "../utils/entity-cache";
-import { Vox } from "../vox";
+import { EntityCache } from "../../utils/entity-cache";
 
-export class ModelLoader {
+export class AbstractModelLoader {
 
   /**
    * @type {EntityCache}
@@ -28,7 +27,7 @@ export class ModelLoader {
    * @param {string|number} fileIndex
    * @param {string} fileUrl
    * @param {number} attemptsNumber
-   * @returns {Promise<{cached: boolean, model: VoxModel}>}
+   * @returns {Promise<{cached: boolean, model: *}>}
    */
   async load (fileIndex, fileUrl, attemptsNumber = 15) {
     if (this._cache.hasEntity( fileIndex )) {
@@ -41,13 +40,42 @@ export class ModelLoader {
     return {
       cached: false,
       // model: await Promise.resolve().delay(50 * Math.random() + 50).then(_ => commonModel)
-      model: await this._tryLoad(fileUrl, attemptsNumber)
+      model: await this.tryLoad(fileUrl, attemptsNumber)
     };
   }
 
   /**
+   * @abstract
+   * @param {string} fileUrl
+   * @param {number} attemptsNumber
+   * @returns {Promise<*>}
+   */
+  async tryLoad (fileUrl, attemptsNumber = 3) {
+    return null;
+  }
+
+  /**
+   * @param {function} asyncAction
+   * @param {number} attemptsNumber
+   * @returns {Promise<*>}
+   */
+  async tryUntil (asyncAction, attemptsNumber) {
+    let attempts = 0;
+
+    while (attempts < attemptsNumber) {
+      try {
+        return asyncAction(attempts);
+      } catch (e) {
+        console.error('Model load error:', e);
+        attempts++;
+        await Promise.delay(125 * Math.min(10, attempts) ** 2 + 500);
+      }
+    }
+  }
+
+  /**
    * @param {string} objectIndex
-   * @param {VoxModel|*} object
+   * @param {*} object
    */
   addToCache (objectIndex, object) {
     this._cache.addEntity( objectIndex, object );
@@ -72,31 +100,5 @@ export class ModelLoader {
    */
   _init () {
     this._cache = new EntityCache( this._maxCacheEntities );
-  }
-
-  /**
-   * @param {string} fileUrl
-   * @param {number} attemptsNumber
-   * @returns {Promise<VoxModel|null>}
-   * @private
-   */
-  async _tryLoad (fileUrl, attemptsNumber = 3) {
-    let vox;
-    let attempts = 0;
-
-    while (attempts < attemptsNumber) {
-      vox = new Vox();
-      try {
-        console.log(`Try to load model [attempt: ${attempts}]: ${fileUrl}`);
-        await vox.load( fileUrl );
-        return vox.model;
-      } catch (e) {
-        console.error('Model loader:', e);
-        attempts++;
-        await Promise.delay(125 * Math.min(10, attempts) ** 2 + 500);
-      }
-    }
-
-    return null;
   }
 }

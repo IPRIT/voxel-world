@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
-import { WorldObjectLoader } from "../world-object";
+import { VoxModelLoader } from "../../model/loaders";
 
-export class WorldMapLoader extends WorldObjectLoader {
+export class WorldMapLoader extends VoxModelLoader {
 
   /**
    * @type {WorldMapLoader}
@@ -21,7 +21,7 @@ export class WorldMapLoader extends WorldObjectLoader {
 
   /**
    * @param {string} chunkIndex
-   * @returns {Promise<{cached: boolean, worldObject?: WorldObject, model?: VoxModel}>}
+   * @returns {Promise<{cached: boolean, worldObject?: WorldObjectVox, model?: VoxModel}>}
    */
   async load (chunkIndex) {
     let [ x, z ] = chunkIndex.split('|').map(Number);

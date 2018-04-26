@@ -1,20 +1,20 @@
+import { WorldObjectVox, WorldObjectType } from "../world-object/index";
+import { resetDecimal } from "../../utils/index";
+import { WorldMapLoader } from "./world-map-loader";
 import {
+  WORLD_MAP_BLOCK_SIZE,
   WORLD_MAP_CHUNK_HEIGHT,
   WORLD_MAP_CHUNK_SIZE,
   WORLD_MAP_CHUNK_SIZE_VECTOR,
-  WORLD_MAP_CHUNK_VIEW_DISTANCE
-} from "../chunks/index";
-import { WorldObject, WorldObjectType } from "../world-object/index";
-import { resetDecimal } from "../../utils/index";
-import { WorldMapLoader } from "./world-map-loader";
-
-export const WORLD_MAP_SIZE = 1 << 12;
-export const WORLD_MAP_BLOCK_SIZE = 2;
+  WORLD_MAP_CHUNK_VIEW_DISTANCE,
+  WORLD_MAP_SIZE
+} from "../../settings";
+import { ModelType } from "../../model";
 
 export class WorldMap extends THREE.Group {
 
   /**
-   * @type {Map<string, WorldObject>}
+   * @type {Map<string, WorldObjectVox>}
    * @private
    */
   _map = new Map();
@@ -43,9 +43,6 @@ export class WorldMap extends THREE.Group {
     super();
   }
 
-  /**
-   * @param {VoxModel|function|null} model
-   */
   init () {
     this.placeGroundPlate();
 
@@ -230,11 +227,26 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {number}
+   */
+  getMapHeight ({ x, y, z }) {
+    x |= 0;
+    y |= 0;
+    z |= 0;
+    let chunkObject = this.getMapChunkAt({ x, y, z });
+    let relativePosition = new THREE.Vector3(x, y, z).sub(chunkObject.chunk.fromPosition);
+    return chunkObject.chunk.getHeight( relativePosition );
+  }
+
+  /**
    * @param force
    */
   update (force = false) {
     /**
-     * @type {WorldObject[]}
+     * @type {WorldObjectVox[]}
      */
     let chunks = [ ...this._map.values() ];
     for (let i = 0; i < chunks.length; ++i) {
@@ -275,7 +287,7 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @return {WorldObject[]}
+   * @return {WorldObjectVox[]}
    */
   getChunks () {
     return [ ...this._map.values() ];
@@ -307,7 +319,7 @@ export class WorldMap extends THREE.Group {
 
   /**
    * @param {THREE.Vector3} position
-   * @returns {WorldObject}
+   * @returns {WorldObjectVox}
    */
   getMapChunkAt (position) {
     if (!this.inside(position.x, position.y, position.z)) {
@@ -322,10 +334,12 @@ export class WorldMap extends THREE.Group {
    * @param {number} x
    * @param {number} y
    * @param {number} z
-   * @returns {WorldObject}
+   * @returns {WorldObjectVox}
    */
   createWorldChunk (model, { x, y, z }) {
-    const mapChunkObject = new WorldObject(model, WorldObjectType.MAP);
+    const mapChunkObject = new WorldObjectVox( WorldObjectType.MAP, ModelType.VOX );
+
+    mapChunkObject.setModel( model );
     mapChunkObject.position.set(
       x * WORLD_MAP_CHUNK_SIZE,
       y + WORLD_MAP_BLOCK_SIZE / 2,
@@ -382,7 +396,7 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {WorldObject} mapObject
+   * @param {WorldObjectVox} mapObject
    */
   attach (mapObject) {
     this.add( mapObject );
@@ -390,7 +404,7 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {WorldObject} mapObject
+   * @param {WorldObjectVox} mapObject
    */
   detach (mapObject) {
     this.remove( mapObject );
@@ -398,14 +412,14 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {WorldObject} mapObject
+   * @param {WorldObjectVox} mapObject
    */
   register (mapObject) {
     this._map.set(mapObject.chunk.mapChunkIndex, mapObject);
   }
 
   /**
-   * @param {WorldObject|string} mapObject
+   * @param {WorldObjectVox|string} mapObject
    */
   unregister (mapObject) {
     if (typeof mapObject === 'string') {
@@ -446,7 +460,7 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @return {Map<string, WorldObject>}
+   * @return {Map<string, WorldObjectVox>}
    */
   get chunksMap () {
     return this._map;

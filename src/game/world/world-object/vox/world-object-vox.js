@@ -1,17 +1,10 @@
-import { WorldObjectType } from "./world-object-type";
-import { WorldChunkMap, WorldChunkBase, WorldChunkObject } from "../chunks";
-import { WorldObjectMesher } from "./world-object-mesher";
-import { WORLD_MAP_BLOCK_SIZE } from "../map/world-map";
+import { WorldObjectBase } from "../world-object-base";
+import { WorldChunkMap, WorldChunkObject } from "../../chunks/index";
+import { WorldObjectVoxMesher } from "./world-object-vox-mesher";
+import { WorldObjectType } from '../world-object-type';
+import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 
-let WORLD_GLOBAL_OBJECT_ID = 1;
-
-export class WorldObject extends THREE.Group {
-
-  /**
-   * @type {number}
-   * @private
-   */
-  _id = 0;
+export class WorldObjectVox extends WorldObjectBase {
 
   /**
    * @type {VoxModel|function|null}
@@ -20,16 +13,10 @@ export class WorldObject extends THREE.Group {
   _model = null;
 
   /**
-   * @type {WorldObjectMesher}
+   * @type {WorldObjectVoxMesher}
    * @private
    */
-  _mesher = null;
-
-  /**
-   * @type {THREE.Mesh}
-   * @private
-   */
-  _mesh = null;
+  _voxMesher = null;
 
   /**
    * @type {THREE.BufferGeometry}
@@ -56,73 +43,32 @@ export class WorldObject extends THREE.Group {
   _material = null;
 
   /**
-   * @type {*}
-   * @private
-   */
-  _options = {};
-
-  /**
-   * @type {number}
-   * @private
-   */
-  _objectType;
-
-  /**
    * @type {WorldChunkMap|WorldChunkObject|WorldChunkBase}
    * @private
    */
   _chunk = null;
 
   /**
-   * @type {boolean}
-   * @private
-   */
-  _wireframe = false;
-
-  _bs = WORLD_MAP_BLOCK_SIZE;
-
-  /**
-   * @param {VoxModel|function|null} model
-   * @param {number} type - @type WorldObjectType
-   */
-  constructor (model = null, type = WorldObjectType.OBJECT) {
-    if (typeof type === 'undefined') {
-      throw new Error(`Unsupported object type. Expected: WorldObjectType, got: ${type}`);
-    }
-    super();
-    this._id = WORLD_GLOBAL_OBJECT_ID++;
-    this._model = model;
-    this._objectType = type;
-    this._bs = this._objectType === WorldObjectType.MAP
-      ? WORLD_MAP_BLOCK_SIZE : .2 * WORLD_MAP_BLOCK_SIZE;
-  }
-
-  /**
    * @param {*} options
    */
   init (options = {}) {
-    this._options = options;
+    super.init( options );
+
     this._createChunk();
     this._createMesh();
 
-    if (this._objectType === WorldObjectType.OBJECT && this.model) {
-
-      this._mesh.position.sub(
-        new THREE.Vector3(
-          this.model.size.x / 2 * this._bs - this._bs,
-          0, this.model.size.z / 2 * this._bs
-        )
-      );
+    if (this.objectType === WorldObjectType.OBJECT && this.model) {
+      this._centerMesh();
     }
 
-    this.add(this._mesh);
+    this.attachMesh();
   }
 
   /**
    * @param {VoxModel|function} model
    */
   setModel (model) {
-    this._model = model;
+    this.model = model;
     return this;
   }
 
@@ -133,7 +79,7 @@ export class WorldObject extends THREE.Group {
     if (!force && !this._chunk.needsUpdate) {
       return;
     }
-    this._mesher.createOrUpdateMesh( this._bs );
+    this._voxMesher.createOrUpdateMesh( this.blockSize );
   }
 
   addBlock (...args) {
@@ -158,31 +104,17 @@ export class WorldObject extends THREE.Group {
   }
 
   /**
-   * @returns {number}
-   */
-  get id () {
-    return this._id;
-  }
-
-  /**
-   * @returns {VoxModel}
+   * @returns {VoxModel|function}
    */
   get model () {
     return this._model;
   }
 
   /**
-   * @returns {THREE.Mesh}
+   * @param {VoxModel|function} value
    */
-  get mesh () {
-    return this._mesh;
-  }
-
-  /**
-   * @param {THREE.Mesh} value
-   */
-  set mesh (value) {
-    this._mesh = value;
+  set model (value) {
+    this._model = value;
   }
 
   /**
@@ -258,10 +190,10 @@ export class WorldObject extends THREE.Group {
     if (this._chunk) {
       return;
     }
-    switch (this._objectType) {
+    switch (this.objectType) {
       case WorldObjectType.MAP:
         this._chunk = new WorldChunkMap(this._model, {
-          worldPosition: this.position.clone().multiplyScalar(1 / WORLD_MAP_BLOCK_SIZE)
+          worldPosition: this.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE )
         });
         break;
       case WorldObjectType.OBJECT:
@@ -276,8 +208,8 @@ export class WorldObject extends THREE.Group {
    * @private
    */
   _createMesh () {
-    this._mesher = new WorldObjectMesher(this);
-    this._mesher.createOrUpdateMesh( this._bs );
+    this._voxMesher = new WorldObjectVoxMesher(this);
+    this._voxMesher.createOrUpdateMesh( this.blockSize );
   }
 
   /**
@@ -287,7 +219,20 @@ export class WorldObject extends THREE.Group {
     // this._material = shaderMaterial;
     this._material = new THREE.MeshLambertMaterial({
       vertexColors: THREE.VertexColors,
-      wireframe: this._wireframe
+      wireframe: this.wireframe
     });
+  }
+
+  /**
+   * @private
+   */
+  _centerMesh () {
+    this.mesh.position.sub(
+      new THREE.Vector3(
+        this.model.size.x / 2 * this.blockSize,
+        0,
+        this.model.size.z / 2 * this.blockSize
+      )
+    );
   }
 }

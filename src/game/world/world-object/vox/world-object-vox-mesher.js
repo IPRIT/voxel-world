@@ -1,16 +1,15 @@
-import { WorldChunkType } from "../chunks";
-import { WORLD_MAP_BLOCK_SIZE } from "../map/world-map";
+import { WorldChunkType } from '../../chunks/world-chunk-type';
 
-export class WorldObjectMesher {
+export class WorldObjectVoxMesher {
 
   /**
-   * @type {WorldObject}
+   * @type {WorldObjectVox}
    * @private
    */
   _worldObject = null;
 
   /**
-   * @param {WorldObject} worldObject
+   * @param {WorldObjectVox} worldObject
    */
   constructor (worldObject) {
     this._worldObject = worldObject;
@@ -87,7 +86,7 @@ export class WorldObjectMesher {
   /**
    * @returns {THREE.Mesh}
    */
-  createOrUpdateMesh (bs = WORLD_MAP_BLOCK_SIZE) {
+  createOrUpdateMesh (bs) {
     const worldObject = this._worldObject;
 
     this.resetFaces();

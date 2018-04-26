@@ -1,15 +1,9 @@
 import { WorldChunkBase } from "./world-chunk-base";
 import { WorldChunkType } from "./world-chunk-type";
-
-export const WORLD_MAP_CHUNK_SIZE = 1 << 5;
-export const WORLD_MAP_CHUNK_HEIGHT = 1 << 5;
-export const WORLD_MAP_CHUNK_VIEW_DISTANCE = 3;
-
-export const WORLD_MAP_CHUNK_SIZE_VECTOR = new THREE.Vector3(
-  WORLD_MAP_CHUNK_SIZE,
+import {
   WORLD_MAP_CHUNK_HEIGHT,
   WORLD_MAP_CHUNK_SIZE
-);
+} from "../../settings";
 
 export class WorldChunkMap extends WorldChunkBase {
 
