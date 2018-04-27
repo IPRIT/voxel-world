@@ -1,6 +1,7 @@
 import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
 import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
+import { PlayerWorldLight } from "./player-world-light";
 
 export class PlayerMe extends Player {
 
@@ -10,57 +11,67 @@ export class PlayerMe extends Player {
    */
   _camera = null;
 
-  constructor () {
-    super();
-  }
+  /**
+   * @type {PlayerWorldLight}
+   * @private
+   */
+  _light = null;
 
-  init (options = {}) {
-    return super.init(options).then(_ => {
-      this._initCamera();
-
-      this._mixer = new THREE.AnimationMixer( this.mesh );
-      console.log('Animations:', this.mesh.geometry.animations);
-
-      this._k = 0;
-      this._mixerAction = this._mixer.clipAction( this.mesh.geometry.animations[ this._k++ ] );
-      console.log(this._mixerAction);
-      this._mixerAction.play();
-
-      setInterval(_ => {
-        this._mixerAction.stop();
-        this._mixerAction = this._mixer.clipAction( this.mesh.geometry.animations[ this._k ] );
-        this._k = (this._k + 1) % this.mesh.geometry.animations.length;
-        this._mixerAction.play();
-      }, 3000)
-    });
+  /**
+   * @param options
+   * @returns {*}
+   */
+  async init (options = {}) {
+    await super.init(options);
+    this._initCamera();
+    this._initLights();
+    this._initControls();
   }
 
   update (clock) {
-    if (this._k === 2) {
-      this.position.z -= .2;
+    super.update( clock );
 
-      let position = this.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE );
-      let y = window.game.world.map.getMapHeight( position );
+    let position = this.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE );
+    let y = window.game.world.map.getMapHeight( position );
 
-      this.position.y = y * WORLD_MAP_BLOCK_SIZE + 2 + .01;
+    this.position.z -= .2;
+    this.position.y = y * WORLD_MAP_BLOCK_SIZE + 2 + .01;
 
-      game._dirLight.position.z -= .2;
-      game._dirLight.target.position.z -= .2;
-    }
-
-    this._camera && this._camera.update( clock );
-    if ( this._mixer ) {
-      this._mixer.update( clock.getDelta() );
+    if (this._camera) {
+      this._camera.update();
     }
   }
 
+  /**
+   * @returns {PlayerCamera}
+   * @private
+   */
   _initCamera () {
-    this._camera = new PlayerCamera();
-    let targetObject = new THREE.Object3D();
-    targetObject.position.set(0, 3, 0);
-    this._camera.setTarget( targetObject );
+    this._camera = new PlayerCamera( this );
     this._camera.initOrbitControls();
-    this.add( this._camera );
     this._camera.makeActive();
+
+    this.add( this._camera );
+
+    return this._camera;
+  }
+
+  /**
+   * @returns {PlayerWorldLight}
+   * @private
+   */
+  _initLights () {
+    this._light = new PlayerWorldLight( this, 0x999999, .4 );
+    this._light.init();
+    this._light.attachToWorld();
+
+    return this._light;
+  }
+
+  /**
+   * @private
+   */
+  _initControls () {
+    // todo
   }
 }

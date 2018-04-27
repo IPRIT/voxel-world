@@ -127,15 +127,6 @@ export default class Game {
   }
 
   _update () {
-    this._theta = this._theta || 0;
-    this._theta += .005;
-    // this._dirLight.rotation.z = Math.cos(this._theta);
-
-    // this._camera.worldPosition.z = Math.sin(this._theta) * 30;
-    // this._camera.worldPosition.x = Math.cos(this._theta) * 30;
-
-    // this._camera.lookAt(this._rollOverMesh.worldPosition);
-
     this.world.update( this._clock );
   }
 
@@ -146,10 +137,9 @@ export default class Game {
     this._initRenderer();
     this._initScene();
     this._initFog();
-    this._initGridHelper();
-    this._initEventListeners();
+    this._attachEventListeners();
 
-    this._addLights();
+    this._addWorldLight();
 
     // this._addObjects(); // shader
 
@@ -185,21 +175,13 @@ export default class Game {
 
   _initFog () {
     // for game
-    this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
+    // this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
 
     // for debug
     // this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);
   }
 
-  _initGridHelper () {
-    /*this._gridHelper = new THREE.GridHelper(WORLD_MAP_SIZE * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE, 0x666666, 0x999999);
-    this._gridHelper.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, .01, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
-    this._scene.add(
-      this._gridHelper
-    );*/
-  }
-
-  _addLights () {
+  _addWorldLight () {
     const ambientLight = new THREE.AmbientLight( 0xEEB1C6 );
     this._scene.add( ambientLight );
 
@@ -214,82 +196,6 @@ export default class Game {
 
     const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 50);
     this._scene.add(hemiLight, hemiLightHelper);
-
-    // this._addWorldSpotLight();
-    this._addWorldDirectionalLight();
-  }
-
-  _addWorldSpotLight () {
-    const spotLight = new THREE.SpotLight(0x999999, .6, 0, Math.PI / 2 - .4);
-    spotLight.color.setHSL( 0.1, 1, 0.95 );
-
-    const lightHelper = new THREE.CameraHelper( spotLight.shadow.camera );
-    this._scene.add( spotLight, lightHelper );
-
-    spotLight.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.5,
-      WORLD_MAP_BLOCK_SIZE * 200,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE * 1.5
-    );
-
-    spotLight.penumbra = 0;
-    spotLight.decay = 2;
-
-    this._addShadows(spotLight);
-
-    const targetObject = new THREE.Object3D();
-    this._scene.add(targetObject);
-
-    spotLight.target = targetObject;
-    targetObject.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2, 0, WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
-    );
-  }
-
-  _addWorldDirectionalLight () {
-    const dirLight = new THREE.DirectionalLight( 0x999999, .4 );
-    // dirLight.color.setHSL( 0.1, 1, 0.95 );
-
-    const dirLightHelper = new THREE.CameraHelper( dirLight.shadow.camera );
-    this._scene.add( dirLight, dirLightHelper );
-
-    dirLight.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 + 300,
-      WORLD_MAP_BLOCK_SIZE * 300,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2 + 300
-    );
-
-    this._addShadows(dirLight);
-
-    const targetObject = new THREE.Object3D();
-    this._scene.add(targetObject);
-
-    dirLight.target = targetObject;
-    targetObject.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
-      0,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
-    );
-
-    this._dirLight = dirLight;
-  }
-
-  _addShadows (light) {
-    light.castShadow = true;
-
-    light.shadow.mapSize.width = 1 << 10;
-    light.shadow.mapSize.height = 1 << 10;
-
-    const offset = 50 * WORLD_MAP_BLOCK_SIZE;
-
-    light.shadow.camera.top = offset;
-    light.shadow.camera.right = offset;
-    light.shadow.camera.bottom = -offset;
-    light.shadow.camera.left = -offset;
-
-    light.shadow.camera.far = 3500;
-    light.shadow.camera.bias = -0.0001;
-    light.shadow.camera.darkness = 0.45;
   }
 
   _initWorld () {
@@ -297,7 +203,7 @@ export default class Game {
     this._world.init();
   }
 
-  _initEventListeners () {
+  _attachEventListeners () {
     window.addEventListener( 'resize', this._onWindowResize.bind(this), false );
     window.addEventListener( 'mousedown', this._onMouseDown.bind(this), false );
     window.addEventListener( 'mouseup', this._onMouseUp.bind(this), false );

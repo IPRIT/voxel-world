@@ -1,6 +1,4 @@
 import { WorldObjectBase } from "../world-object-base";
-import { WorldObjectType } from "../index";
-import { ModelType } from "../../../model";
 
 export class WorldObjectSkinned extends WorldObjectBase {
 
@@ -44,6 +42,20 @@ export class WorldObjectSkinned extends WorldObjectBase {
    */
   get material () {
     return this._material;
+  }
+
+  /**
+   * @returns {THREE.AnimationClip[]}
+   */
+  get geometryAnimations () {
+    return this.mesh.geometry.animations || [];
+  }
+
+  /**
+   * @returns {THREE.AnimationClip[]}
+   */
+  get geometryAnimationNames () {
+    return this.geometryAnimations.map(animation => animation.name);
   }
 
   /**

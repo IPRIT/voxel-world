@@ -1,11 +1,11 @@
 import Promise from 'bluebird';
 import { PlayerClassType } from "./player-class-type";
 import { PlayerModelLoader } from "./utils/player-model-loader";
-import { WorldObjectSkinned } from "../world/world-object/skinned";
 import { WorldObjectType } from "../world/world-object";
 import { ModelType } from "../model";
+import { WorldObjectAnimated } from "../world/world-object/animated";
 
-export class PlayerObject extends WorldObjectSkinned {
+export class PlayerObject extends WorldObjectAnimated {
 
   /**
    * @type {object}

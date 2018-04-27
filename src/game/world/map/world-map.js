@@ -237,6 +237,9 @@ export class WorldMap extends THREE.Group {
     y |= 0;
     z |= 0;
     let chunkObject = this.getMapChunkAt({ x, y, z });
+    if (!chunkObject) {
+      return 0;
+    }
     let relativePosition = new THREE.Vector3(x, y, z).sub(chunkObject.chunk.fromPosition);
     return chunkObject.chunk.getHeight( relativePosition );
   }

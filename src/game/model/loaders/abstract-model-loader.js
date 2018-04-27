@@ -31,7 +31,7 @@ export class AbstractModelLoader {
    */
   async load (fileIndex, fileUrl, attemptsNumber = 15) {
     if (this._cache.hasEntity( fileIndex )) {
-      console.log('Cache hit:', fileIndex);
+      // console.log('Cache hit:', fileIndex);
       return {
         cached: true,
         model: this._cache.getEntity( fileIndex )
