@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
 import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
@@ -22,10 +23,11 @@ export class PlayerMe extends Player {
    * @returns {*}
    */
   async init (options = {}) {
-    await super.init(options);
     this._initCamera();
     this._initLights();
     this._initControls();
+    await Promise.resolve().delay(4000);
+    await super.init(options);
   }
 
   update (clock) {

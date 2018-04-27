@@ -63,7 +63,7 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
    * @private
    */
   _attachToMe () {
-    this.position.addScalar( 300 );
+    this.position.addScalar( 300 * WORLD_MAP_BLOCK_SIZE );
     const fakeTarget = new THREE.Object3D();
     this._me.add( fakeTarget );
     this.target = fakeTarget;

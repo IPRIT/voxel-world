@@ -24,7 +24,7 @@ export class PlayerModelLoader extends SkinnedModelLoader {
    * @returns {Promise<{cached: boolean, skinnedMesh?: THREE.SkinnedMesh, model?: {geometry: *, material: *}}>}
    */
   async load (modelName) {
-    let fileName = `${modelName}.json`;
+    let fileName = `${modelName}-pink.json`;
     let pathToFile = `resources/models/skinned/`;
     let modelUrl = `${pathToFile}${fileName}`;
 

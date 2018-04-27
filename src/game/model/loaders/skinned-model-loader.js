@@ -11,11 +11,8 @@ export class SkinnedModelLoader extends AbstractModelLoader {
    */
   async load (fileIndex, fileUrl, attemptsNumber = 15) {
     let object = await super.load( fileIndex, fileUrl, attemptsNumber );
-    if (object.cached) {
-      return {
-        cached: true,
-        skinnedMesh: object.model
-      }
+    if (object && !object.cached) {
+      this.addToCache(fileIndex, object.model);
     }
     return object;
   }

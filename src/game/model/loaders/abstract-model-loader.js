@@ -31,7 +31,7 @@ export class AbstractModelLoader {
    */
   async load (fileIndex, fileUrl, attemptsNumber = 15) {
     if (this._cache.hasEntity( fileIndex )) {
-      // console.log('Cache hit:', fileIndex);
+      console.log('Cache hit:', fileIndex);
       return {
         cached: true,
         model: this._cache.getEntity( fileIndex )
@@ -39,7 +39,6 @@ export class AbstractModelLoader {
     }
     return {
       cached: false,
-      // model: await Promise.resolve().delay(50 * Math.random() + 50).then(_ => commonModel)
       model: await this.tryLoad(fileUrl, attemptsNumber)
     };
   }

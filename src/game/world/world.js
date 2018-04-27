@@ -39,20 +39,12 @@ export class World {
     let me = new PlayerMe();
     this._me = me;
 
+    me.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE + 2, 12.4, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
+
     me.init({
       classType: PlayerClassType.MYSTIC
     }).then(_ => {
-      console.log('Me:', me);
-      me.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE + 2, 2.4, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
-
       me.activateClipAction('RunAction');
-
-      setTimeout(_ => {
-        me.stopClipAction();
-        setTimeout(_ => {
-          me.resumeClipAction();
-        }, 2000);
-      }, 3000);
     });
 
     this._game.scene.add( me );

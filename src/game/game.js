@@ -87,8 +87,25 @@ export default class Game {
   _animationFrameId = null;
   _pauseOpaqueToken = false;
 
-  constructor () {
-    this._init();
+  init () {
+    this._clock = new THREE.Clock();
+    this._stats = this._initStats();
+
+    this._initRenderer();
+    this._initScene();
+    this._initFog();
+    this._attachEventListeners();
+
+    this._addWorldLight();
+
+    // this._addObjects(); // shader
+
+    this._initWorld();
+
+    if (!this._mouse) {
+      this._mouse = new THREE.Vector2();
+      this._raycaster = new THREE.Raycaster();
+    }
   }
 
   start () {
@@ -130,27 +147,6 @@ export default class Game {
     this.world.update( this._clock );
   }
 
-  _init () {
-    this._clock = new THREE.Clock();
-    this._stats = this._initStats();
-
-    this._initRenderer();
-    this._initScene();
-    this._initFog();
-    this._attachEventListeners();
-
-    this._addWorldLight();
-
-    // this._addObjects(); // shader
-
-    this._initWorld();
-
-    if (!this._mouse) {
-      this._mouse = new THREE.Vector2();
-      this._raycaster = new THREE.Raycaster();
-    }
-  }
-
   _initRenderer () {
     this._renderer = new THREE.WebGLRenderer(this._rendererOptions);
     this._renderer.setSize(this._screenWidth, this._screenHeight);
@@ -175,7 +171,7 @@ export default class Game {
 
   _initFog () {
     // for game
-    // this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
+    this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
 
     // for debug
     // this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);
