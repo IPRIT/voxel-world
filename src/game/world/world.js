@@ -46,6 +46,13 @@ export class World {
       me.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE + 2, 2.4, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
 
       me.activateClipAction('RunAction');
+
+      setTimeout(_ => {
+        me.stopClipAction();
+        setTimeout(_ => {
+          me.resumeClipAction();
+        }, 2000);
+      }, 3000);
     });
 
     this._game.scene.add( me );

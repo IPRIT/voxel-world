@@ -60,6 +60,15 @@ export class WorldObjectAnimated extends WorldObjectSkinned {
   }
 
   /**
+   * Resumes current clip action
+   */
+  resumeClipAction () {
+    if (this._currentClipAction) {
+      this._currentClipAction.play();
+    }
+  }
+
+  /**
    * Stops playing active clip action
    * and sets null to the object
    */

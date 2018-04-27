@@ -30,9 +30,12 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
     this._attachToMe();
   }
 
+  update () {
+  }
+
   attachToWorld () {
     this._me.add( this );
-    this._me.add( this._lightHelper );
+    game.scene.add( this._lightHelper );
   }
 
   /**

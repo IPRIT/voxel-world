@@ -40,6 +40,9 @@ export class PlayerMe extends Player {
     if (this._camera) {
       this._camera.update();
     }
+    if (this._light) {
+      this._light.update();
+    }
   }
 
   /**
