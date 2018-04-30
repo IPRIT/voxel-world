@@ -4,7 +4,7 @@ import { WorldMapLoader } from "./world-map-loader";
 import {
   WORLD_MAP_BLOCK_SIZE,
   WORLD_MAP_CHUNK_HEIGHT,
-  WORLD_MAP_CHUNK_SIZE,
+  WORLD_MAP_CHUNK_SIZE, WORLD_MAP_CHUNK_SIZE_POWER,
   WORLD_MAP_CHUNK_SIZE_VECTOR,
   WORLD_MAP_CHUNK_VIEW_DISTANCE,
   WORLD_MAP_SIZE
@@ -483,8 +483,8 @@ export class WorldMap extends THREE.Group {
    */
   _computeChunkIndex (position) {
     const { x, z } = position;
-    const chunkIndexX = (x / WORLD_MAP_CHUNK_SIZE) | 0;
-    const chunkIndexZ = (z / WORLD_MAP_CHUNK_SIZE) | 0;
+    const chunkIndexX = x >> WORLD_MAP_CHUNK_SIZE_POWER;
+    const chunkIndexZ = z >> WORLD_MAP_CHUNK_SIZE_POWER;
     return this._buildChunkStringIndex(chunkIndexX, chunkIndexZ);
   }
 

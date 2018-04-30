@@ -26,17 +26,22 @@ export class PlayerMe extends Player {
     this._initCamera();
     this._initLights();
     this._initControls();
-    await Promise.resolve().delay(4000);
+    // await Promise.resolve().delay(4000);
     await super.init(options);
   }
 
-  update (clock) {
-    super.update( clock );
+  /**
+   * @param {number} deltaTimeMs
+   */
+  update (deltaTimeMs) {
+    super.update( deltaTimeMs );
 
     let position = this.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE );
     let y = window.game.world.map.getMapHeight( position );
 
-    this.position.z -= .2;
+    let delta = deltaTimeMs * 1000;
+    let desiredDelta = 1000 / 60;
+    this.position.z -= (delta * .2) / desiredDelta;
     this.position.y = y * WORLD_MAP_BLOCK_SIZE + 2 + .01;
 
     if (this._camera) {
@@ -66,7 +71,7 @@ export class PlayerMe extends Player {
    * @private
    */
   _initLights () {
-    this._light = new PlayerWorldLight( this, 0x999999, .4 );
+    this._light = new PlayerWorldLight( this, 0xEEB1C6, .5 );
     this._light.init();
     this._light.attachToWorld();
 

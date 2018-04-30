@@ -50,9 +50,9 @@ export class World {
     this._game.scene.add( me );
   }
 
-  update (clock) {
+  update (deltaTimeMs) {
     if (this._me) {
-      this._me.update( clock );
+      this._me.update( deltaTimeMs );
       this.map.updateAtPosition( this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE ) );
     }
   }

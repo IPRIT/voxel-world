@@ -40,7 +40,11 @@ export class VoxLoader {
     req.send(null);
 
     return new Promise((resolve, reject) => {
-      req.onload = event => resolve(req, event);
+      req.onreadystatechange = () => {
+        if (req.readyState === 4 && (req.status === 200 || req.status === 0)) {
+          resolve(req);
+        }
+      };
       req.onerror = event => reject(req, event);
     });
   }

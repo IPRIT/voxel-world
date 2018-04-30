@@ -65,8 +65,7 @@ export class WorldChunkHeightMap {
    * @returns {number}
    */
   bufferOffset (x, z) {
-    return x * this.size.z
-      + z;
+    return x * this.size.z + z;
   }
 
   /**

@@ -110,7 +110,7 @@
     "dat.gui": "^0.7.1",
     "md-svg-vue": "^1.0.6",
     "normalize.css": "^8.0.0",
-    "parse-magica-voxel": "http://github.com/IPRIT/parse-magica-voxel.git",
+    "parse-magica-voxel": "^1.0.3",
     "stats.js": "^0.17.0",
     "three": "^0.91.0",
     "three-orbit-controls": "^82.1.0",

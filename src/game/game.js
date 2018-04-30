@@ -88,7 +88,7 @@ export default class Game {
   _pauseOpaqueToken = false;
 
   init () {
-    this._clock = new THREE.Clock();
+    this._clock = new THREE.Clock( true );
     this._stats = this._initStats();
 
     this._initRenderer();
@@ -109,10 +109,12 @@ export default class Game {
   }
 
   start () {
+    this._clock.start();
     this._animate();
   }
 
   pause () {
+    this._clock.stop();
     this._pauseOpaqueToken = true;
   }
 
@@ -144,7 +146,7 @@ export default class Game {
   }
 
   _update () {
-    this.world.update( this._clock );
+    this.world.update( this._clock.getDelta() );
   }
 
   _initRenderer () {
@@ -171,22 +173,20 @@ export default class Game {
 
   _initFog () {
     // for game
-    this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
+    this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 200 * WORLD_MAP_BLOCK_SIZE);
 
     // for debug
     // this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);
   }
 
   _addWorldLight () {
-    const ambientLight = new THREE.AmbientLight( 0xEEB1C6 );
+    const ambientLight = new THREE.AmbientLight( 0xffa1c1 );
     this._scene.add( ambientLight );
 
-    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
-    hemiLight.color.setHSL( 0.6, 1, 0.6 );
-    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+    const hemiLight = new THREE.HemisphereLight( 0x0, 0xEEB1C6, 0.4 );
     hemiLight.position.set(
       WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE,
-      500 * WORLD_MAP_BLOCK_SIZE,
+      300 * WORLD_MAP_BLOCK_SIZE,
       WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE
     );
 

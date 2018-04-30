@@ -26,11 +26,11 @@ export class WorldObjectAnimated extends WorldObjectSkinned {
   }
 
   /**
-   * @param {THREE.Clock} clock
+   * @param {number} deltaTimeMs
    */
-  update (clock) {
+  update (deltaTimeMs) {
     if (this._animationMixer) {
-      this._animationMixer.update( clock.getDelta() );
+      this._animationMixer.update( deltaTimeMs );
     }
   }
 
