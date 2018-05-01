@@ -20,9 +20,9 @@ export class WorldObjectAnimated extends WorldObjectSkinned {
    * @returns {*}
    */
   init (options = {}) {
-    super.init( options );
-
-    this._initAnimationMixer();
+    return super.init( options ).then(_ => {
+      this._initAnimationMixer();
+    });
   }
 
   /**
@@ -104,6 +104,13 @@ export class WorldObjectAnimated extends WorldObjectSkinned {
    */
   get currentClipAction () {
     return this._currentClipAction;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get animationMixerInited () {
+    return !!this._animationMixer;
   }
 
   /**

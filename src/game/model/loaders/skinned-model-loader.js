@@ -31,7 +31,7 @@ export class SkinnedModelLoader extends AbstractModelLoader {
         loader.load(fileUrl, scene => {
           let object = scene.children[0];
           if (!object) {
-            reject( new Error('[tryLoad]: Skinned object not found when parsing') );
+            reject( new Error('[tryLoad]: Skinned object not found') );
           }
           resolve( object );
         });

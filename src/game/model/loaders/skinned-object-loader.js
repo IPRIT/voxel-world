@@ -1,22 +1,22 @@
 import Promise from 'bluebird';
 import { SkinnedModelLoader } from "../../model/loaders";
 
-export class PlayerModelLoader extends SkinnedModelLoader {
+export class SkinnedObjectLoader extends SkinnedModelLoader {
 
   /**
-   * @type {PlayerModelLoader}
+   * @type {SkinnedObjectLoader}
    * @private
    */
   static _instance = null;
 
   /**
-   * @returns {PlayerModelLoader}
+   * @returns {SkinnedObjectLoader}
    */
   static getLoader () {
     if (this._instance) {
       return this._instance;
     }
-    return (this._instance = new PlayerModelLoader( 50 ));
+    return (this._instance = new SkinnedObjectLoader( 100 ));
   }
 
   /**
@@ -24,7 +24,7 @@ export class PlayerModelLoader extends SkinnedModelLoader {
    * @returns {Promise<{cached: boolean, skinnedMesh?: THREE.SkinnedMesh, model?: {geometry: *, material: *}}>}
    */
   async load (modelName) {
-    let fileName = `${modelName}-pink.json`;
+    let fileName = `${modelName}.json`;
     let pathToFile = `resources/models/skinned/`;
     let modelUrl = `${pathToFile}${fileName}`;
 

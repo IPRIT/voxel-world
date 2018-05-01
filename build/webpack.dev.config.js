@@ -51,6 +51,18 @@ module.exports = {
         test: /\.scss$/,
         loaders: extractPlugin,
         exclude: /node_modules/
+      },
+      {
+        test: /\.worker\.js$/,
+        use: [
+          'babel-loader',
+          {
+            loader: 'worker-loader',
+            options: {
+            }
+          },
+          'eslint-loader'
+        ]
       }
     ]
   },

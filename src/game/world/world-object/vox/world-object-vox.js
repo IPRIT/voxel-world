@@ -55,13 +55,12 @@ export class WorldObjectVox extends WorldObjectBase {
     super.init( options );
 
     this._createChunk();
-    this._createMesh();
-
-    if (this.objectType === WorldObjectType.OBJECT && this.model) {
-      this._centerMesh();
-    }
-
-    this.attachMesh();
+    this._createMesh().then(_ => {
+      if (this.objectType === WorldObjectType.OBJECT && this.model) {
+        this._centerMesh();
+      }
+      this.attachMesh();
+    });
   }
 
   /**
@@ -209,7 +208,7 @@ export class WorldObjectVox extends WorldObjectBase {
    */
   _createMesh () {
     this._voxMesher = new WorldObjectVoxMesher(this);
-    this._voxMesher.createOrUpdateMesh( this.blockSize );
+    return this._voxMesher.createOrUpdateMesh( this.blockSize );
   }
 
   /**

@@ -46,6 +46,20 @@ module.exports = merge(baseWebpackConfig, {
         test: /\.scss$/,
         use: extractPlugin,
         exclude: /node_modules/
+      },
+      {
+        test: /\.worker\.js$/,
+        use: [
+          'babel-loader',
+          {
+            loader: 'worker-loader',
+            options: {
+              inline: false
+            }
+          },
+          'eslint-loader'
+        ],
+        exclude: /node_modules/
       }
     ]
   },

@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
-import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
+import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 import { PlayerWorldLight } from "./player-world-light";
 
 export class PlayerMe extends Player {
@@ -26,8 +26,8 @@ export class PlayerMe extends Player {
     this._initCamera();
     this._initLights();
     this._initControls();
-    // await Promise.resolve().delay(4000);
-    await super.init(options);
+    await Promise.resolve().delay(0);
+    return super.init(options);
   }
 
   /**
@@ -59,6 +59,7 @@ export class PlayerMe extends Player {
   _initCamera () {
     this._camera = new PlayerCamera( this );
     this._camera.initOrbitControls();
+    this._camera.initStartPosition();
     this._camera.makeActive();
 
     this.add( this._camera );

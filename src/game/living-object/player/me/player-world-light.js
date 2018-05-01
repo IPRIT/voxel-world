@@ -1,4 +1,4 @@
-import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
+import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 
 export class PlayerWorldLight extends THREE.DirectionalLight {
 

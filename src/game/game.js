@@ -173,7 +173,7 @@ export default class Game {
 
   _initFog () {
     // for game
-    this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 200 * WORLD_MAP_BLOCK_SIZE);
+    // this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 200 * WORLD_MAP_BLOCK_SIZE);
 
     // for debug
     // this._scene.fog = new THREE.Fog(0xffa1c1, 100 * WORLD_MAP_BLOCK_SIZE, 1000 * WORLD_MAP_BLOCK_SIZE);

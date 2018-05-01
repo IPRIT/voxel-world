@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import { WorldObjectVox, WorldObjectType } from "../world-object/index";
 import { resetDecimal } from "../../utils/index";
 import { WorldMapLoader } from "./world-map-loader";
@@ -59,7 +60,7 @@ export class WorldMap extends THREE.Group {
       return;
     }
     this._chunksLoading = true;
-    let newVisibleChunks = this.getVisibleChunksAt( position );
+    let newVisibleChunks = this.getVisibleChunksAt( position, true );
     let chunksToLoad = newVisibleChunks.filter(chunkIndex => {
       return !this._map.has( chunkIndex );
     });
@@ -68,11 +69,10 @@ export class WorldMap extends THREE.Group {
     });
 
     // loading chunks
-    let loadings = [];
-    for (let chunkToLoad of chunksToLoad) {
+    return Promise.resolve(chunksToLoad).mapSeries(chunkToLoad => {
       let [ x, z ] = this._parseChunkIndex( chunkToLoad );
 
-      let loadingEntity = this.loadChunkModel( chunkToLoad ).then(data => {
+      return this.loadChunkModel( chunkToLoad ).then(data => {
         let { cached, model = null, worldObject = null } = data || {};
         if (cached && worldObject) {
           // if cached attach object was created before
@@ -99,16 +99,12 @@ export class WorldMap extends THREE.Group {
           this.unloadChunk( chunkIndex );
         }
       });
+    }).then(_ => {
+      // unload the rest
+      this.unloadChunks( chunksToUnload );
 
-      loadings.push( loadingEntity );
-    }
-
-    await Promise.all( loadings );
-
-    // unload the rest
-    this.unloadChunks( chunksToUnload );
-
-    this._chunksLoading = false;
+      this._chunksLoading = false;
+    });
   }
 
   /**
@@ -212,18 +208,31 @@ export class WorldMap extends THREE.Group {
 
   /**
    * @param {THREE.Vector3} position
+   * @param {boolean} sort
    * @returns {string[]}
    */
-  getVisibleChunksAt (position) {
+  getVisibleChunksAt (position, sort = false) {
     position = new THREE.Vector3(position.x, position.y, position.z);
     let visibleChunksBox = this.getVisibleChunksBoxAt( position );
     let chunksIndicies = [];
     for (let xIndex = visibleChunksBox.from.x; xIndex <= visibleChunksBox.to.x; ++xIndex) {
       for (let zIndex = visibleChunksBox.from.z; zIndex <= visibleChunksBox.to.z; ++zIndex) {
-        chunksIndicies.push( this._buildChunkStringIndex(xIndex, zIndex) );
+        chunksIndicies.push( new THREE.Vector3(xIndex, 0, zIndex) );
       }
     }
-    return chunksIndicies;
+
+    if (sort) {
+      let chunkSize = WORLD_MAP_CHUNK_SIZE_VECTOR.clone();
+      let curChunk = resetDecimal( position.clone().divide( chunkSize ).setY(0) );
+
+      chunksIndicies = chunksIndicies.sort((chunkA, chunkB) => {
+        return curChunk.distanceTo( chunkA ) - curChunk.distanceTo( chunkB );
+      });
+    }
+
+    return chunksIndicies.map(chunkVector => {
+      return this._buildChunkStringIndex( chunkVector.x, chunkVector.z );
+    });
   }
 
   /**

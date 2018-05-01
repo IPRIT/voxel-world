@@ -1,6 +1,6 @@
 import { WorldMap } from "./map/world-map";
-import { PlayerMe } from "../player/me/player-me";
-import { PlayerClassType } from "../player/player-class-type";
+import { PlayerMe } from "../living-object/player/me/player-me";
+import { PlayerClassType } from "../living-object/player/player-class-type";
 import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
 
 export class World {

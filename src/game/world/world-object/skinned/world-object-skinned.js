@@ -1,4 +1,6 @@
 import { WorldObjectBase } from "../world-object-base";
+import { ModelType, SkinnedObjectLoader } from "../../../model";
+import { WorldObjectType } from "../index";
 
 export class WorldObjectSkinned extends WorldObjectBase {
 
@@ -15,12 +17,21 @@ export class WorldObjectSkinned extends WorldObjectBase {
   _material = null;
 
   /**
+   * Setting up skinned object
+   */
+  constructor () {
+    super(WorldObjectType.OBJECT, ModelType.SKINNED);
+  }
+
+  /**
    * @param {*} options
    */
   init (options = {}) {
     super.init( options );
-    this._createMesh( options );
-    this.attachMesh();
+    return this._load().then(([ model ]) => {
+      this._createMesh( model );
+      this.attachMesh();
+    });
   }
 
   /**
@@ -56,6 +67,22 @@ export class WorldObjectSkinned extends WorldObjectBase {
    */
   get geometryAnimationNames () {
     return this.geometryAnimations.map(animation => animation.name);
+  }
+
+  /**
+   * @returns {Promise<*>}
+   * @private
+   */
+  async _load () {
+    let { model } = await this._loadObjectModel();
+    return [ model ];
+  }
+
+  async _loadObjectModel () {
+    const { modelName } = this.options;
+
+    let skinnedObjectLoader = SkinnedObjectLoader.getLoader();
+    return skinnedObjectLoader.load( modelName );
   }
 
   /**
