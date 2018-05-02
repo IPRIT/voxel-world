@@ -1,11 +1,11 @@
 import { VoxModel } from "./vox-model";
 import PromiseWorker from 'promise-worker';
-import ParseWorker from 'worker-loader!./vox-parser.worker';
+import ParseWorker from './vox-parser.worker';
 import { voxLoadAndParse } from "./vox-parser";
 
 let parseWorker;
 
-if (window.Worker) {
+if (!window.Worker) {
   parseWorker = new PromiseWorker(ParseWorker());
 }
 
@@ -41,7 +41,7 @@ export class VoxLoader {
    * @returns {Promise<any>}
    * @private
    */
-  _loadRequest (url) {
+  async _loadRequest (url) {
     return parseWorker && parseWorker.postMessage( url )
       || voxLoadAndParse( url );
   }

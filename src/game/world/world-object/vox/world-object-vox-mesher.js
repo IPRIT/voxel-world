@@ -1,13 +1,14 @@
 import PromiseWorker from 'promise-worker';
 import { WorldChunkType } from '../../chunks/world-chunk-type';
-import MesherWorker from 'worker-loader!./compute-vertices.worker';
+import MesherWorker from './compute-vertices.worker';
 import { computeVertices } from "./compute-vertices";
 
 let mesherWorkers = [];
 let roundRobinIndex = 0;
+const workersNumber = 5;
 
 if (window.Worker) {
-  for (let i = 0; i < 5; ++i) {
+  for (let i = 0; i < workersNumber; ++i) {
     mesherWorkers.push( new PromiseWorker(MesherWorker()) );
   }
 }
@@ -152,8 +153,6 @@ export class WorldObjectVoxMesher {
 
     roundRobinIndex++;
     roundRobinIndex %= mesherWorkers.length;
-
-    mesherWorkers[ roundRobinIndex ].postMessage( context );
 
     return mesherWorkers[ roundRobinIndex ].postMessage( context );
   }

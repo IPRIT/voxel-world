@@ -1,6 +1,7 @@
 import { WorldObjectBase } from "../world-object-base";
 import { ModelType, SkinnedObjectLoader } from "../../../model";
 import { WorldObjectType } from "../index";
+import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 
 export class WorldObjectSkinned extends WorldObjectBase {
 
@@ -90,10 +91,22 @@ export class WorldObjectSkinned extends WorldObjectBase {
    * @param {THREE.Material} material
    */
   _createMesh ({ geometry, material } = {}) {
+    /*geometry = new THREE.CylinderGeometry(
+      WORLD_MAP_BLOCK_SIZE,
+      WORLD_MAP_BLOCK_SIZE,
+      WORLD_MAP_BLOCK_SIZE * 3,
+      18,
+      4,
+      false
+    );*/
+
     this._geometry = geometry;
     this._material = material;
 
     let skinnedMesh = new THREE.SkinnedMesh( geometry, material );
+    // let skinnedMesh = new THREE.Mesh( geometry, material );
+    // skinnedMesh.position.y = WORLD_MAP_BLOCK_SIZE * 2.99 / 2;
+
     skinnedMesh.castShadow = true;
     skinnedMesh.receiveShadow = true;
 

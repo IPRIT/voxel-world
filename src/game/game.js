@@ -337,7 +337,7 @@ export default class Game {
     let x = ((intersects[0].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    console.log(x, y, z);
+    console.log('Clicked:', x, y, z, 'World:', intersects[0].point.x, intersects[0].point.y, intersects[0].point.z);
 
     this.world._me.setTargetLocation(intersects[0].point);
 

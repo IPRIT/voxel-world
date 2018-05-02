@@ -45,6 +45,9 @@ export class World {
       classType: PlayerClassType.MYSTIC
     });
 
+    game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
+    game._transformControl.attach( me );
+    this._game.scene.add( game._transformControl );
     this._game.scene.add( me );
   }
 
@@ -53,6 +56,8 @@ export class World {
       this._me.update( deltaTime );
       this.map.updateAtPosition( this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE ) );
     }
+
+    game._transformControl.update();
   }
 
   /**

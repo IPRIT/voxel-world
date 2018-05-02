@@ -1,5 +1,6 @@
 import { WorldObjectAnimated } from "../world/world-object/animated";
 import { warp } from "../utils";
+import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 
 const EPS = 1e-5;
 
@@ -60,9 +61,6 @@ export class LivingObject extends WorldObjectAnimated {
 
       if (this.getComingLocationDistance() > 2 * this._velocityScalar) {
         this._nextPosition( deltaTime );
-        if (!this._coming) {
-          this.setComingState();
-        }
       } else {
         this.setComingState( false );
       }
@@ -192,11 +190,196 @@ export class LivingObject extends WorldObjectAnimated {
         warp( this._velocityScalar, deltaTimeMs )
       );
 
-    this.position.add( shiftVector );
+    let { shiftPosition, changed } = this._clampNextPosition(shiftVector);
+
+    if (changed) {
+      this._updateVelocityDirection();
+    }
+
+    let oldPosition = this.position.clone();
+    this.position.add( shiftPosition );
+    let distancePassed = oldPosition.distanceTo( this.position );
+    if (distancePassed < .001) {
+      this.setComingState( false );
+    }
 
     if (this.mesh) {
       this.mesh.setRotationFromMatrix( this._rotationMatrix );
     }
+  }
+
+  /**
+   * @param {THREE.Vector3} shiftVector
+   * @private
+   */
+  _clampNextPosition (shiftVector) {
+    let shiftX = shiftVector.x;
+    let shiftY = shiftVector.y;
+    let shiftZ = shiftVector.z;
+
+    const bs = WORLD_MAP_BLOCK_SIZE;
+
+    let currentPosition = this.position.clone();
+    let desiredPosition = currentPosition.clone().add( shiftVector );
+
+    let playerRadius = bs * 1.5;
+    let playerHeight = bs * 3;
+
+    let blockPosition = new THREE.Vector3(
+      this._blockCoord(currentPosition.x) + 1,
+      this._blockCoord(currentPosition.y) + (shiftY > 0 ? playerHeight / bs : 0),
+      this._blockCoord(currentPosition.z) + 1
+    );
+
+    let map = game.world.map;
+
+    let changed = false;
+
+    // clamp for X
+    {
+      let shiftXVector = new THREE.Vector3(Math.sign(shiftX), 0, 0);
+      let nextBlockPosition = blockPosition.clone().add( shiftXVector );
+      let frontBlocksPositions = [
+        nextBlockPosition.clone(),
+        nextBlockPosition.clone().add(new THREE.Vector3(0, 1, 0)),
+        nextBlockPosition.clone().add(new THREE.Vector3(0, 2, 0))
+      ];
+      let frontBlocks = frontBlocksPositions.map(frontBlockPosition => {
+        return map.getBlock(frontBlockPosition);
+      });
+
+      for (let blockIndex = frontBlocks.length - 1; blockIndex >= 0; --blockIndex) {
+        let frontBlock = frontBlocks[ blockIndex ];
+        if (!frontBlock) {
+          continue;
+        }
+        let frontBlockWorldPosition = frontBlocksPositions[ blockIndex ].clone()
+          .add({x: -1, y: 0, z: -1 }).multiplyScalar( bs );
+        let playerPoint = currentPosition.clone().setY(frontBlockWorldPosition.y);
+        let nextPlayerPoint = desiredPosition.clone().setY(frontBlockWorldPosition.y);
+        let linePointA = frontBlockWorldPosition.clone();
+        let linePointB = frontBlockWorldPosition.clone().add(new THREE.Vector3(0, 0, bs));
+
+        if (shiftX < 0) {
+          linePointA.add({ x: bs, y: 0, z: 0 });
+          linePointB.add({ x: bs, y: 0, z: 0 });
+        }
+
+        let line = new THREE.Line3(linePointA, linePointB);
+        let crossPoint = new THREE.Vector3();
+        line.closestPointToPoint(playerPoint, false, crossPoint);
+
+        let distanceToPlane = nextPlayerPoint.distanceTo( crossPoint );
+
+        if (distanceToPlane < playerRadius) {
+          let overlapBy = playerRadius - distanceToPlane;
+          shiftX = 0;
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    // clamp for Z
+    {
+      let shiftZVector = new THREE.Vector3(0, 0, Math.sign(shiftZ));
+      let nextBlockPosition = blockPosition.clone().add( shiftZVector );
+      let frontBlocksPositions = [
+        nextBlockPosition.clone(),
+        nextBlockPosition.clone().add(new THREE.Vector3(0, 1, 0)),
+        nextBlockPosition.clone().add(new THREE.Vector3(0, 2, 0))
+      ];
+      let frontBlocks = frontBlocksPositions.map(frontBlockPosition => {
+        return map.getBlock(frontBlockPosition);
+      });
+
+      for (let blockIndex = frontBlocks.length - 1; blockIndex >= 0; --blockIndex) {
+        let frontBlock = frontBlocks[ blockIndex ];
+        if (!frontBlock) {
+          continue;
+        }
+        let frontBlockWorldPosition = frontBlocksPositions[ blockIndex ].clone()
+          .add({x: -1, y: 0, z: -1 }).multiplyScalar( bs );
+        let playerPoint = currentPosition.clone().setY(frontBlockWorldPosition.y);
+        let nextPlayerPoint = desiredPosition.clone().setY(frontBlockWorldPosition.y);
+        let linePointA = frontBlockWorldPosition.clone();
+        let linePointB = frontBlockWorldPosition.clone().add(new THREE.Vector3(bs, 0, 0));
+
+        if (shiftZ < 0) {
+          linePointA.add({ x: 0, y: 0, z: bs });
+          linePointB.add({ x: 0, y: 0, z: bs });
+        }
+
+        let line = new THREE.Line3(linePointA, linePointB);
+        let crossPoint = new THREE.Vector3();
+        line.closestPointToPoint(playerPoint, false, crossPoint);
+
+        let distanceToPlane = nextPlayerPoint.distanceTo( crossPoint );
+
+        if (distanceToPlane < playerRadius) {
+          let overlapBy = playerRadius - distanceToPlane;
+          shiftZ = 0;
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    // clamp for Y
+    {
+      let shiftYVector = new THREE.Vector3(0, Math.sign(shiftY), 0);
+      let nextBlockPosition = blockPosition.clone().add( shiftYVector );
+      let frontBlocksPositions = [
+        nextBlockPosition.clone()
+      ];
+      let frontBlocks = frontBlocksPositions.map(frontBlockPosition => {
+        return map.getBlock(frontBlockPosition);
+      });
+
+      for (let blockIndex = frontBlocks.length - 1; blockIndex >= 0; --blockIndex) {
+        let frontBlock = frontBlocks[ blockIndex ];
+        if (!frontBlock) {
+          continue;
+        }
+        let frontBlockWorldPosition = frontBlocksPositions[ blockIndex ].clone().multiplyScalar( bs );
+        let nextPlayerPoint = desiredPosition.clone();
+
+        let yDiff = 0;
+        if (shiftY < 0) {
+          yDiff = nextPlayerPoint.y - (frontBlockWorldPosition.y + bs);
+        } else {
+          yDiff = frontBlockWorldPosition.y - (nextPlayerPoint.y + playerHeight);
+        }
+        if (yDiff < 0) {
+          shiftY = shiftY < 0 ? shiftY - yDiff : shiftY + yDiff;
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    return {
+      shiftPosition: shiftVector.setX(shiftX).setZ(shiftZ).setY(shiftY),
+      changed
+    };
+  }
+
+  /**
+   * @param {number} value
+   * @returns {number}
+   * @private
+   */
+  _worldBlockCoord (value) {
+    return this._blockCoord(value) * WORLD_MAP_BLOCK_SIZE;
+  }
+
+  /**
+   * @param {number} value
+   * @returns {number}
+   * @private
+   */
+  _blockCoord (value) {
+    return (value / WORLD_MAP_BLOCK_SIZE) | 0;
   }
 
   /**

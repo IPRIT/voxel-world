@@ -33,7 +33,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
   }
 
   initStartPosition () {
-    this.position.set(0, 370, 480);
+    this.position.set(0, 70, 80);
   }
 
   initOrbitControls () {

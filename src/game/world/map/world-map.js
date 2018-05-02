@@ -40,10 +40,6 @@ export class WorldMap extends THREE.Group {
    */
   _dummyModelFunction = (x, z) => ([{ x, y: 0, z }, [255, 0, 0]]);
 
-  constructor () {
-    super();
-  }
-
   init () {
     this.placeGroundPlate();
 

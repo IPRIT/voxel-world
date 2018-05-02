@@ -25,7 +25,7 @@ export class SkinnedModelLoader extends AbstractModelLoader {
   tryLoad (fileUrl, attemptsNumber) {
     return this.tryUntil(attemptNumber => {
       return new Promise((resolve, reject) => {
-        console.log(`Trying to load skinned model [attempt: ${attemptNumber}]: ${fileUrl}`);
+        // console.log(`Trying to load skinned model [attempt: ${attemptNumber}]: ${fileUrl}`);
 
         let loader = new THREE.ObjectLoader();
         loader.load(fileUrl, scene => {

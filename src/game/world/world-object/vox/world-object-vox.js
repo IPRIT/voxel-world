@@ -92,7 +92,7 @@ export class WorldObjectVox extends WorldObjectBase {
     if (!this.chunkInited) {
       return 0;
     }
-    this._chunk.getBlock( ...args );
+    return this._chunk.getBlock( ...args );
   }
 
   removeBlock (...args) {
