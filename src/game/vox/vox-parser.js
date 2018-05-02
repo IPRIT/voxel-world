@@ -34,9 +34,11 @@ export function voxLoadAndParse (url) {
   return new Promise((resolve, reject) => {
     req.onreadystatechange = () => {
       if (req.readyState === 4 && (req.status === 200 || req.status === 0)) {
-        resolve( parseVoxelBuffer( req.response ) );
+        if (req.response) {
+          resolve( parseVoxelBuffer( req.response ) );
+        }
       }
     };
-    req.onerror = event => reject();
+    req.onerror = event => reject(new Error('Can\'t load vox model'));
   });
 }

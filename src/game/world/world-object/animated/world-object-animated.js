@@ -26,12 +26,13 @@ export class WorldObjectAnimated extends WorldObjectSkinned {
   }
 
   /**
-   * @param {number} deltaTimeMs
+   * @param {number} deltaTime
    */
-  update (deltaTimeMs) {
+  update (deltaTime) {
     if (this._animationMixer) {
-      this._animationMixer.update( deltaTimeMs );
+      this._animationMixer.update( deltaTime );
     }
+    super.update( deltaTime );
   }
 
   /**
@@ -104,6 +105,14 @@ export class WorldObjectAnimated extends WorldObjectSkinned {
    */
   get currentClipAction () {
     return this._currentClipAction;
+  }
+
+  /**
+   * @returns {string}
+   */
+  get currentClipActionName () {
+    return this._currentClipAction
+      && this._currentClipAction._clip.name;
   }
 
   /**

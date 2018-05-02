@@ -339,6 +339,8 @@ export default class Game {
     let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
     console.log(x, y, z);
 
+    this.world._me.setTargetLocation(intersects[0].point);
+
     // console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
 
     // this.world.map.updateAtPosition({ x, y, z });
@@ -367,6 +369,6 @@ export default class Game {
 
     // console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
 
-    this.world.map.updateAtPosition({ x, y, z });
+    // this.world.map.updateAtPosition({ x, y, z });
   }
 }

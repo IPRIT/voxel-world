@@ -31,10 +31,9 @@ export class VoxLoader {
    * @param url
    * @returns {Promise<VoxModel>}
    */
-  load (url) {
-    return this._loadRequest(url).then(voxelData => {
-      return new VoxModel(voxelData);
-    });
+  async load (url) {
+    let voxelData = await this._loadRequest(url);
+    return new VoxModel(voxelData);
   }
 
   /**

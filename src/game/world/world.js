@@ -43,16 +43,14 @@ export class World {
 
     me.init({
       classType: PlayerClassType.MYSTIC
-    }).then(_ => {
-      me.activateClipAction('RunAction');
     });
 
     this._game.scene.add( me );
   }
 
-  update (deltaTimeMs) {
+  update (deltaTime) {
     if (this._me) {
-      this._me.update( deltaTimeMs );
+      this._me.update( deltaTime );
       this.map.updateAtPosition( this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE ) );
     }
   }
@@ -62,5 +60,12 @@ export class World {
    */
   get map () {
     return this._map;
+  }
+
+  /**
+   * @returns {PlayerMe}
+   */
+  get me () {
+    return this._me;
   }
 }

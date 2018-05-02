@@ -75,8 +75,11 @@ export class WorldObjectBase extends THREE.Group {
     this.setWorldScale(options);
   }
 
-  update () {
-    // not implemented
+  /**
+   * @param {number} deltaTime
+   */
+  update (deltaTime) {
+    // todo: not implemented
   }
 
   /**

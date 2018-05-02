@@ -31,18 +31,10 @@ export class PlayerMe extends Player {
   }
 
   /**
-   * @param {number} deltaTimeMs
+   * @param {number} deltaTime
    */
-  update (deltaTimeMs) {
-    super.update( deltaTimeMs );
-
-    let position = this.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE );
-    let y = window.game.world.map.getMapHeight( position );
-
-    let delta = deltaTimeMs * 1000;
-    let desiredDelta = 1000 / 60;
-    this.position.z -= (delta * .2) / desiredDelta;
-    this.position.y = y * WORLD_MAP_BLOCK_SIZE + 2 + .01;
+  update (deltaTime) {
+    super.update( deltaTime );
 
     if (this._camera) {
       this._camera.update();

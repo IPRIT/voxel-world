@@ -28,11 +28,10 @@ export class VoxModelLoader extends AbstractModelLoader {
    */
   async tryLoad (fileUrl, attemptsNumber) {
     return this.tryUntil(async attemptNumber => {
-      console.log(`Try to load vox model [attempt: ${attemptNumber}]: ${fileUrl}`);
+      console.log(`Trying to load vox model [attempt: ${attemptNumber}]: ${fileUrl}`);
       // return commonModel;
       let vox = new Vox();
-      await vox.load( fileUrl );
-      return vox.model;
+      return vox.load( fileUrl );
     }, attemptsNumber);
   }
 }

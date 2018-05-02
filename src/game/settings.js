@@ -11,5 +11,5 @@ export const WORLD_MAP_CHUNK_SIZE_VECTOR = new THREE.Vector3(
 );
 
 /* Map */
-export const WORLD_MAP_SIZE = 1 << 16;
+export const WORLD_MAP_SIZE = 1 << 14;
 export const WORLD_MAP_BLOCK_SIZE = 2;

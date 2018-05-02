@@ -1,5 +1,4 @@
 import { rgbToInt } from "../../utils";
-import { WorldChunkHeightMap } from "./world-chunk-height-map";
 
 export class WorldChunkBase {
 
@@ -63,12 +62,6 @@ export class WorldChunkBase {
   startingBlocks = 0;
 
   /**
-   * @type {WorldChunkHeightMap}
-   * @private
-   */
-  _heightMap = null;
-
-  /**
    * @param {VoxModel} model
    */
   constructor (model) {
@@ -80,7 +73,6 @@ export class WorldChunkBase {
    */
   init () {
     this._createBlocksBuffer();
-    this._createHeightMap();
     this.buildModel();
     this._inited = true;
   }
@@ -95,16 +87,6 @@ export class WorldChunkBase {
     for (let i = 0; i < blocks.length; ++i) {
       this.addBlock( blocks[i], blocks[i].color );
     }
-  }
-
-  /**
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
-   * @returns {number}
-   */
-  getHeight ({ x, y, z }) {
-    return this._heightMap.getHeight({ x, y, z });
   }
 
   /**
@@ -162,7 +144,6 @@ export class WorldChunkBase {
       this._voxBlocksNumber ++;
     }
     this.blocks[ blockIndex ] = color;
-    this.heightMap.updateHeight({ x, y, z });
     this.needsUpdate = true;
   }
 
@@ -180,6 +161,14 @@ export class WorldChunkBase {
   }
 
   /**
+   * @param {{x: number, y: number, z: number}} position
+   * @returns {boolean}
+   */
+  hasBlock (position) {
+    return !!this.getBlock(position);
+  }
+
+  /**
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -190,7 +179,6 @@ export class WorldChunkBase {
     }
     const blockIndex = this.blockIndex(x, y, z);
     this.blocks[ blockIndex ] = 0;
-    this.heightMap.resetHeight({ x, y, z }); // todo: needs to update properly
     this.needsUpdate = true;
   }
 
@@ -246,13 +234,6 @@ export class WorldChunkBase {
   }
 
   /**
-   * @returns {WorldChunkHeightMap}
-   */
-  get heightMap () {
-    return this._heightMap;
-  }
-
-  /**
    * @returns {boolean}
    */
   get inited () {
@@ -290,13 +271,5 @@ export class WorldChunkBase {
    */
   _createBlocksBuffer () {
     return (this._blocks = new Uint32Array( this.bufferSize ));
-  }
-
-  /**
-   * @returns {WorldChunkHeightMap}
-   * @private
-   */
-  _createHeightMap () {
-    return (this._heightMap = new WorldChunkHeightMap( this.size ));
   }
 }

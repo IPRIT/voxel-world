@@ -1,5 +1,6 @@
 import { PlayerClassType } from "./player-class-type";
 import { LivingObject } from "../index";
+import { PLAYER_VELOCITY_SCALAR } from "./player-defaults";
 
 export class PlayerObject extends LivingObject {
 
@@ -27,7 +28,8 @@ export class PlayerObject extends LivingObject {
 
     Object.assign(options, {
       worldScale: .4,
-      modelName: this.className
+      modelName: this.className,
+      velocityScalar: PLAYER_VELOCITY_SCALAR
     });
 
     return super.init( options );

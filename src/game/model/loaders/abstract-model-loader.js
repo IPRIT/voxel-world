@@ -63,7 +63,8 @@ export class AbstractModelLoader {
 
     while (attempts < attemptsNumber) {
       try {
-        return asyncAction(attempts);
+        let result = await asyncAction(attempts);
+        return result;
       } catch (e) {
         console.error('Model load error:', e);
         attempts++;
