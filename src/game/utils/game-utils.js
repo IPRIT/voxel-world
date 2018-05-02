@@ -1,6 +1,6 @@
 export const FRAMES_PER_SECOND = 60;
-export const FRAMES_DELTA_MS = 1000 / 60;
 export const FRAMES_DELTA_SEC = 1 / 60;
+export const FRAMES_DELTA_MS = 1000 / 60;
 
 /**
  * @param {number[]} colorArray
@@ -26,20 +26,19 @@ export function resetDecimal (vector) {
 
 /**
  * @param {number} value
- * @param {number} deltaTimeMs
+ * @param {number} deltaTime
  * @returns {number}
  * @private
  */
-export function warp (value, deltaTimeMs) {
-  return value * warpRatio( deltaTimeMs );
+export function warp (value, deltaTime) {
+  return value * warpRatio( deltaTime );
 }
 
 /**
- * @param {number} deltaTimeMs
+ * @param {number} deltaTime
  * @returns {number}
  * @private
  */
 export function warpRatio (deltaTime) {
-  let actualDelta = deltaTime * 1000;
-  return actualDelta / FRAMES_DELTA_MS;
+  return deltaTime / FRAMES_DELTA_SEC;
 }
