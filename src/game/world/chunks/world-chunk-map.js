@@ -29,6 +29,9 @@ export class WorldChunkMap extends WorldChunkBase {
     this.setWorldPosition( worldPosition );
   }
 
+  /**
+   * Builds map chunk by function or vox model
+   */
   buildModel () {
     if (!this.model) {
       return;
@@ -79,7 +82,7 @@ export class WorldChunkMap extends WorldChunkBase {
    * @param {number} z
    * @returns {boolean}
    */
-  insideChunk (x, y, z) {
+  absoluteInside (x, y, z) {
     if (typeof x === 'object') {
       const position = x;
       x = position.x;

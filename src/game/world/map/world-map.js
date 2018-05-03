@@ -318,6 +318,24 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {number}
+   */
+  getMinMaxBlockY ({ x, y, z }) {
+    x |= 0;
+    y |= 0;
+    z |= 0;
+    let chunkObject = this.getMapChunkAt({ x, y, z });
+    if (!chunkObject) {
+      return 0;
+    }
+    let relativePosition = new THREE.Vector3(x, y, z).sub(chunkObject.chunk.fromPosition);
+    return chunkObject.chunk.getMinMaxBlockY( relativePosition );
+  }
+
+  /**
    * @param {THREE.Vector3} position
    * @returns {WorldObjectVox}
    */

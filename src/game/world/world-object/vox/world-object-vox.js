@@ -72,9 +72,10 @@ export class WorldObjectVox extends WorldObjectBase {
   }
 
   /**
+   * @param {number} deltaTime
    * @param {boolean} force
    */
-  update (force = false) {
+  update (deltaTime, force = false) {
     if (!force && !this._chunk.needsUpdate) {
       return;
     }

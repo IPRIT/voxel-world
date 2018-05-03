@@ -42,3 +42,86 @@ export function warp (value, deltaTime) {
 export function warpRatio (deltaTime) {
   return deltaTime / FRAMES_DELTA_SEC;
 }
+
+/**
+ * @param {number} value
+ * @param {number} bitIndex
+ * @returns {number}
+ */
+export function hasBit (value, bitIndex) {
+  return value & ( 1 << bitIndex );
+}
+
+/**
+ * @param {number} value
+ * @param {number} bitIndex
+ * @returns {number}
+ */
+export function setBit (value, bitIndex) {
+  return value | ( 1 << bitIndex );
+}
+
+
+/**
+ * @param {number} value
+ * @param {number} bitIndex
+ * @returns {number}
+ */
+export function unsetBit (value, bitIndex) {
+  return value & ~( 1 << bitIndex );
+}
+
+/**
+ * @see http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+ * @param {number} v
+ * @returns {number}
+ */
+export function nearestHighestPowerOfTwo (v) {
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  return ++v;
+}
+
+/**
+ * @see http://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+ * @param {number} v
+ * @returns {boolean}
+ */
+export function isPowerOfTwo (v) {
+  return v && !(v & (v - 1));
+}
+
+/**
+ * Computes integer log2 of number
+ * @see http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+ * @param {number} v
+ * @returns {number}
+ */
+export function log2 (v) {
+  let b = [ 0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000 ];
+  let S = [ 1, 2, 4, 8, 16 ];
+  let r = 0; // result of log2(v) will go here
+  for (let i = 4; i >= 0; i--) { // unroll for speed...
+    if (v & b[i]) {
+      v >>= S[i];
+      r |= S[i];
+    }
+  }
+  return r;
+}
+
+/**
+ * 0000100011110111000 ->
+ * 0000000000000100000
+ * @param {number} v
+ * @returns {number}
+ */
+export function lowestMaxBit (v) {
+  v |= v - 1;
+  v ^= v | (v + 1);
+  return v >> 1;
+}

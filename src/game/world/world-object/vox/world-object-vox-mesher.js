@@ -144,7 +144,8 @@ export class WorldObjectVoxMesher {
       chunkType: chunk.type,
       chunkSize: chunk.size,
       bs,
-      WorldChunkType: WorldChunkType.getPlainObject()
+      WorldChunkType: WorldChunkType.getPlainObject(),
+      renderNegY: true
     };
 
     if (!window.Worker) {

@@ -5,7 +5,8 @@ export function computeVertices (context) {
     chunkBlocks,
     chunkType,
     chunkSize,
-    bs
+    bs,
+    renderNegY = false
   } = context;
 
   const chunkBlockIndex = (x, y, z) => {
@@ -91,7 +92,7 @@ export function computeVertices (context) {
         }
 
         // Only check / draw bottom if we are an object!
-        if (!isMapChunk) {
+        if (!isMapChunk || renderNegY) {
           if (y > 0) {
             if (chunkBlocks[ chunkBlockIndex(x, y - 1, z) ] !== 0) {
               below = 1;
@@ -133,7 +134,7 @@ export function computeVertices (context) {
           }
         }
 
-        if (isMapChunk) {
+        if (isMapChunk && !renderNegY) {
           if (front === 1 && left === 1 && right === 1 && above === 1 && back === 1) {
             continue; // block is hidden (map)
           }
@@ -146,7 +147,7 @@ export function computeVertices (context) {
         // Draw blocks
 
         // Only draw below if we are an object
-        if (!isMapChunk) {
+        if (!isMapChunk || renderNegY) {
           if (!below) {
             // Get below (bit 6)
             if ((chunkBlocks[ blockIndex ] & 0x20) === 0) {

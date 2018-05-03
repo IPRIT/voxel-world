@@ -1,4 +1,10 @@
 import { rgbToInt } from "../../utils";
+import { WorldChunkHeightMap } from "./world-chunk-height-map";
+import {
+  WORLD_MAP_CHUNK_HEIGHT_POWER, WORLD_MAP_CHUNK_SIZE,
+  WORLD_MAP_CHUNK_SIZE_POWER
+} from "../../settings";
+import { WorldChunkType } from "./world-chunk-type";
 
 export class WorldChunkBase {
 
@@ -42,6 +48,12 @@ export class WorldChunkBase {
   _triangles = 0;
 
   /**
+   * @type {WorldChunkHeightMap}
+   * @private
+   */
+  _heightMap = null;
+
+  /**
    * @type {boolean}
    */
   needsUpdate = false;
@@ -73,6 +85,7 @@ export class WorldChunkBase {
    */
   init () {
     this._createBlocksBuffer();
+    this._createHeightMap();
     this.buildModel();
     this._inited = true;
   }
@@ -104,6 +117,11 @@ export class WorldChunkBase {
    * @returns {number}
    */
   blockIndex (x, y, z) {
+    if (this._type === WorldChunkType.MAP_CHUNK) {
+      return ((x << WORLD_MAP_CHUNK_HEIGHT_POWER) << WORLD_MAP_CHUNK_SIZE_POWER)
+        + (y << WORLD_MAP_CHUNK_SIZE_POWER)
+        + z;
+    }
     return x * this.size.y * this.size.z
       + y * this.size.z
       + z;
@@ -144,6 +162,7 @@ export class WorldChunkBase {
       this._voxBlocksNumber ++;
     }
     this.blocks[ blockIndex ] = color;
+    this._heightMap.addBlock(x, y, z);
     this.needsUpdate = true;
   }
 
@@ -179,7 +198,17 @@ export class WorldChunkBase {
     }
     const blockIndex = this.blockIndex(x, y, z);
     this.blocks[ blockIndex ] = 0;
+    this._heightMap.removeBlock(x, y, z);
     this.needsUpdate = true;
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} z
+   * @returns {number}
+   */
+  getMinMaxBlockY ({ x, z }) {
+    return this._heightMap.getMinMaxBlock(x, z);
   }
 
   /**
@@ -271,5 +300,13 @@ export class WorldChunkBase {
    */
   _createBlocksBuffer () {
     return (this._blocks = new Uint32Array( this.bufferSize ));
+  }
+
+  /**
+   * @returns {WorldChunkHeightMap}
+   * @private
+   */
+  _createHeightMap () {
+    return (this._heightMap = new WorldChunkHeightMap( this.size ));
   }
 }
