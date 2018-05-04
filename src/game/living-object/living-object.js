@@ -1,6 +1,7 @@
 import { WorldObjectAnimated } from "../world/world-object/animated";
 import { warp } from "../utils";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
+import { ObjectGravity } from "../physic";
 
 const EPS = 1e-5;
 
@@ -27,6 +28,12 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _velocityScalar = 0;
+
+  /**
+   * @type {ObjectGravity}
+   * @private
+   */
+  _gravity = new ObjectGravity();
 
   /**
    * @type {THREE.Matrix4}
@@ -66,6 +73,9 @@ export class LivingObject extends WorldObjectAnimated {
       }
     }
 
+    this._gravity.update( deltaTime );
+    this._updateVerticalPosition();
+
     super.update( deltaTime );
   }
 
@@ -85,6 +95,10 @@ export class LivingObject extends WorldObjectAnimated {
    */
   setTargetObject (livingObject) {
     if (livingObject) {
+      if (this._targetObject
+        && this._targetObject.id === livingObject.id) {
+        this.setComingState();
+      }
       this._targetObject = livingObject;
       this._targetLocation = null;
       this._updateVelocityDirection();
@@ -132,7 +146,10 @@ export class LivingObject extends WorldObjectAnimated {
    */
   getComingLocationDistance () {
     let comingLocation = this.getComingLocation();
-    return comingLocation && comingLocation.distanceTo( this.position ) || 0;
+    return comingLocation && comingLocation.setY( 0 )
+      .distanceTo(
+        this.position.clone().setY( 0 )
+      ) || 0;
   }
 
   /**
@@ -180,14 +197,14 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
-   * @param {number} deltaTimeMs
+   * @param {number} deltaTime
    * @private
    */
-  _nextPosition ( deltaTimeMs ) {
+  _nextPosition ( deltaTime ) {
     let shiftVector = this._velocityDirection.clone()
       .normalize()
       .multiplyScalar(
-        warp( this._velocityScalar, deltaTimeMs )
+        warp( this._velocityScalar, deltaTime )
       );
 
     let { shiftPosition, changed } = this._clampNextPosition(shiftVector);
@@ -197,7 +214,7 @@ export class LivingObject extends WorldObjectAnimated {
     }
 
     let oldPosition = this.position.clone();
-    this.position.add( shiftPosition );
+    this.position.add( shiftPosition.setY( 0 ) );
     let distancePassed = oldPosition.distanceTo( this.position );
     if (distancePassed < .001) {
       this.setComingState( false );
@@ -222,12 +239,11 @@ export class LivingObject extends WorldObjectAnimated {
     let currentPosition = this.position.clone();
     let desiredPosition = currentPosition.clone().add( shiftVector );
 
-    let playerRadius = bs * 1.5;
-    let playerHeight = bs * 3;
+    let playerRadius = bs * .9;
 
     let blockPosition = new THREE.Vector3(
       this._blockCoord(currentPosition.x) + 1,
-      this._blockCoord(currentPosition.y) + (shiftY > 0 ? playerHeight / bs : 0),
+      this._blockCoord(currentPosition.y),
       this._blockCoord(currentPosition.z) + 1
     );
 
@@ -239,43 +255,77 @@ export class LivingObject extends WorldObjectAnimated {
     {
       let shiftXVector = new THREE.Vector3(Math.sign(shiftX), 0, 0);
       let nextBlockPosition = blockPosition.clone().add( shiftXVector );
-      let frontBlocksPositions = [
-        nextBlockPosition.clone(),
-        nextBlockPosition.clone().add(new THREE.Vector3(0, 1, 0)),
-        nextBlockPosition.clone().add(new THREE.Vector3(0, 2, 0))
-      ];
-      let frontBlocks = frontBlocksPositions.map(frontBlockPosition => {
-        return map.getBlock(frontBlockPosition);
+
+      let frontBlocksPositions = [[
+        nextBlockPosition.clone().add({ x: 0, y: 0, z: -1 }),
+        nextBlockPosition.clone().add({ x: 0, y: 0, z: 0 }),
+        nextBlockPosition.clone().add({ x: 0, y: 0, z: 1 })
+      ], [
+        nextBlockPosition.clone().add({ x: 0, y: 1, z: -1 }),
+        nextBlockPosition.clone().add({ x: 0, y: 1, z: 0 }),
+        nextBlockPosition.clone().add({ x: 0, y: 1, z: 1 })
+      ], [
+        nextBlockPosition.clone().add({ x: 0, y: 2, z: -1 }),
+        nextBlockPosition.clone().add({ x: 0, y: 2, z: 0 }),
+        nextBlockPosition.clone().add({ x: 0, y: 2, z: 1 })
+      ]];
+
+      let frontBlocksValues = frontBlocksPositions.map(frontBlocksLevel => {
+        return frontBlocksLevel.map( position => map.getBlock(position) );
       });
 
-      for (let blockIndex = frontBlocks.length - 1; blockIndex >= 0; --blockIndex) {
-        let frontBlock = frontBlocks[ blockIndex ];
-        if (!frontBlock) {
-          continue;
-        }
-        let frontBlockWorldPosition = frontBlocksPositions[ blockIndex ].clone()
-          .add({x: -1, y: 0, z: -1 }).multiplyScalar( bs );
-        let playerPoint = currentPosition.clone().setY(frontBlockWorldPosition.y);
-        let nextPlayerPoint = desiredPosition.clone().setY(frontBlockWorldPosition.y);
-        let linePointA = frontBlockWorldPosition.clone();
-        let linePointB = frontBlockWorldPosition.clone().add(new THREE.Vector3(0, 0, bs));
-
-        if (shiftX < 0) {
-          linePointA.add({ x: bs, y: 0, z: 0 });
-          linePointB.add({ x: bs, y: 0, z: 0 });
-        }
-
-        let line = new THREE.Line3(linePointA, linePointB);
-        let crossPoint = new THREE.Vector3();
-        line.closestPointToPoint(playerPoint, false, crossPoint);
-
-        let distanceToPlane = nextPlayerPoint.distanceTo( crossPoint );
-
-        if (distanceToPlane < playerRadius) {
-          let overlapBy = playerRadius - distanceToPlane;
-          shiftX = 0;
-          changed = true;
+      let leftRightValue = false;
+      for (let i = 0; i < frontBlocksValues.length; ++i) {
+        if (frontBlocksValues[i][0] && frontBlocksValues[i][2]
+          || frontBlocksValues[i][1]) {
+          leftRightValue = true;
           break;
+        }
+      }
+
+      if (leftRightValue) {
+        let shiftsX = [];
+
+        for (let levelIndex = frontBlocksValues.length - 1; levelIndex >= 0; --levelIndex) {
+          let levelBlocksValues = frontBlocksValues[ levelIndex ];
+          let levelBlocksPositions = frontBlocksPositions[ levelIndex ];
+          let frontBlocksWorldPositions = [];
+          let frontBlockPoint = new THREE.Vector3();
+
+          for (let levelBlockIndex = 0; levelBlockIndex < levelBlocksValues.length; ++levelBlockIndex) {
+            let zOffset = (2 - levelBlockIndex) / 2;
+            frontBlocksWorldPositions.push(
+              levelBlocksPositions[ levelBlockIndex ].clone()
+                .add({ x: shiftX > 0 ? -1 : 0, y: .5, z: -1 + zOffset })
+                .multiplyScalar( bs )
+            );
+          }
+
+          let nextPlayerPoint = desiredPosition.clone().setY(frontBlocksWorldPositions[1].y);
+
+          let line = new THREE.Line3(frontBlocksWorldPositions[0], frontBlocksWorldPositions[2]);
+          line.closestPointToPoint(nextPlayerPoint, false, frontBlockPoint);
+
+          let levelBlockValue = levelBlocksValues[ 1 ];
+          if (!levelBlockValue) {
+            continue;
+          }
+          let distanceToPoint = nextPlayerPoint.distanceTo( frontBlockPoint );
+          if (distanceToPoint > playerRadius) {
+            continue;
+          }
+
+          let overlap = playerRadius - distanceToPoint;
+          shiftsX.push(
+            shiftX + Math.sign(-shiftX) * overlap
+          );
+        }
+
+        if (shiftsX.length) {
+          shiftX = shiftX > 0
+            ? Math.min( ...shiftsX )
+            : Math.max( ...shiftsX );
+          changed = true;
         }
       }
     }
@@ -284,76 +334,78 @@ export class LivingObject extends WorldObjectAnimated {
     {
       let shiftZVector = new THREE.Vector3(0, 0, Math.sign(shiftZ));
       let nextBlockPosition = blockPosition.clone().add( shiftZVector );
-      let frontBlocksPositions = [
-        nextBlockPosition.clone(),
-        nextBlockPosition.clone().add(new THREE.Vector3(0, 1, 0)),
-        nextBlockPosition.clone().add(new THREE.Vector3(0, 2, 0))
-      ];
-      let frontBlocks = frontBlocksPositions.map(frontBlockPosition => {
-        return map.getBlock(frontBlockPosition);
+
+      let frontBlocksPositions = [[
+        nextBlockPosition.clone().add({ x: -1, y: 0, z: 0 }),
+        nextBlockPosition.clone().add({ x: 0, y: 0, z: 0 }),
+        nextBlockPosition.clone().add({ x: 1, y: 0, z: 0 })
+      ], [
+        nextBlockPosition.clone().add({ x: -1, y: 1, z: 0 }),
+        nextBlockPosition.clone().add({ x: 0, y: 1, z: 0 }),
+        nextBlockPosition.clone().add({ x: 1, y: 1, z: 0 })
+      ], [
+        nextBlockPosition.clone().add({ x: -1, y: 2, z: 0 }),
+        nextBlockPosition.clone().add({ x: 0, y: 2, z: 0 }),
+        nextBlockPosition.clone().add({ x: 1, y: 2, z: 0 })
+      ]];
+
+      let frontBlocksValues = frontBlocksPositions.map(frontBlocksLevel => {
+        return frontBlocksLevel.map( position => map.getBlock(position) );
       });
 
-      for (let blockIndex = frontBlocks.length - 1; blockIndex >= 0; --blockIndex) {
-        let frontBlock = frontBlocks[ blockIndex ];
-        if (!frontBlock) {
-          continue;
-        }
-        let frontBlockWorldPosition = frontBlocksPositions[ blockIndex ].clone()
-          .add({x: -1, y: 0, z: -1 }).multiplyScalar( bs );
-        let playerPoint = currentPosition.clone().setY(frontBlockWorldPosition.y);
-        let nextPlayerPoint = desiredPosition.clone().setY(frontBlockWorldPosition.y);
-        let linePointA = frontBlockWorldPosition.clone();
-        let linePointB = frontBlockWorldPosition.clone().add(new THREE.Vector3(bs, 0, 0));
-
-        if (shiftZ < 0) {
-          linePointA.add({ x: 0, y: 0, z: bs });
-          linePointB.add({ x: 0, y: 0, z: bs });
-        }
-
-        let line = new THREE.Line3(linePointA, linePointB);
-        let crossPoint = new THREE.Vector3();
-        line.closestPointToPoint(playerPoint, false, crossPoint);
-
-        let distanceToPlane = nextPlayerPoint.distanceTo( crossPoint );
-
-        if (distanceToPlane < playerRadius) {
-          let overlapBy = playerRadius - distanceToPlane;
-          shiftZ = 0;
-          changed = true;
+      let leftRightValue = false;
+      for (let i = 0; i < frontBlocksValues.length; ++i) {
+        if (frontBlocksValues[i][0] && frontBlocksValues[i][2]
+          || frontBlocksValues[i][1]) {
+          leftRightValue = true;
           break;
         }
       }
-    }
 
-    // clamp for Y
-    {
-      let shiftYVector = new THREE.Vector3(0, Math.sign(shiftY), 0);
-      let nextBlockPosition = blockPosition.clone().add( shiftYVector );
-      let frontBlocksPositions = [
-        nextBlockPosition.clone()
-      ];
-      let frontBlocks = frontBlocksPositions.map(frontBlockPosition => {
-        return map.getBlock(frontBlockPosition);
-      });
+      if (leftRightValue) {
+        let shiftsZ = [];
 
-      for (let blockIndex = frontBlocks.length - 1; blockIndex >= 0; --blockIndex) {
-        let frontBlock = frontBlocks[ blockIndex ];
-        if (!frontBlock) {
-          continue;
+        for (let levelIndex = frontBlocksValues.length - 1; levelIndex >= 0; --levelIndex) {
+          let levelBlocksValues = frontBlocksValues[ levelIndex ];
+          let levelBlocksPositions = frontBlocksPositions[ levelIndex ];
+          let frontBlocksWorldPositions = [];
+          let frontBlockPoint = new THREE.Vector3();
+
+          for (let levelBlockIndex = 0; levelBlockIndex < levelBlocksValues.length; ++levelBlockIndex) {
+            let xOffset = (2 - levelBlockIndex) / 2;
+            frontBlocksWorldPositions.push(
+              levelBlocksPositions[ levelBlockIndex ].clone()
+                .add({ x: -1 + xOffset, y: .5, z: shiftZ > 0 ? -1 : 0 })
+                .multiplyScalar( bs )
+            );
+          }
+
+          let nextPlayerPoint = desiredPosition.clone().setY(frontBlocksWorldPositions[1].y);
+
+          let line = new THREE.Line3(frontBlocksWorldPositions[0], frontBlocksWorldPositions[2]);
+          line.closestPointToPoint(nextPlayerPoint, false, frontBlockPoint);
+
+          let levelBlockValue = levelBlocksValues[ 1 ];
+          if (!levelBlockValue) {
+            continue;
+          }
+
+          let distanceToPoint = nextPlayerPoint.distanceTo( frontBlockPoint );
+          if (distanceToPoint > playerRadius) {
+            continue;
+          }
+
+          let overlap = playerRadius - distanceToPoint;
+          shiftsZ.push(
+            shiftZ + Math.sign(-shiftZ) * overlap
+          );
         }
-        let frontBlockWorldPosition = frontBlocksPositions[ blockIndex ].clone().multiplyScalar( bs );
-        let nextPlayerPoint = desiredPosition.clone();
 
-        let yDiff = 0;
-        if (shiftY < 0) {
-          yDiff = nextPlayerPoint.y - (frontBlockWorldPosition.y + bs);
-        } else {
-          yDiff = frontBlockWorldPosition.y - (nextPlayerPoint.y + playerHeight);
-        }
-        if (yDiff < 0) {
-          shiftY = shiftY < 0 ? shiftY - yDiff : shiftY + yDiff;
+        if (shiftsZ.length) {
+          shiftZ = shiftZ > 0
+            ? Math.min( ...shiftsZ )
+            : Math.max( ...shiftsZ );
           changed = true;
-          break;
         }
       }
     }
@@ -362,6 +414,133 @@ export class LivingObject extends WorldObjectAnimated {
       shiftPosition: shiftVector.setX(shiftX).setZ(shiftZ).setY(shiftY),
       changed
     };
+  }
+
+  /**
+   * @private
+   */
+  _updateVerticalPosition () {
+    let shiftY = -this._gravity.velocity;
+
+    this.position.y += this._clampVerticalPosition( shiftY );
+  }
+
+  /**
+   * @param {number} shiftY
+   * @returns {number}
+   * @private
+   */
+  _clampVerticalPosition (shiftY) {
+    const bs = WORLD_MAP_BLOCK_SIZE;
+
+    let currentPosition = this.position.clone();
+    let nextPlayerPosition = currentPosition.clone().add({ x: 0, y: shiftY, z: 0 });
+
+    let playerBlocksHeight = 3;
+
+    let blockPosition = new THREE.Vector3(
+      this._blockCoord(currentPosition.x) + 1,
+      this._blockCoord(currentPosition.y) + (shiftY > 0 ? playerBlocksHeight : 0),
+      this._blockCoord(currentPosition.z) + 1
+    );
+
+    let map = game.world.map;
+    let changed = false;
+
+    // clamp for Y
+    {
+      let shiftYVector = new THREE.Vector3(0, Math.sign(shiftY), 0);
+      let nextBlockPosition = blockPosition.clone().add( shiftYVector );
+
+      let frontBlocksPositions = [[
+        nextBlockPosition.clone().add({ x: 1, y: 0, z: -1 }),
+        nextBlockPosition.clone().add({ x: 1, y: 0, z: 0 }),
+        nextBlockPosition.clone().add({ x: 1, y: 0, z: 1 })
+      ], [
+        nextBlockPosition.clone().add({ x: 0, y: 0, z: -1 }),
+        nextBlockPosition.clone().add({ x: 0, y: 0, z: 0 }),
+        nextBlockPosition.clone().add({ x: 0, y: 0, z: 1 })
+      ], [
+        nextBlockPosition.clone().add({ x: -1, y: 0, z: -1 }),
+        nextBlockPosition.clone().add({ x: -1, y: 0, z: 0 }),
+        nextBlockPosition.clone().add({ x: -1, y: 0, z: 1 })
+      ]];
+
+      let frontBlocksValues = frontBlocksPositions.map(frontBlocksLevel => {
+        return frontBlocksLevel.map( position => map.getBlock(position) );
+      });
+
+      let hasValue = false;
+      for (let i = 0; i < frontBlocksValues.length; ++i) {
+        for (let j = 0; j < frontBlocksValues[i].length; ++j) {
+          if (frontBlocksValues[i][j]) {
+            hasValue = true;
+            break;
+          }
+        }
+      }
+
+      if (hasValue) {
+        let frontBlocksWorldPositions = [];
+        let centerPosition = frontBlocksPositions[ 1 ][ 1 ].clone()
+          .add({ x: -1, y: 0, z: -1});
+
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 1, y: shiftY > 0 ? 0 : 1, z: 0 })
+            .multiplyScalar( bs )
+        );
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 1, y: shiftY > 0 ? 0 : 1, z: 1 })
+            .multiplyScalar( bs )
+        );
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 0, y: shiftY > 0 ? 0 : 1, z: 1 })
+            .multiplyScalar( bs )
+        );
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 0, y: shiftY > 0 ? 0 : 1, z: 0 })
+            .multiplyScalar( bs )
+        );
+
+        let blockY = frontBlocksWorldPositions[0].y;
+
+        if (shiftY > 0) {
+          changed = nextPlayerPosition.y > blockY;
+          shiftY = changed
+            ? shiftY - (nextPlayerPosition.y - blockY)
+            : shiftY;
+        } else {
+          changed = blockY > nextPlayerPosition.y;
+          shiftY = changed
+            ? shiftY + (blockY - nextPlayerPosition.y) + .01 // to prevent model collisions with ground
+            : shiftY;
+        }
+      }
+    }
+
+    let minMaxY = map.getMinMaxBlockY(
+      new THREE.Vector3(
+        this._blockCoord(currentPosition.x) + 1,
+        this._blockCoord(currentPosition.y),
+        this._blockCoord(currentPosition.z) + 1
+      )
+    );
+    minMaxY = (minMaxY + 1) * bs;
+
+    let newPlayerY = currentPosition.y + shiftY;
+    if (newPlayerY < minMaxY) {
+      shiftY += minMaxY - newPlayerY;
+    }
+
+    if (changed) {
+      this._gravity.resetVelocity();
+    }
+
+    return shiftY;
   }
 
   /**
@@ -386,8 +565,8 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _updateVelocityDirection () {
-    let target = this.getComingLocation();
-    let current = this.position.clone();
+    let target = this.getComingLocation().setY( 0 );
+    let current = this.position.clone().setY( 0 );
     this._velocityDirection = target.sub( current ).normalize();
 
     this._updateRotationMatrix();

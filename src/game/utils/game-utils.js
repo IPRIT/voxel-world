@@ -116,12 +116,27 @@ export function log2 (v) {
 
 /**
  * 0000100011110111000 ->
+ * 0000100011110111111 ->
+ * 0000100011111111000 ^ 0000100011110111111 ->
+ * 0000000000001000000 ->
  * 0000000000000100000
  * @param {number} v
  * @returns {number}
  */
 export function lowestMaxBit (v) {
+  // filling lowest bit set
   v |= v - 1;
+  // find difference between current value and value with lowest zero bit "fired"
   v ^= v | (v + 1);
   return v >> 1;
 }
+
+const powersOfTwoInv = {};
+const powersOfTwo = {};
+
+for (let i = 0; i < 32; ++i) {
+  powersOfTwo[ i ] = 2 ** i;
+  powersOfTwoInv[ 2 ** i ] = i;
+}
+
+export const powers = { powersOfTwo, powersOfTwoInv };

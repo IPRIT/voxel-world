@@ -1,1 +1,1 @@
-export * from './physic-mixin';
+export * from './gravity';

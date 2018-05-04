@@ -1,5 +1,5 @@
 import { WORLD_MAP_CHUNK_HEIGHT, WORLD_MAP_CHUNK_SIZE_POWER } from "../../settings";
-import { hasBit, lowestMaxBit } from "../../utils";
+import { hasBit, lowestMaxBit, powers } from "../../utils";
 
 export class WorldChunkHeightMap {
 
@@ -63,21 +63,26 @@ export class WorldChunkHeightMap {
   }
 
   /**
+   * This method is faster than getMinMaxBlock2 relying on the performance test
+   *
    * @param {number} x
    * @param {number} z
    * @returns {number}
    */
   getMinMaxBlock (x, z) {
     let column = this.getColumn( x, z );
-    if (!column) {
-      return 0;
+    let minMaxY = 0, minY = -1;
+    for (let y = 0; y < WORLD_MAP_CHUNK_HEIGHT; ++y) {
+      if (hasBit( column, y )) {
+        minMaxY = y;
+        if (minY === -1) {
+          minY = y;
+        }
+      } else if (minY >= 0) {
+        break;
+      }
     }
-    let minMax = lowestMaxBit( column );
-    if (minMax < 0) {
-      return 30; // lowestMaxBit returns negative value when log2 is 30 (single case)
-    }
-    // lowestMaxBit returns zero when power of 2 is 31 (single case)
-    return minMax === 0 ? 31 : Math.log2( minMax ); // minMax always power of 2
+    return minMaxY;
   }
 
   /**
@@ -87,8 +92,28 @@ export class WorldChunkHeightMap {
    */
   getMinMaxBlock2 (x, z) {
     let column = this.getColumn( x, z );
-    let minMaxY = 0, minY = -1;
-    for (let y = 0; y < WORLD_MAP_CHUNK_HEIGHT; ++y) {
+    if (!column) {
+      return 0;
+    }
+    let minMax = lowestMaxBit( column );
+    if (minMax < 0) {
+      return 30; // lowestMaxBit returns negative value when log2 is 30 (single case)
+    }
+    // lowestMaxBit returns zero when power of 2 is 31 (single case)
+    return minMax === 0 ? 31 : powers.powersOfTwoInv[ minMax ]; // minMax always power of 2
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} z
+   * @param {number} fromY
+   * @param {number} toY
+   * @returns {number}
+   */
+  getMinMaxBlockBetween (x, z, fromY, toY) {
+    let column = this.getColumn( x, z );
+    let minMaxY = fromY, minY = -1;
+    for (let y = fromY; y < toY; ++y) {
       if (hasBit( column, y )) {
         minMaxY = y;
         if (minY === -1) {

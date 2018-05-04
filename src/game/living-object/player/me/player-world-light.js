@@ -44,10 +44,10 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
   _addShadows () {
     this.castShadow = true;
 
-    this.shadow.mapSize.width = 1 << 10;
-    this.shadow.mapSize.height = 1 << 10;
+    this.shadow.mapSize.width = 1 << 11;
+    this.shadow.mapSize.height = 1 << 11;
 
-    const offset = 50 * WORLD_MAP_BLOCK_SIZE;
+    const offset = 70 * WORLD_MAP_BLOCK_SIZE;
 
     this.shadow.camera.top = offset;
     this.shadow.camera.right = offset;
@@ -63,7 +63,7 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
    * @private
    */
   _attachToMe () {
-    this.position.addScalar( 300 * WORLD_MAP_BLOCK_SIZE );
+    this.position.addScalar( 250 * WORLD_MAP_BLOCK_SIZE );
     const fakeTarget = new THREE.Object3D();
     this._me.add( fakeTarget );
     this.target = fakeTarget;
