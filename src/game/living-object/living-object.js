@@ -1,5 +1,5 @@
 import { WorldObjectAnimated } from "../world/world-object/animated";
-import { warp } from "../utils";
+import { keyboardCode, warp } from "../utils";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { ObjectGravity } from "../physic";
 
@@ -49,11 +49,26 @@ export class LivingObject extends WorldObjectAnimated {
   _coming = false;
 
   /**
+   * @type {boolean}
+   * @private
+   */
+  _needsVerticalUpdate = true;
+
+  /**
    * @param {object} options
    * @returns {*}
    */
   init (options = {}) {
     this._initOptions( options );
+
+    window.addEventListener('keydown', ev => {
+      if (ev.keyCode === 32) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        this.jump();
+      }
+    }, false);
+
     return super.init( options );
   }
 
@@ -74,7 +89,9 @@ export class LivingObject extends WorldObjectAnimated {
     }
 
     this._gravity.update( deltaTime );
-    this._updateVerticalPosition();
+    if (this._needsVerticalUpdate) {
+      this._updateVerticalPosition();
+    }
 
     super.update( deltaTime );
   }
@@ -152,6 +169,13 @@ export class LivingObject extends WorldObjectAnimated {
       ) || 0;
   }
 
+  jump () {
+    if (!this._needsVerticalUpdate) {
+      this._resumeVerticalUpdate();
+    }
+    this._gravity.setVelocity(-.7);
+  }
+
   /**
    * @returns {THREE.Vector3}
    */
@@ -220,6 +244,10 @@ export class LivingObject extends WorldObjectAnimated {
       this.setComingState( false );
     }
 
+    if (!this._needsVerticalUpdate) {
+      this._resumeVerticalUpdate();
+    }
+
     if (this.mesh) {
       this.mesh.setRotationFromMatrix( this._rotationMatrix );
     }
@@ -239,7 +267,7 @@ export class LivingObject extends WorldObjectAnimated {
     let currentPosition = this.position.clone();
     let desiredPosition = currentPosition.clone().add( shiftVector );
 
-    let playerRadius = bs * .9;
+    let playerRadius = bs * .95;
 
     let blockPosition = new THREE.Vector3(
       this._blockCoord(currentPosition.x) + 1,
@@ -422,12 +450,21 @@ export class LivingObject extends WorldObjectAnimated {
   _updateVerticalPosition () {
     let shiftY = -this._gravity.velocity;
 
-    this.position.y += this._clampVerticalPosition( shiftY );
+    let result = this._clampVerticalPosition( shiftY );
+    shiftY = result.shiftY;
+    this.position.y += shiftY;
+
+    if (Math.abs( shiftY ) < EPS && !this._coming) {
+      this._stopVerticalUpdate();
+    } else if (result.changed) {
+      // if shiftY changed
+      this._gravity.resetVelocity();
+    }
   }
 
   /**
-   * @param {number} shiftY
-   * @returns {number}
+   * @param shiftY
+   * @returns {{shiftY: number, changed: boolean}}
    * @private
    */
   _clampVerticalPosition (shiftY) {
@@ -536,11 +573,24 @@ export class LivingObject extends WorldObjectAnimated {
       shiftY += minMaxY - newPlayerY;
     }
 
-    if (changed) {
-      this._gravity.resetVelocity();
-    }
+    return { shiftY, changed };
+  }
 
-    return shiftY;
+  /**
+   * @private
+   */
+  _stopVerticalUpdate () {
+    this._gravity.stopUpdatingVelocity();
+    this._gravity.resetVelocity();
+    this._needsVerticalUpdate = false;
+  }
+
+  /**
+   * @private
+   */
+  _resumeVerticalUpdate () {
+    this._gravity.resumeUpdatingVelocity();
+    this._needsVerticalUpdate = true;
   }
 
   /**
