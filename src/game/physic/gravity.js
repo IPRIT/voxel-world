@@ -1,3 +1,5 @@
+import { warp } from "../utils";
+
 export class ObjectGravity {
 
   /**
@@ -16,7 +18,7 @@ export class ObjectGravity {
    * @type {number}
    * @private
    */
-  _gravityAcceleration = .9;
+  _gravityAcceleration = .01;
 
   /**
    * @param {number} deltaTime
@@ -88,6 +90,6 @@ export class ObjectGravity {
    * @private
    */
   _updateVelocity (deltaTime) {
-    this._velocity += this._gravityAcceleration * deltaTime;
+    this._velocity += warp(this._gravityAcceleration, deltaTime);
   }
 }

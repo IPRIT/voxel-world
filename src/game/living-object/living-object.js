@@ -66,6 +66,8 @@ export class LivingObject extends WorldObjectAnimated {
         ev.stopPropagation();
         ev.preventDefault();
         this.jump();
+      } else if (ev.keyCode === 27) {
+        this.setComingState( false );
       }
     }, false);
 
@@ -240,7 +242,7 @@ export class LivingObject extends WorldObjectAnimated {
     let oldPosition = this.position.clone();
     this.position.add( shiftPosition.setY( 0 ) );
     let distancePassed = oldPosition.distanceTo( this.position );
-    if (distancePassed < .001) {
+    if (distancePassed < .01) {
       this.setComingState( false );
     }
 
@@ -507,15 +509,9 @@ export class LivingObject extends WorldObjectAnimated {
         return frontBlocksLevel.map( position => map.getBlock(position) );
       });
 
-      let hasValue = false;
-      for (let i = 0; i < frontBlocksValues.length; ++i) {
-        for (let j = 0; j < frontBlocksValues[i].length; ++j) {
-          if (frontBlocksValues[i][j]) {
-            hasValue = true;
-            break;
-          }
-        }
-      }
+      let hasValue = frontBlocksValues[1][0] && frontBlocksValues[1][2]
+        || frontBlocksValues[0][1] && frontBlocksValues[2][1]
+        || frontBlocksValues[1][1];
 
       if (hasValue) {
         let frontBlocksWorldPositions = [];
