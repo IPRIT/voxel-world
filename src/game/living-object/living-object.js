@@ -2,6 +2,7 @@ import { WorldObjectAnimated } from "../world/world-object/animated";
 import { keyboardCode, warp } from "../utils";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { ObjectGravity } from "../physic";
+import { debugPoints } from "../utils/debug-utils";
 
 const EPS = 1e-5;
 
@@ -175,7 +176,7 @@ export class LivingObject extends WorldObjectAnimated {
     if (!this._needsVerticalUpdate) {
       this._resumeVerticalUpdate();
     }
-    this._gravity.setVelocity(-.7);
+    this._gravity.setVelocity(-.05); // -.7
   }
 
   /**
@@ -538,6 +539,8 @@ export class LivingObject extends WorldObjectAnimated {
             .add({ x: 0, y: shiftY > 0 ? 0 : 1, z: 0 })
             .multiplyScalar( bs )
         );
+
+        debugPoints('test' + Math.sign(shiftY), [...frontBlocksWorldPositions, frontBlocksWorldPositions[0]]);
 
         let blockY = frontBlocksWorldPositions[0].y;
 
