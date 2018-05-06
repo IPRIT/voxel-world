@@ -207,9 +207,6 @@ export default class Game {
 
   _attachEventListeners () {
     window.addEventListener( 'resize', this._onWindowResize.bind(this), false );
-    window.addEventListener( 'mousedown', this._onMouseDown.bind(this), false );
-    window.addEventListener( 'mouseup', this._onMouseUp.bind(this), false );
-    window.addEventListener( 'mousemove', this._onMouseMove.bind(this), false );
   }
 
   _initStats () {
@@ -318,63 +315,5 @@ export default class Game {
     this._activeCamera.updateProjectionMatrix();
 
     this._renderer.setSize( this._screenWidth, this._screenHeight );
-  }
-
-  /**
-   * @param {MouseEvent} event
-   * @private
-   */
-  _onMouseDown (event) {
-    this._mousePressedDown = event.which === 1;
-
-    if (!this._mousePressedDown) {
-      return;
-    }
-
-    this._mouse.x = ( event.clientX / this._screenWidth ) * 2 - 1;
-    this._mouse.y = - ( event.clientY / this._screenHeight ) * 2 + 1;
-    // update the picking ray with the camera and mouse position
-    this._raycaster.setFromCamera( this._mouse, this._activeCamera );
-    // calculate objects intersecting the picking ray
-    const intersects = this._raycaster.intersectObjects(
-      [ ...this.world.map.getMeshes(), this.world.map.groundPlate.children[0] ]
-    );
-
-    let x = ((intersects[0].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    console.log('Clicked:', x, y, z, 'World:', intersects[0].point.x, intersects[0].point.y, intersects[0].point.z);
-
-    this.world._me.setTargetLocation(intersects[0].point);
-
-    // console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
-
-    // this.world.map.updateAtPosition({ x, y, z });
-  }
-
-  _onMouseUp (event) {
-    this._mousePressedDown = false;
-  }
-
-  _onMouseMove (event) {
-    if (!this._mousePressedDown) {
-      return;
-    }
-    this._mouse.x = ( event.clientX / this._screenWidth ) * 2 - 1;
-    this._mouse.y = - ( event.clientY / this._screenHeight ) * 2 + 1;
-    // update the picking ray with the camera and mouse position
-    this._raycaster.setFromCamera( this._mouse, this._activeCamera );
-    // calculate objects intersecting the picking ray
-    const intersects = this._raycaster.intersectObjects(
-      [ ...this.world.map.getMeshes(), this.world.map.groundPlate.children[0] ]
-    );
-
-    let x = ((intersects[0].point.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    let y = ((intersects[0].point.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    let z = ((intersects[0].point.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-
-    // console.log( this.world.map.getVisibleChunksAt({ x, y, z }) );
-
-    // this.world.map.updateAtPosition({ x, y, z });
   }
 }

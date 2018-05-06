@@ -1,4 +1,5 @@
 import { isVectorZeroStrict } from "../../../utils";
+import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 
 export class PlayerControls {
 
@@ -21,6 +22,18 @@ export class PlayerControls {
   _playerWalkingByKeyboard = false;
 
   /**
+   * @type {THREE.Vector2}
+   * @private
+   */
+  _clickedAt = new THREE.Vector2();
+
+  /**
+   * @type {THREE.Raycaster}
+   * @private
+   */
+  _mapRaycaster = new THREE.Raycaster();
+
+  /**
    * @param {PlayerMe} player
    */
   constructor (player) {
@@ -29,6 +42,7 @@ export class PlayerControls {
 
   init () {
     this._initKeyboardState();
+    this._initMouseEvents();
   }
 
   /**
@@ -45,6 +59,7 @@ export class PlayerControls {
     if (this._keyboardState) {
       this._keyboardState.destroy();
     }
+    this._removeMouseEvents();
   }
 
   /**
@@ -52,6 +67,14 @@ export class PlayerControls {
    */
   _initKeyboardState () {
     this._keyboardState = new THREEx.KeyboardState();
+  }
+
+  /**
+   * @private
+   */
+  _initMouseEvents () {
+    window.addEventListener( 'mousedown', this._onMouseDown.bind(this), false );
+    window.addEventListener( 'touchstart', this._onMouseDown.bind(this), false );
   }
 
   /**
@@ -123,6 +146,49 @@ export class PlayerControls {
   }
 
   /**
+   * @param {MouseEvent} event
+   * @private
+   */
+  _onMouseDown (event) {
+    let isTouchEvent = event.type === 'touchstart';
+    if (event.which !== 1 && !isTouchEvent) {
+      return;
+    }
+    let map = game.world.map;
+
+    let targetEvent;
+    if (isTouchEvent) {
+      targetEvent = event.targetTouches[0];
+    } else {
+      targetEvent = event;
+    }
+
+    let { clientX, clientY } = targetEvent;
+
+    this._clickedAt.x = ( clientX / window.innerWidth ) * 2 - 1;
+    this._clickedAt.y = - ( clientY / window.innerHeight ) * 2 + 1;
+    // update the picking ray with the camera and mouse position
+    this._mapRaycaster.setFromCamera( this._clickedAt, this._me.camera );
+    // calculate objects intersecting the picking ray
+    const intersects = this._mapRaycaster.intersectObjects(
+      [ ...map.getMeshes(), map.groundPlate.children[0] ]
+    );
+
+    if (!intersects.length) {
+      return;
+    }
+
+    let clickedPoint = intersects[0].point;
+    let x = ((clickedPoint.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    let y = ((clickedPoint.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    let z = ((clickedPoint.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+
+    console.log('Clicked:', x, y, z, 'World:', clickedPoint.x, clickedPoint.y, clickedPoint.z);
+
+    this._me.setTargetLocation( clickedPoint );
+  }
+
+  /**
    * @param {THREE.Vector3} point
    * @private
    */
@@ -139,5 +205,13 @@ export class PlayerControls {
     const verticalAxis = new THREE.Vector3( 0, 1, 0 );
 
     return vector.applyAxisAngle( verticalAxis, angle );
+  }
+
+  /**
+   * @private
+   */
+  _removeMouseEvents () {
+    window.removeEventListener( 'mousedown', this._onMouseDown.bind(this), false );
+    window.removeEventListener( 'touchstart', this._onMouseDown.bind(this), false );
   }
 }
