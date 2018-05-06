@@ -51,7 +51,6 @@ export function isVectorZero (vector, eps = 1e-5) {
  * @param {number} value
  * @param {number} deltaTime
  * @returns {number}
- * @private
  */
 export function warp (value, deltaTime) {
   return value * warpRatio( deltaTime );
@@ -60,7 +59,6 @@ export function warp (value, deltaTime) {
 /**
  * @param {number} deltaTime
  * @returns {number}
- * @private
  */
 export function warpRatio (deltaTime) {
   return deltaTime / FRAMES_DELTA_SEC;
