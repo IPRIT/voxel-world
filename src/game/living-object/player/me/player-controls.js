@@ -59,6 +59,7 @@ export class PlayerControls {
    */
   _handleKeyboard () {
     this._handleKeyboardWalk();
+    this._handleKeyboardEvents();
   }
 
   /**
@@ -69,15 +70,6 @@ export class PlayerControls {
     const cameraDirection = this._me.camera.cameraDirection.setY( 0 );
 
     let keyboardDirection = new THREE.Vector3();
-    let spacePressed = keyboardState.pressed( 'space' );
-    let escPressed = keyboardState.pressed( 'escape' );
-
-    if (spacePressed) {
-      this._me.jump();
-    }
-    if (escPressed) {
-      this._me.setComingState( false );
-    }
 
     if (keyboardState.pressed( 'W' )) {
       keyboardDirection.add( cameraDirection );
@@ -111,6 +103,22 @@ export class PlayerControls {
     if (this._oldInfinitePoint.distanceTo( infinitePoint ) > 1e-5) {
       this._updateTargetLocation( infinitePoint );
       this._oldInfinitePoint = infinitePoint;
+    }
+  }
+
+  /**
+   * @private
+   */
+  _handleKeyboardEvents () {
+    let keyboardState = this._keyboardState;
+    let spacePressed = keyboardState.pressed( 'space' );
+    let escPressed = keyboardState.pressed( 'escape' );
+
+    if (spacePressed) {
+      this._me.jump();
+    }
+    if (escPressed) {
+      this._me.setComingState( false );
     }
   }
 
