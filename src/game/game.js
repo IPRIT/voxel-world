@@ -45,12 +45,6 @@ export default class Game {
   };
 
   /**
-   * @type {THREE.OrbitControls}
-   * @private
-   */
-  _orbitControls = null;
-
-  /**
    * @type {THREE.Scene}
    * @private
    */
@@ -101,11 +95,6 @@ export default class Game {
     // this._addObjects(); // shader
 
     this._initWorld();
-
-    if (!this._mouse) {
-      this._mouse = new THREE.Vector2();
-      this._raycaster = new THREE.Raycaster();
-    }
   }
 
   start () {
