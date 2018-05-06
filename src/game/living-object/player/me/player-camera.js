@@ -28,14 +28,23 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
     this.target = targetObject;
   }
 
+  /**
+   * Update loop
+   */
   update () {
     this._orbitControls.update();
   }
 
+  /**
+   * Inits camera position for player
+   */
   initStartPosition () {
     this.position.set(0, 70, 80);
   }
 
+  /**
+   * Inits orbit camera for player
+   */
   initOrbitControls () {
     this._orbitControls = new THREE.OrbitControls(this, game._renderer.domElement);
     this._orbitControls.target = this.target.position;
@@ -48,7 +57,17 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
     this.update();
   }
 
+  /**
+   * Makes camera active for current scene
+   */
   makeActive () {
     game._activeCamera = this;
+  }
+
+  /**
+   * @returns {THREE.Vector3}
+   */
+  get cameraDirection () {
+    return this.target.position.clone().sub( this.position ).normalize();
   }
 }

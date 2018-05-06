@@ -3,6 +3,7 @@ import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
 import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 import { PlayerWorldLight } from "./player-world-light";
+import { PlayerControls } from "./player-controls";
 
 export class PlayerMe extends Player {
 
@@ -17,6 +18,12 @@ export class PlayerMe extends Player {
    * @private
    */
   _light = null;
+
+  /**
+   * @type {PlayerControls}
+   * @private
+   */
+  _controls = null;
 
   /**
    * @param options
@@ -36,12 +43,28 @@ export class PlayerMe extends Player {
   update (deltaTime) {
     super.update( deltaTime );
 
+    if (this._controls) {
+      this._controls.update( deltaTime );
+    }
     if (this._camera) {
       this._camera.update();
     }
     if (this._light) {
       this._light.update();
     }
+  }
+
+  jump () {
+    if (!this.isJumping) {
+      super.jump();
+    }
+  }
+
+  /**
+   * @returns {PlayerCamera}
+   */
+  get camera () {
+    return this._camera;
   }
 
   /**
@@ -64,7 +87,7 @@ export class PlayerMe extends Player {
    * @private
    */
   _initLights () {
-    this._light = new PlayerWorldLight( this, 0xEEB1C6, .5 );
+    this._light = new PlayerWorldLight( this, 0x999999, .4 );
     this._light.init();
     this._light.attachToWorld();
 
@@ -75,6 +98,7 @@ export class PlayerMe extends Player {
    * @private
    */
   _initControls () {
-    // todo
+    this._controls = new PlayerControls( this );
+    this._controls.init();
   }
 }

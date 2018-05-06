@@ -25,6 +25,29 @@ export function resetDecimal (vector) {
 }
 
 /**
+ * @param {THREE.Vector3} vector
+ * @returns {boolean}
+ */
+export function isVectorZeroStrict (vector) {
+  return vector.equals({ x: 0, y: 0, z: 0 });
+}
+
+/**
+ * @param {THREE.Vector3} vector
+ * @param {number} eps
+ * @returns {boolean}
+ */
+export function isVectorZero (vector, eps = 1e-5) {
+  const EPS = eps;
+  for (let i = 0; i < 3; ++i) {
+    if (vector.getComponent( i ) > EPS) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * @param {number} value
  * @param {number} deltaTime
  * @returns {number}

@@ -1,10 +1,7 @@
 import { WorldObjectAnimated } from "../world/world-object/animated";
-import { keyboardCode, warp } from "../utils";
+import { warp } from "../utils";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { ObjectGravity } from "../physic";
-import { debugPoints } from "../utils/debug-utils";
-
-const EPS = 1e-5;
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -12,6 +9,12 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {THREE.Vector3}
    */
   _targetLocation = null;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _targetLocationInfinite = false;
 
   /**
    * @type {LivingObject}
@@ -53,6 +56,12 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {boolean}
    * @private
    */
+  _isJumping = false;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
   _needsVerticalUpdate = true;
 
   /**
@@ -61,17 +70,6 @@ export class LivingObject extends WorldObjectAnimated {
    */
   init (options = {}) {
     this._initOptions( options );
-
-    window.addEventListener('keydown', ev => {
-      if (ev.keyCode === 32) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        this.jump();
-      } else if (ev.keyCode === 27) {
-        this.setComingState( false );
-      }
-    }, false);
-
     return super.init( options );
   }
 
@@ -91,9 +89,8 @@ export class LivingObject extends WorldObjectAnimated {
       }
     }
 
-    this._gravity.update( deltaTime );
     if (this._needsVerticalUpdate) {
-      this._updateVerticalPosition();
+      this._updateVerticalPosition( deltaTime );
     }
 
     super.update( deltaTime );
@@ -101,10 +98,12 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * @param {THREE.Vector3} location
+   * @param {boolean} infinite
    */
-  setTargetLocation (location) {
+  setTargetLocation (location, infinite = false) {
     if (location) {
       this._targetLocation = new THREE.Vector3(location.x, location.y, location.z);
+      this._targetLocationInfinite = infinite;
       this._updateVelocityDirection();
       this.setComingState();
     }
@@ -176,7 +175,8 @@ export class LivingObject extends WorldObjectAnimated {
     if (!this._needsVerticalUpdate) {
       this._resumeVerticalUpdate();
     }
-    this._gravity.setVelocity(-.05); // -.7
+    this._isJumping = true;
+    this._gravity.setVelocity(-50);
   }
 
   /**
@@ -184,6 +184,13 @@ export class LivingObject extends WorldObjectAnimated {
    */
   get targetLocation () {
     return this._targetLocation;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get targetLocationInfinite () {
+    return this._targetLocationInfinite;
   }
 
   /**
@@ -198,6 +205,13 @@ export class LivingObject extends WorldObjectAnimated {
    */
   get isComing () {
     return this._coming;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isJumping () {
+    return this._isJumping;
   }
 
   /**
@@ -450,18 +464,21 @@ export class LivingObject extends WorldObjectAnimated {
   /**
    * @private
    */
-  _updateVerticalPosition () {
-    let shiftY = -this._gravity.velocity;
+  _updateVerticalPosition ( deltaTime ) {
+    let shiftY = -this._gravity.update( deltaTime );
+    let falling = shiftY < 0;
 
     let result = this._clampVerticalPosition( shiftY );
     shiftY = result.shiftY;
     this.position.y += shiftY;
 
-    if (Math.abs( shiftY ) < EPS && !this._coming) {
-      this._stopVerticalUpdate();
-    } else if (result.changed) {
-      // if shiftY changed
+    if (result.changed) {
       this._gravity.resetVelocity();
+      
+      if (falling) {
+        !this._coming && this._stopVerticalUpdate();
+        this._isJumping && (this._isJumping = false);
+      }
     }
   }
 
@@ -477,6 +494,7 @@ export class LivingObject extends WorldObjectAnimated {
     let nextPlayerPosition = currentPosition.clone().add({ x: 0, y: shiftY, z: 0 });
 
     let playerBlocksHeight = 3;
+    let playerHeight = playerBlocksHeight * bs;
 
     let blockPosition = new THREE.Vector3(
       this._blockCoord(currentPosition.x) + 1,
@@ -489,7 +507,7 @@ export class LivingObject extends WorldObjectAnimated {
 
     // clamp for Y
     {
-      let shiftYVector = new THREE.Vector3(0, Math.sign(shiftY), 0);
+      let shiftYVector = new THREE.Vector3(0, shiftY > 0 ? 0 : Math.sign(shiftY), 0);
       let nextBlockPosition = blockPosition.clone().add( shiftYVector );
 
       let frontBlocksPositions = [[
@@ -507,7 +525,7 @@ export class LivingObject extends WorldObjectAnimated {
       ]];
 
       let frontBlocksValues = frontBlocksPositions.map(frontBlocksLevel => {
-        return frontBlocksLevel.map( position => map.getBlock(position) );
+        return frontBlocksLevel.map( position => map.hasBlock(position) );
       });
 
       let hasValue = frontBlocksValues[1][0] && frontBlocksValues[1][2]
@@ -519,35 +537,35 @@ export class LivingObject extends WorldObjectAnimated {
         let centerPosition = frontBlocksPositions[ 1 ][ 1 ].clone()
           .add({ x: -1, y: 0, z: -1});
 
-        frontBlocksWorldPositions.push(
-          centerPosition.clone()
-            .add({ x: 1, y: shiftY > 0 ? 0 : 1, z: 0 })
-            .multiplyScalar( bs )
-        );
-        frontBlocksWorldPositions.push(
-          centerPosition.clone()
-            .add({ x: 1, y: shiftY > 0 ? 0 : 1, z: 1 })
-            .multiplyScalar( bs )
-        );
-        frontBlocksWorldPositions.push(
-          centerPosition.clone()
-            .add({ x: 0, y: shiftY > 0 ? 0 : 1, z: 1 })
-            .multiplyScalar( bs )
-        );
-        frontBlocksWorldPositions.push(
-          centerPosition.clone()
-            .add({ x: 0, y: shiftY > 0 ? 0 : 1, z: 0 })
-            .multiplyScalar( bs )
-        );
+        let yOffset = shiftY > 0 ? 0 : 1;
 
-        debugPoints('test' + Math.sign(shiftY), [...frontBlocksWorldPositions, frontBlocksWorldPositions[0]]);
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 1, y: yOffset, z: 0 })
+            .multiplyScalar( bs )
+        );
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 1, y: yOffset, z: 1 })
+            .multiplyScalar( bs )
+        );
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 0, y: yOffset, z: 1 })
+            .multiplyScalar( bs )
+        );
+        frontBlocksWorldPositions.push(
+          centerPosition.clone()
+            .add({ x: 0, y: yOffset, z: 0 })
+            .multiplyScalar( bs )
+        );
 
         let blockY = frontBlocksWorldPositions[0].y;
 
         if (shiftY > 0) {
-          changed = nextPlayerPosition.y > blockY;
+          changed = nextPlayerPosition.y + playerHeight * bs > blockY;
           shiftY = changed
-            ? shiftY - (nextPlayerPosition.y - blockY)
+            ? shiftY - (nextPlayerPosition.y + playerHeight - blockY)
             : shiftY;
         } else {
           changed = blockY > nextPlayerPosition.y;
@@ -570,6 +588,7 @@ export class LivingObject extends WorldObjectAnimated {
     let newPlayerY = currentPosition.y + shiftY;
     if (newPlayerY < minMaxY) {
       shiftY += minMaxY - newPlayerY;
+      changed = true;
     }
 
     return { shiftY, changed };

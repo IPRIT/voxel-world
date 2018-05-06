@@ -39,7 +39,9 @@ export class World {
     let me = new PlayerMe();
     this._me = me;
 
-    me.position.set(WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE + 2, 12.4, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
+    me.position.set(
+      16353.944446908708, 2, 16356.723378763674
+    );
 
     me.init({
       classType: PlayerClassType.MYSTIC

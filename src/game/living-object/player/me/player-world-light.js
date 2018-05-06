@@ -21,6 +21,7 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
    */
   constructor (player, color, intensity) {
     super( color, intensity );
+    this.color.setHSL( 0.1, 1, 0.95 );
     this._me = player;
   }
 

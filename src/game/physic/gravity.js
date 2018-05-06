@@ -18,15 +18,17 @@ export class ObjectGravity {
    * @type {number}
    * @private
    */
-  _gravityAcceleration = .01;
+  _gravityAcceleration = 0.8;
 
   /**
    * @param {number} deltaTime
    */
   update ( deltaTime ) {
+    let distance = this._computeDistanceDelta( deltaTime );
     if (this._velocityUpdate) {
       this._updateVelocity( deltaTime );
     }
+    return distance;
   }
 
   /**
@@ -87,6 +89,17 @@ export class ObjectGravity {
 
   /**
    * @param {number} deltaTime
+   * @returns {number}
+   * @private
+   */
+  _computeDistanceDelta (deltaTime) {
+    return this._velocity * deltaTime
+      + .5 * this._gravityAcceleration * deltaTime * deltaTime;
+  }
+
+  /**
+   * @param {number} deltaTime
+   * @returns {number}
    * @private
    */
   _updateVelocity (deltaTime) {

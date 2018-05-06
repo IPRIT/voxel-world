@@ -160,6 +160,9 @@ export default class Game {
     // insert in DOM
     this._domContainer = document.querySelector('.game-scene');
     this._domContainer.appendChild(this._renderer.domElement);
+
+    this._renderer.domElement.setAttribute('tabIndex', '0');
+    this._renderer.domElement.focus();
   }
 
   _initScene () {
@@ -183,7 +186,10 @@ export default class Game {
     const ambientLight = new THREE.AmbientLight( 0xffa1c1 );
     this._scene.add( ambientLight );
 
-    const hemiLight = new THREE.HemisphereLight( 0x0, 0xEEB1C6, 0.4 );
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
+    hemiLight.color.setHSL( 0.6, 1, 0.6 );
+    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+
     hemiLight.position.set(
       WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE,
       300 * WORLD_MAP_BLOCK_SIZE,
@@ -325,8 +331,8 @@ export default class Game {
       return;
     }
 
-    this._mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    this._mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    this._mouse.x = ( event.clientX / this._screenWidth ) * 2 - 1;
+    this._mouse.y = - ( event.clientY / this._screenHeight ) * 2 + 1;
     // update the picking ray with the camera and mouse position
     this._raycaster.setFromCamera( this._mouse, this._activeCamera );
     // calculate objects intersecting the picking ray
@@ -354,8 +360,8 @@ export default class Game {
     if (!this._mousePressedDown) {
       return;
     }
-    this._mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    this._mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    this._mouse.x = ( event.clientX / this._screenWidth ) * 2 - 1;
+    this._mouse.y = - ( event.clientY / this._screenHeight ) * 2 + 1;
     // update the picking ray with the camera and mouse position
     this._raycaster.setFromCamera( this._mouse, this._activeCamera );
     // calculate objects intersecting the picking ray
