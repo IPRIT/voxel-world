@@ -22,6 +22,7 @@ export class ObjectGravity {
 
   /**
    * @param {number} deltaTime
+   * @returns {number}
    */
   update ( deltaTime ) {
     let distance = this._computeDistanceDelta( deltaTime );
