@@ -2,6 +2,7 @@ import { WorldMap } from "./map/world-map";
 import { PlayerMe } from "../living-object/player/me/player-me";
 import { PlayerClassType } from "../living-object/player/player-class-type";
 import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
+import { PlayerEnemy } from "../living-object/player/enemy";
 
 export class World {
 
@@ -24,6 +25,12 @@ export class World {
   _me = null;
 
   /**
+   * @type {Array<Player>}
+   * @private
+   */
+  _players = [];
+
+  /**
    * @param {Game} game
    */
   constructor (game) {
@@ -36,12 +43,25 @@ export class World {
     this._game.scene.add( map );
     this._map = map;
 
+    let coords = new THREE.Vector3( 16353.944446908708, 2, 16356.723378763674 );
+
+    for (let i = 0; i < 300; ++i) {
+      let enemy = new PlayerEnemy();
+      let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 0, z: Math.random() * 1000 - 500 });
+      enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
+      this._players.push( enemy );
+
+      enemy.init({
+        classType: PlayerClassType.MYSTIC
+      });
+    }
+
+    this._game.scene.add( ...this._players );
+
     let me = new PlayerMe();
     this._me = me;
 
-    me.position.set(
-      16353.944446908708, 2, 16356.723378763674
-    );
+    me.position.set(coords.x, coords.y, coords.z);
 
     me.init({
       classType: PlayerClassType.MYSTIC
@@ -51,6 +71,10 @@ export class World {
     game._transformControl.attach( me );
     this._game.scene.add( game._transformControl );
     this._game.scene.add( me );
+
+    setTimeout(_ => {
+      this._runDemo();
+    }, 1000);
   }
 
   update (deltaTime) {
@@ -59,7 +83,13 @@ export class World {
       this.map.updateAtPosition( this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE ) );
     }
 
-    game._transformControl.update();
+    if (this._players.length) {
+      for (let i = 0; i < this._players.length; ++i) {
+        this._players[ i ].update( deltaTime );
+      }
+    }
+
+    game._transformControl && game._transformControl.update();
   }
 
   /**
@@ -74,5 +104,48 @@ export class World {
    */
   get me () {
     return this._me;
+  }
+
+  /**
+   * @private
+   */
+  _runDemo () {
+    this._players.forEach(player => {
+      this._runDemoForPlayer2( player );
+    });
+  }
+
+  /**
+   * @param {Player} player
+   * @private
+   */
+  _runDemoForPlayer (player) {
+    let pointIndex = 0;
+    let points = [ ];
+
+    for (let i = 0; i < 100; ++i) {
+      let point = new THREE.Vector3( 16353.944446908708, 2, 16356.723378763674 );
+      point.add({ x: Math.random() * 400 - 200, y: 0, z: Math.random() * 400 - 200 });
+      points.push( point );
+    }
+
+    player.__interval = setInterval(_ => {
+      if (!player.isComing) {
+        player.setTargetLocation( points[ pointIndex ++ % points.length ] );
+      }
+
+      if (Math.random() < .05) {
+        player.jump();
+      }
+    }, 1000);
+  }
+
+  /**
+   * @param {Player} player
+   * @private
+   */
+  _runDemoForPlayer2 (player) {
+    player.setTargetObject( this._me );
+    player.setTargetObject( this._me );
   }
 }

@@ -474,7 +474,7 @@ export class LivingObject extends WorldObjectAnimated {
 
     if (result.changed) {
       this._gravity.resetVelocity();
-      
+
       if (falling) {
         !this._coming && this._stopVerticalUpdate();
         this._isJumping && (this._isJumping = false);
