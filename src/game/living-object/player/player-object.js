@@ -28,6 +28,8 @@ export class PlayerObject extends LivingObject {
 
     Object.assign(options, {
       worldScale: .4,
+      objectBlocksHeight: 3,
+      objectBlocksRadius: 2, // only even numbers
       modelName: this.className,
       velocityScalar: PLAYER_VELOCITY_SCALAR
     });

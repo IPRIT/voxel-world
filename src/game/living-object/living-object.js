@@ -2,6 +2,7 @@ import { WorldObjectAnimated } from "../world/world-object/animated";
 import { warp } from "../utils";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { ObjectGravity } from "../physic";
+import { debugPoints } from "../utils/debug-utils";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -34,6 +35,18 @@ export class LivingObject extends WorldObjectAnimated {
   _velocityScalar = 0;
 
   /**
+   * @type {number}
+   * @private
+   */
+  _objectBlocksHeight = 3;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _objectBlocksRadius = 1;
+
+  /**
    * @type {ObjectGravity}
    * @private
    */
@@ -46,7 +59,7 @@ export class LivingObject extends WorldObjectAnimated {
   _rotationMatrix;
 
   /**
-   * Player needs to get the target
+   * Object needs to get the target
    * @type {boolean}
    * @private
    */
@@ -82,7 +95,7 @@ export class LivingObject extends WorldObjectAnimated {
         this._updateVelocityDirection();
       }
 
-      if (this.getComingLocationDistance() > 2 * this._velocityScalar) {
+      if (this.getComingLocationDistance() > warp( this._velocityScalar, deltaTime )) {
         this._nextPosition( deltaTime );
       } else {
         this.setComingState( false );
@@ -138,7 +151,7 @@ export class LivingObject extends WorldObjectAnimated {
         actionName = 'Pose';
       }
       if (this.currentClipActionName !== actionName) {
-        this.activateClipAction( actionName );
+        // this.activateClipAction( actionName );
       }
     }
   }
@@ -229,12 +242,28 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
+   * @returns {number}
+   */
+  get objectBlocksHeight () {
+    return this._objectBlocksHeight;
+  }
+
+  /**
+   * @returns {number}
+   */
+  get objectBlocksRadius () {
+    return this._objectBlocksRadius;
+  }
+
+  /**
    * @param {object} options
    * @private
    */
   _initOptions (options) {
-    let { velocityScalar } = options;
+    let { velocityScalar, objectBlocksHeight, objectBlocksRadius } = options;
     this._velocityScalar = velocityScalar;
+    this._objectBlocksHeight = objectBlocksHeight;
+    this._objectBlocksRadius = objectBlocksRadius;
   }
 
   /**
@@ -272,6 +301,7 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * @param {THREE.Vector3} shiftVector
+   * @returns {{shiftPosition: THREE.Vector3, changed: boolean}}
    * @private
    */
   _clampNextPosition (shiftVector) {
@@ -284,7 +314,8 @@ export class LivingObject extends WorldObjectAnimated {
     let currentPosition = this.position.clone();
     let desiredPosition = currentPosition.clone().add( shiftVector );
 
-    let playerRadius = bs * .95;
+    let objectBlocksRadius = this._objectBlocksRadius;
+    let objectRadius = objectBlocksRadius * bs;
 
     let blockPosition = new THREE.Vector3(
       this._blockCoord(currentPosition.x) + 1,
@@ -297,38 +328,34 @@ export class LivingObject extends WorldObjectAnimated {
     let changed = false;
 
     // clamp for X
-    {
-      let shiftXVector = new THREE.Vector3(Math.sign(shiftX), 0, 0);
-      let nextBlockPosition = blockPosition.clone().add( shiftXVector );
+    if (shiftX) {
+      let frontBlocksPositions = [];
+      const shiftBlocksX = Math.sign(shiftX) * this._objectBlocksRadius;
+      for (let y = 0; y < this._objectBlocksHeight; ++y) {
+        let level = [];
+        for (let z = -this._objectBlocksRadius; z <= this._objectBlocksRadius; ++z) {
+          level.push(
+            blockPosition.clone().add({ x: shiftBlocksX, y, z })
+          );
+        }
+        frontBlocksPositions.push( level );
+      }
 
-      let frontBlocksPositions = [[
-        nextBlockPosition.clone().add({ x: 0, y: 0, z: -1 }),
-        nextBlockPosition.clone().add({ x: 0, y: 0, z: 0 }),
-        nextBlockPosition.clone().add({ x: 0, y: 0, z: 1 })
-      ], [
-        nextBlockPosition.clone().add({ x: 0, y: 1, z: -1 }),
-        nextBlockPosition.clone().add({ x: 0, y: 1, z: 0 }),
-        nextBlockPosition.clone().add({ x: 0, y: 1, z: 1 })
-      ], [
-        nextBlockPosition.clone().add({ x: 0, y: 2, z: -1 }),
-        nextBlockPosition.clone().add({ x: 0, y: 2, z: 0 }),
-        nextBlockPosition.clone().add({ x: 0, y: 2, z: 1 })
-      ]];
-
-      let frontBlocksValues = frontBlocksPositions.map(frontBlocksLevel => {
-        return frontBlocksLevel.map( position => map.getBlock(position) );
+      let frontBlocksValues = frontBlocksPositions.map(level => {
+        return level.map( blockPosition => map.getBlock( blockPosition ) );
       });
 
-      let leftRightValue = false;
-      for (let i = 0; i < frontBlocksValues.length; ++i) {
-        if (frontBlocksValues[i][0] && frontBlocksValues[i][2]
-          || frontBlocksValues[i][1]) {
-          leftRightValue = true;
-          break;
+      let hasValue = false;
+      loop: for (let levelIndex = 0; levelIndex < frontBlocksValues.length; ++levelIndex) {
+        for (let blockIndex = 0; blockIndex < frontBlocksValues[ levelIndex ].length; ++blockIndex) {
+          if (frontBlocksValues[ levelIndex ][ blockIndex ]) {
+            hasValue = true;
+            break loop;
+          }
         }
       }
 
-      if (leftRightValue) {
+      if (hasValue || true) {
         let shiftsX = [];
 
         for (let levelIndex = frontBlocksValues.length - 1; levelIndex >= 0; --levelIndex) {
@@ -338,29 +365,32 @@ export class LivingObject extends WorldObjectAnimated {
           let frontBlockPoint = new THREE.Vector3();
 
           for (let levelBlockIndex = 0; levelBlockIndex < levelBlocksValues.length; ++levelBlockIndex) {
-            let zOffset = (2 - levelBlockIndex) / 2;
             frontBlocksWorldPositions.push(
               levelBlocksPositions[ levelBlockIndex ].clone()
-                .add({ x: shiftX > 0 ? -1 : 0, y: .5, z: -1 + zOffset })
+                .add({ x: shiftX > 0 ? -1 : 0, y: .5, z: 0 })
                 .multiplyScalar( bs )
             );
           }
 
-          let nextPlayerPoint = desiredPosition.clone().setY(frontBlocksWorldPositions[1].y);
+          debugPoints('test' + levelIndex, frontBlocksWorldPositions);
 
-          let line = new THREE.Line3(frontBlocksWorldPositions[0], frontBlocksWorldPositions[2]);
-          line.closestPointToPoint(nextPlayerPoint, false, frontBlockPoint);
+          let nextLivingObjectPoint = desiredPosition.clone().setY(frontBlocksWorldPositions[0].y);
+
+          let line = new THREE.Line3(
+            frontBlocksWorldPositions[0], frontBlocksWorldPositions[ frontBlocksWorldPositions.length - 1 ]
+          );
+          line.closestPointToPoint(nextLivingObjectPoint, false, frontBlockPoint);
 
           let levelBlockValue = levelBlocksValues[ 1 ];
           if (!levelBlockValue) {
             continue;
           }
-          let distanceToPoint = nextPlayerPoint.distanceTo( frontBlockPoint );
-          if (distanceToPoint > playerRadius) {
+          let distanceToPoint = nextLivingObjectPoint.distanceTo( frontBlockPoint );
+          if (distanceToPoint > objectRadius) {
             continue;
           }
 
-          let overlap = playerRadius - distanceToPoint;
+          let overlap = objectRadius - distanceToPoint;
           shiftsX.push(
             shiftX + Math.sign(-shiftX) * overlap
           );
@@ -425,22 +455,22 @@ export class LivingObject extends WorldObjectAnimated {
             );
           }
 
-          let nextPlayerPoint = desiredPosition.clone().setY(frontBlocksWorldPositions[1].y);
+          let nextObjectPoint = desiredPosition.clone().setY(frontBlocksWorldPositions[1].y);
 
           let line = new THREE.Line3(frontBlocksWorldPositions[0], frontBlocksWorldPositions[2]);
-          line.closestPointToPoint(nextPlayerPoint, false, frontBlockPoint);
+          line.closestPointToPoint(nextObjectPoint, false, frontBlockPoint);
 
           let levelBlockValue = levelBlocksValues[ 1 ];
           if (!levelBlockValue) {
             continue;
           }
 
-          let distanceToPoint = nextPlayerPoint.distanceTo( frontBlockPoint );
-          if (distanceToPoint > playerRadius) {
+          let distanceToPoint = nextObjectPoint.distanceTo( frontBlockPoint );
+          if (distanceToPoint > objectRadius) {
             continue;
           }
 
-          let overlap = playerRadius - distanceToPoint;
+          let overlap = objectRadius - distanceToPoint;
           shiftsZ.push(
             shiftZ + Math.sign(-shiftZ) * overlap
           );
@@ -491,14 +521,14 @@ export class LivingObject extends WorldObjectAnimated {
     const bs = WORLD_MAP_BLOCK_SIZE;
 
     let currentPosition = this.position.clone();
-    let nextPlayerPosition = currentPosition.clone().add({ x: 0, y: shiftY, z: 0 });
+    let nextObjectPosition = currentPosition.clone().add({ x: 0, y: shiftY, z: 0 });
 
-    let playerBlocksHeight = 3;
-    let playerHeight = playerBlocksHeight * bs;
+    let objectBlocksHeight = this._objectBlocksHeight;
+    let objectHeight = objectBlocksHeight * bs;
 
     let blockPosition = new THREE.Vector3(
       this._blockCoord(currentPosition.x) + 1,
-      this._blockCoord(currentPosition.y) + (shiftY > 0 ? playerBlocksHeight : 0),
+      this._blockCoord(currentPosition.y) + (shiftY > 0 ? objectBlocksHeight : 0),
       this._blockCoord(currentPosition.z) + 1
     );
 
@@ -563,14 +593,14 @@ export class LivingObject extends WorldObjectAnimated {
         let blockY = frontBlocksWorldPositions[0].y;
 
         if (shiftY > 0) {
-          changed = nextPlayerPosition.y + playerHeight * bs > blockY;
+          changed = nextObjectPosition.y + objectHeight * bs > blockY;
           shiftY = changed
-            ? shiftY - (nextPlayerPosition.y + playerHeight - blockY)
+            ? shiftY - (nextObjectPosition.y + objectHeight - blockY)
             : shiftY;
         } else {
-          changed = blockY > nextPlayerPosition.y;
+          changed = blockY > nextObjectPosition.y;
           shiftY = changed
-            ? shiftY + (blockY - nextPlayerPosition.y) + .01 // to prevent model collisions with ground
+            ? shiftY + (blockY - nextObjectPosition.y) + .01 // to prevent model collisions with ground
             : shiftY;
         }
       }
@@ -585,9 +615,9 @@ export class LivingObject extends WorldObjectAnimated {
     );
     minMaxY = (minMaxY + 1) * bs;
 
-    let newPlayerY = currentPosition.y + shiftY;
-    if (newPlayerY < minMaxY) {
-      shiftY += minMaxY - newPlayerY;
+    let newObjectY = currentPosition.y + shiftY;
+    if (newObjectY < minMaxY) {
+      shiftY += minMaxY - newObjectY;
       changed = true;
     }
 

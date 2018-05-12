@@ -91,26 +91,26 @@ export class WorldObjectSkinned extends WorldObjectBase {
    * @param {THREE.Material} material
    */
   _createMesh ({ geometry, material } = {}) {
-    /*geometry = new THREE.CylinderGeometry(
+    geometry = new THREE.CylinderGeometry(
       .1 * WORLD_MAP_BLOCK_SIZE,
       .1 * WORLD_MAP_BLOCK_SIZE,
       WORLD_MAP_BLOCK_SIZE * 3,
       18,
       4,
       false
-    );*/
+    );
 
     this._geometry = geometry;
     this._material = material;
 
-    let skinnedMesh = new THREE.SkinnedMesh( geometry, material );
-    // let skinnedMesh = new THREE.Mesh( geometry, material );
-    // skinnedMesh.position.y = WORLD_MAP_BLOCK_SIZE * 3 / 2;
+    // let skinnedMesh = new THREE.SkinnedMesh( geometry, material );
+    let skinnedMesh = new THREE.Mesh( geometry, material );
+    skinnedMesh.position.y = WORLD_MAP_BLOCK_SIZE * 3 / 2;
 
     skinnedMesh.castShadow = true;
     skinnedMesh.receiveShadow = true;
 
-    skinnedMesh.scale.set( .4, -.4, .4 );
+    // skinnedMesh.scale.set( .4, -.4, .4 );
 
     this.mesh = skinnedMesh;
   }
