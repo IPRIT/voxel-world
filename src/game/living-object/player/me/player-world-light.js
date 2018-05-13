@@ -21,7 +21,7 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
    */
   constructor (player, color, intensity) {
     super( color, intensity );
-    this.color.setHSL( 0.1, 1, 0.95 );
+    // this.color.setHSL( 0.1, 1, 0.95 );
     this._me = player;
   }
 
@@ -45,10 +45,10 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
   _addShadows () {
     this.castShadow = true;
 
-    this.shadow.mapSize.width = 1 << 11;
-    this.shadow.mapSize.height = 1 << 11;
+    this.shadow.mapSize.width = 1 << 12;
+    this.shadow.mapSize.height = 1 << 12;
 
-    const offset = 70 * WORLD_MAP_BLOCK_SIZE;
+    const offset = 300;
 
     this.shadow.camera.top = offset;
     this.shadow.camera.right = offset;

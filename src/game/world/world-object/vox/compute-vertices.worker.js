@@ -1,6 +1,6 @@
-import registerPromiseWorker from 'promise-worker/register';
+import registerWebworker from 'webworker-promise/lib/register';
 import { computeVertices } from "./compute-vertices";
 
-registerPromiseWorker(context => {
+registerWebworker(context => {
   return computeVertices( context );
 });

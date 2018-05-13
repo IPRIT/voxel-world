@@ -1,6 +1,12 @@
 import { PlayerClassType } from "./player-class-type";
 import { LivingObject } from "../index";
-import { PLAYER_VELOCITY_SCALAR } from "./player-defaults";
+import {
+  PLAYER_BLOCKS_HEIGHT,
+  PLAYER_BLOCKS_RADIUS,
+  PLAYER_GRAVITY,
+  PLAYER_VELOCITY_SCALAR,
+  PLAYER_WORLD_SCALE
+} from "./player-defaults";
 
 export class PlayerObject extends LivingObject {
 
@@ -27,11 +33,12 @@ export class PlayerObject extends LivingObject {
     this._classType = classType;
 
     Object.assign(options, {
-      worldScale: .4,
-      objectBlocksHeight: 3,
-      objectBlocksRadius: 2, // only even numbers
       modelName: this.className,
-      velocityScalar: PLAYER_VELOCITY_SCALAR
+      worldScale: PLAYER_WORLD_SCALE,
+      objectBlocksRadius: PLAYER_BLOCKS_RADIUS,
+      objectBlocksHeight: PLAYER_BLOCKS_HEIGHT,
+      velocityScalar: PLAYER_VELOCITY_SCALAR,
+      gravity: PLAYER_GRAVITY,
     });
 
     return super.init( options );

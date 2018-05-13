@@ -172,12 +172,10 @@ export default class Game {
   }
 
   _addWorldLight () {
-    const ambientLight = new THREE.AmbientLight( 0xffa1c1 );
+    const ambientLight = new THREE.AmbientLight( 0xd68973 );
     this._scene.add( ambientLight );
 
-    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
-    hemiLight.color.setHSL( 0.6, 1, 0.6 );
-    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 0.6 );
 
     hemiLight.position.set(
       WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE,

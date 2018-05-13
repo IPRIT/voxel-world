@@ -18,7 +18,7 @@ export class ObjectGravity {
    * @type {number}
    * @private
    */
-  _gravityAcceleration = 0.8;
+  _gravityAcceleration = 1;
 
   /**
    * @param {number} deltaTime

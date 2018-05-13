@@ -11,6 +11,7 @@ import {
   WORLD_MAP_SIZE
 } from "../../settings";
 import { ModelType } from "../../model";
+import { WorldMapCollisions } from "./world-map-collisions";
 
 export class WorldMap extends THREE.Group {
 
@@ -19,6 +20,12 @@ export class WorldMap extends THREE.Group {
    * @private
    */
   _map = new Map();
+
+  /**
+   * @type {WorldMapCollisions}
+   * @private
+   */
+  _collisions = null;
 
   /**
    * @type {THREE.Group}
@@ -42,6 +49,7 @@ export class WorldMap extends THREE.Group {
 
   init () {
     this.placeGroundPlate();
+    this._initCollisions();
 
     this.updateAtPosition(
       new THREE.Vector3(WORLD_MAP_SIZE / 2, 0, WORLD_MAP_SIZE / 2)
@@ -219,7 +227,12 @@ export class WorldMap extends THREE.Group {
 
     if (sort) {
       let chunkSize = WORLD_MAP_CHUNK_SIZE_VECTOR.clone();
-      let curChunk = resetDecimal( position.clone().divide( chunkSize ).setY(0) );
+      let curChunk = resetDecimal(
+        position.clone()
+          .divide( chunkSize )
+          .setY(0)
+          .sub({x: 1, z: 1, y: 0})
+      );
 
       chunksIndicies = chunksIndicies.sort((chunkA, chunkB) => {
         return curChunk.distanceTo( chunkA ) - curChunk.distanceTo( chunkB );
@@ -489,6 +502,20 @@ export class WorldMap extends THREE.Group {
    */
   get groundPlate () {
     return this._groundPlate;
+  }
+
+  /**
+   * @returns {WorldMapCollisions}
+   */
+  get collisions () {
+    return this._collisions;
+  }
+
+  /**
+   * @private
+   */
+  _initCollisions () {
+    this._collisions = new WorldMapCollisions( this );
   }
 
   /**

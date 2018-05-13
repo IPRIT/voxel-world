@@ -1,6 +1,6 @@
-import registerPromiseWorker from 'promise-worker/register';
+import registerPromiseWorker from 'webworker-promise/lib/register';
 import { voxLoadAndParse } from "./vox-parser";
 
-registerPromiseWorker(url => {
+registerPromiseWorker(async (url) => {
   return voxLoadAndParse( url );
 });

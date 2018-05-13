@@ -112,11 +112,11 @@
     "md-svg-vue": "^1.0.6",
     "normalize.css": "^8.0.0",
     "parse-magica-voxel": "^1.0.3",
-    "promise-worker": "^1.1.1",
     "stats.js": "^0.17.0",
     "three": "^0.91.0",
     "three-orbit-controls": "^82.1.0",
     "vue-virtual-repeater": "^1.1.10",
+    "webworker-promise": "^0.4.1",
     "worker-loader": "^1.1.1"
   },
   "peerDependencies": {

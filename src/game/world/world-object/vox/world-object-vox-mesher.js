@@ -1,16 +1,17 @@
-import PromiseWorker from 'promise-worker';
 import { WorldChunkType } from '../../chunks/world-chunk-type';
-import MesherWorker from './compute-vertices.worker';
 import { computeVertices } from "./compute-vertices";
+import MesherWorker from './compute-vertices.worker';
+import WorkerPool from 'webworker-promise/lib/pool';
 
-let mesherWorkers = [];
-let roundRobinIndex = 0;
 const workersNumber = 5;
+let workerPool;
 
 if (window.Worker) {
-  for (let i = 0; i < workersNumber; ++i) {
-    mesherWorkers.push( new PromiseWorker(MesherWorker()) );
-  }
+  workerPool = WorkerPool.create({
+    create: () => new MesherWorker(),
+    maxThreads: workersNumber,
+    maxConcurrentPerWorker: 1
+  });
 }
 
 export class WorldObjectVoxMesher {
@@ -148,13 +149,9 @@ export class WorldObjectVoxMesher {
       renderNegY: true
     };
 
-    if (!window.Worker) {
+    if (!workerPool) {
       return computeVertices( context );
     }
-
-    roundRobinIndex++;
-    roundRobinIndex %= mesherWorkers.length;
-
-    return mesherWorkers[ roundRobinIndex ].postMessage( context );
+    return workerPool.postMessage( context );
   }
 }

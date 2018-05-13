@@ -1,12 +1,17 @@
 import { VoxModel } from "./vox-model";
-import PromiseWorker from 'promise-worker';
 import ParseWorker from './vox-parser.worker';
 import { voxLoadAndParse } from "./vox-parser";
+import WorkerPool from "webworker-promise/lib/pool";
 
-let parseWorker;
+const workersNumber = 5;
+let workerPool;
 
-if (!window.Worker) {
-  parseWorker = new PromiseWorker(ParseWorker());
+if (window.Worker) {
+  workerPool = WorkerPool.create({
+    create: () => new ParseWorker(),
+    maxThreads: workersNumber,
+    maxConcurrentPerWorker: 1
+  });
 }
 
 export class VoxLoader {
@@ -42,7 +47,7 @@ export class VoxLoader {
    * @private
    */
   async _loadRequest (url) {
-    return parseWorker && parseWorker.postMessage( url )
+    return workerPool && workerPool.postMessage( url )
       || voxLoadAndParse( url );
   }
 }
