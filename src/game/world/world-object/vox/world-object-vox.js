@@ -218,9 +218,7 @@ export class WorldObjectVox extends WorldObjectBase {
     // this._material = shaderMaterial;
     this._material = new THREE.MeshLambertMaterial({
       vertexColors: THREE.VertexColors,
-      wireframe: this.wireframe,
-      transparent: true,
-      opacity: .5
+      wireframe: this.wireframe
     });
   }
 
