@@ -266,10 +266,9 @@ export class WorldMap extends THREE.Group {
     if (!worldChunkObject) {
       return;
     }
-    const fromPosition = worldChunkObject.chunk.fromPosition;
-    const x = position.x - fromPosition.x;
-    const y = position.y - fromPosition.y;
-    const z = position.z - fromPosition.z;
+    const x = position.x - worldChunkObject.chunk._fromX;
+    const y = position.y - worldChunkObject.chunk._fromY;
+    const z = position.z - worldChunkObject.chunk._fromZ;
     worldChunkObject.addBlock( { x, y, z }, color );
   }
 
@@ -282,10 +281,13 @@ export class WorldMap extends THREE.Group {
     if (!worldChunkObject) {
       return 0;
     }
-    const fromPosition = worldChunkObject.chunk.fromPosition;
-    const x = position.x - fromPosition.x;
-    const y = position.y - fromPosition.y;
-    const z = position.z - fromPosition.z;
+    const x = position.x - worldChunkObject.chunk._fromX;
+    const y = position.y - worldChunkObject.chunk._fromY;
+    const z = position.z - worldChunkObject.chunk._fromZ;
+    if (!window.test) {
+      window.test = 1;
+    }
+    window.test++;
     return worldChunkObject.getBlock( { x, y, z } );
   }
 
@@ -353,7 +355,7 @@ export class WorldMap extends THREE.Group {
    * @returns {WorldObjectVox}
    */
   getMapChunkAt (position) {
-    if (!this.inside(position.x, position.y, position.z)) {
+    if (!this.inside( position.x, position.y, position.z )) {
       return null;
     }
     let chunkIndex = this._computeChunkIndex(position);
@@ -461,26 +463,15 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {number|THREE.Vector3} x
+   * @param {number} x
    * @param {number} y
    * @param {number} z
    * @returns {boolean}
    */
   inside (x, y, z) {
-    if (typeof x === 'object') {
-      const position = x;
-      x = position.x;
-      y = position.y;
-      z = position.z;
-    }
-    let limits = {
-      x: [0, WORLD_MAP_SIZE],
-      y: [0, WORLD_MAP_CHUNK_HEIGHT],
-      z: [0, WORLD_MAP_SIZE]
-    };
-    return x > limits.x[0] && x < limits.x[1] &&
-      y >= limits.y[0] && y < limits.y[1] &&
-      z > limits.z[0] && z < limits.z[1];
+    return x >= 0 && x < WORLD_MAP_SIZE &&
+      y >= 0 && y < WORLD_MAP_CHUNK_HEIGHT &&
+      z >= 0 && z < WORLD_MAP_SIZE;
   }
 
   /**

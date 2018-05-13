@@ -1,7 +1,6 @@
 import { WorldObjectBase } from "../world-object-base";
 import { ModelType, SkinnedObjectLoader } from "../../../model";
 import { WorldObjectType } from "../index";
-import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 
 export class WorldObjectSkinned extends WorldObjectBase {
 

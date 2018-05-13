@@ -45,7 +45,7 @@ export class World {
 
     let coords = new THREE.Vector3( 16353.944446908708, 2, 16356.723378763674 );
 
-    for (let i = 0; i < 80; ++i) {
+    for (let i = 0; i < 1; ++i) {
       let enemy = new PlayerEnemy();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 0, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );

@@ -1,6 +1,5 @@
 import { WorldObjectAnimated } from "../world/world-object/animated";
 import { warp } from "../utils";
-import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { ObjectGravity } from "../physic";
 
 export class LivingObject extends WorldObjectAnimated {
@@ -44,6 +43,12 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _objectBlocksRadius = 1;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _objectJumpVelocity = 50;
 
   /**
    * @type {ObjectGravity}
@@ -188,7 +193,7 @@ export class LivingObject extends WorldObjectAnimated {
       this._resumeVerticalUpdate();
     }
     this._isJumping = true;
-    this._gravity.setVelocity(-50);
+    this._gravity.setVelocity( -this._objectJumpVelocity );
   }
 
   /**
@@ -255,6 +260,13 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
+   * @returns {number}
+   */
+  get objectJumpVelocity () {
+    return this._objectJumpVelocity;
+  }
+
+  /**
    * @returns {WorldMap}
    */
   get map () {
@@ -266,10 +278,18 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _initOptions (options) {
-    let { velocityScalar, gravity, objectBlocksHeight, objectBlocksRadius } = options;
+    let {
+      velocityScalar,
+      gravity,
+      objectBlocksHeight,
+      objectBlocksRadius,
+      objectJumpVelocity
+    } = options;
+
     this._velocityScalar = velocityScalar;
     this._objectBlocksHeight = objectBlocksHeight;
     this._objectBlocksRadius = objectBlocksRadius;
+    this._objectJumpVelocity = objectJumpVelocity;
 
     this._gravity.setAcceleration( gravity );
   }

@@ -72,10 +72,9 @@ export class WorldObjectVox extends WorldObjectBase {
   }
 
   /**
-   * @param {number} deltaTime
    * @param {boolean} force
    */
-  update (deltaTime, force = false) {
+  update (force = false) {
     if (!force && !this._chunk.needsUpdate) {
       return;
     }
@@ -219,7 +218,9 @@ export class WorldObjectVox extends WorldObjectBase {
     // this._material = shaderMaterial;
     this._material = new THREE.MeshLambertMaterial({
       vertexColors: THREE.VertexColors,
-      wireframe: this.wireframe
+      wireframe: this.wireframe,
+      transparent: true,
+      opacity: .5
     });
   }
 
