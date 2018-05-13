@@ -107,6 +107,15 @@ export class World {
   }
 
   /**
+   * @returns {THREE.Mesh[]}
+   */
+  get playersMeshes () {
+    return (this._players || []).filter(_ => !!_.mesh).map(player => {
+      return player.mesh;
+    });
+  }
+
+  /**
    * @private
    */
   _runDemo () {

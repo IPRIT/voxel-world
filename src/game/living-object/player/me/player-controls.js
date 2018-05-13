@@ -1,5 +1,6 @@
 import { isVectorZeroStrict } from "../../../utils";
 import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
+import { LivingObject } from "../../living-object";
 
 export class PlayerControls {
 
@@ -171,21 +172,21 @@ export class PlayerControls {
     this._mapRaycaster.setFromCamera( this._clickedAt, this._me.camera );
     // calculate objects intersecting the picking ray
     const intersects = this._mapRaycaster.intersectObjects(
-      [ ...map.getMeshes(), map.groundPlate.children[0] ]
+      [ ...game.world.playersMeshes, ...map.getMeshes(), map.groundPlate.children[0] ]
     );
 
     if (!intersects.length) {
       return;
     }
 
-    let clickedPoint = intersects[0].point;
-    let x = ((clickedPoint.x / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    let y = ((clickedPoint.y / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
-    let z = ((clickedPoint.z / WORLD_MAP_BLOCK_SIZE) | 0) + 1;
+    let object3D = intersects[0].object && intersects[0].object.parent;
+    let isLivingObject = object3D instanceof LivingObject;
 
-    console.log('Clicked:', x, y, z, 'World:', clickedPoint.x, clickedPoint.y, clickedPoint.z);
-
-    this._me.setTargetLocation( clickedPoint );
+    if (isLivingObject) {
+      this._me.setTargetObject( object3D );
+    } else {
+      this._me.setTargetLocation( intersects[0].point );
+    }
   }
 
   /**
