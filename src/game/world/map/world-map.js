@@ -50,10 +50,6 @@ export class WorldMap extends THREE.Group {
   init () {
     this.placeGroundPlate();
     this._initCollisions();
-
-    this.updateAtPosition(
-      new THREE.Vector3(WORLD_MAP_SIZE / 2, 0, WORLD_MAP_SIZE / 2)
-    );
   }
 
   /**
@@ -231,7 +227,6 @@ export class WorldMap extends THREE.Group {
         position.clone()
           .divide( chunkSize )
           .setY(0)
-          .sub({x: 1, z: 1, y: 0})
       );
 
       chunksIndicies = chunksIndicies.sort((chunkA, chunkB) => {

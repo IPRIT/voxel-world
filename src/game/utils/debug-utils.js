@@ -1,3 +1,6 @@
+import { WORLD_MAP_SIZE } from "../settings";
+import { Game } from "../game";
+
 let lineMaterial = null;
 let linesCache = new Map();
 
@@ -20,7 +23,32 @@ export function debugPoints(geometryCacheKey, vertices) {
     let line = new THREE.Line(geometry, lineMaterial);
     linesCache.set( geometryCacheKey, line );
 
-    game.world.map.add( line );
+    Game.getInstance().world.map.add( line );
   }
   geometry.verticesNeedUpdate = true;
+}
+
+/**
+ * @param {number} x
+ * @param {number} z
+ * @returns {number}
+ */
+function getY(x, z) {
+  x -= WORLD_MAP_SIZE / 2;
+  z -= WORLD_MAP_SIZE / 2;
+  x /= WORLD_MAP_SIZE / 5;
+  z /= WORLD_MAP_SIZE / 5;
+  return Math.sin(x ** 2 + 0.1 * z ** 2) / (0.1 + Math.sqrt(x ** 2 + 2 * z ** 2) ** 2)
+    + (x ** 2 + 1.9 * z ** 2) * Math.exp(1 - Math.sqrt(x ** 2 + 2 * z ** 2) ** 2) / 4.0 * 80
+    + 3;
+}
+
+/**
+ * @param {number} x
+ * @param {number} z
+ * @returns {*[]}
+ */
+export function functionModel (x, z) {
+  let y = getY(x, z) | 0;
+  return [{ x, y, z }, [ 200, (y * 10) % 256, 100 ]];
 }

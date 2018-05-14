@@ -1,6 +1,7 @@
 import { isVectorZeroStrict } from "../../../utils";
 import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
 import { LivingObject } from "../../living-object";
+import { Game } from "../../../game";
 
 export class PlayerControls {
 
@@ -155,7 +156,8 @@ export class PlayerControls {
     if (event.which !== 1 && !isTouchEvent) {
       return;
     }
-    let map = game.world.map;
+    let game = Game.getInstance();
+    let map = Game.getInstance().world.map;
 
     let targetEvent;
     if (isTouchEvent) {
@@ -168,6 +170,7 @@ export class PlayerControls {
 
     this._clickedAt.x = ( clientX / window.innerWidth ) * 2 - 1;
     this._clickedAt.y = - ( clientY / window.innerHeight ) * 2 + 1;
+
     // update the picking ray with the camera and mouse position
     this._mapRaycaster.setFromCamera( this._clickedAt, this._me.camera );
     // calculate objects intersecting the picking ray

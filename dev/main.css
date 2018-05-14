@@ -1525,6 +1525,475 @@ h6 {
 .overflow-y-hidden {
   overflow-y: hidden;
 }
+
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** Typography */
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+/**
+ * Миксин для генерации теней
+ */
+/**
+ * Миксин для плавного перехода теней
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/** Container layout */
+/** Row */
+/** Cols */
+/** App */
+/** Button */
+/** Loading */
+/** Cards */
+/** Switch */
+/** Text-field */
+/** Chip */
+/** Lists */
+/** Dividers */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Bem Constructor settings override
+ */
+/******* Common *******/
+/**
+ * Layout breakpoints
+ * xs, sm, md, lg
+ **/
+/** Radius */
+/** Indents */
+/** Grid */
+/** Typography */
+/** Transitions */
+/** Shadows */
+/** Ripple Animation */
+/******* Components *******/
+/** Buttons */
+/** Loading */
+/** Icon */
+/** Dialog */
+/** Overlay */
+/** Input Group */
+/** Card */
+/** Toolbar */
+/** Switch */
+/** Checkbox */
+/** Radio buttons */
+/** Chip */
+/** Lists */
+/** Divider */
+/** Tabs */
+/** Tab */
+/** Page Header */
+/** Mobile Header */
+/** Mobile Menu */
+/**
+ * Replace `$search` with `$replace` in `$string`
+ * @param {String} $string - Initial string
+ * @param {String} $search - Substring to replace
+ * @param {String} $replace ('') - New value
+ * @return {String} - Updated string
+ */
+/**
+ * Merges stacks of font
+ * Usage: font-family: merge-fonts-stack('Roboto Regular');
+ * Usage: font-family: merge-fonts-stack('Roboto Regular', $font-family-default);
+ */
+/**
+ * Imports background url with image
+ * Usage: background: import-background-image('image.png');
+ * Usage: background: import-background-image('image.png', '/'); // from `static` directory
+ */
+/** Typography */
+/**
+ * Add custom style to different states of input's placeholder (like :hover or :active etc).
+ *
+ * @param {string} $color - color for input placeholder
+ * @param {:hover|:active|:focus|null} $target-pseudo - parent pseudo-class
+ * E.g.: @include input-placeholder-color(#faf);
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0));
+ * E.g.: @include input-placeholder-color(#faf, (hover: #ff0, active: #0ff), false) {
+ *    transition: all .2s ease;
+ * }
+ */
+/**
+ * Миксин для media-query:
+ * ---------------------------------------- *
+ * xs: 480px
+ * sm: 720px
+ * md: 1024px
+ * lg: 1280px
+ * ---------------------------------------- *
+ *
+ * xs-and-down  |   < 480px
+ * xs-only      |   0 <= x < 480px
+ * xs-and-up    |   >= 480px
+ *
+ * sm-and-down  |   < 720px
+ * sm-only      |   480px <= x < 720px
+ * sm-and-up    |   >= 720px
+ *
+ * md-and-down  |   < 1024px
+ * md-only      |   720px <= x < 1024px
+ * md-and-up    |   >= 1024px
+ *
+ * lg-and-down  |   < 1280px
+ * lg-only      |   1024px <= x < 1280px
+ * lg-and-up    |   >= 1280px
+ *
+ * xl-only      |   >= 1280px
+ *
+ * ---------------------------------------- *
+ * E.g.:
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down) {
+ *      width: 100%;
+ *    }
+ * }
+ *
+ * .class {
+ *    width: 800px;
+ *    @include media-query(xs-and-down, landscape, print) {
+ *      padding: 0 20px;
+ *    }
+ * }
+ */
+/**
+ * Миксин для генерации теней
+ */
+/**
+ * Миксин для плавного перехода теней
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/**
+ * Миксин для установки темы (primary, secondary) на различные текстовые свойства
+ * $properties - свойства
+ * $force-color - установить свой color насильно
+ * $hover - установить hover
+ * $color-alpha - сделать цвет прозрачным от 0 до 1
+ * $important - принудительно
+ */
+/** Container layout */
+/** Row */
+/** Cols */
+.living-object-label {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  color: white;
+  font-size: 18px;
+  font-weight: bolder;
+  will-change: transform;
+  pointer-events: none;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.75);
+}
+.living-object-label.own {
+    color: white;
+}
+.living-object-label.enemy {
+    color: #ec1300;
+}
 @media screen and (max-width: 479px) {
 .hidden-xs {
     display: none !important;

@@ -1,8 +1,16 @@
 import { WorldObjectAnimated } from "../world/world-object/animated";
 import { warp } from "../utils";
 import { ObjectGravity } from "../physic";
+import { Game } from "../game";
+import { LivingObjectLabel } from "./label";
 
 export class LivingObject extends WorldObjectAnimated {
+
+  /**
+   * @type {LivingObjectLabel}
+   * @private
+   */
+  _label = null;
 
   /**
    * @type {THREE.Vector3}
@@ -36,7 +44,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {number}
    * @private
    */
-  _objectBlocksHeight = 3;
+  _objectBlocksHeight = 2;
 
   /**
    * @type {number}
@@ -48,7 +56,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {number}
    * @private
    */
-  _objectJumpVelocity = 50;
+  _objectJumpVelocity = 25;
 
   /**
    * @type {ObjectGravity}
@@ -110,7 +118,36 @@ export class LivingObject extends WorldObjectAnimated {
       this._updateVerticalPosition( deltaTime );
     }
 
+    this.updateLabel();
+
     super.update( deltaTime );
+  }
+
+  /**
+   * @param {string} label
+   * @param {boolean} own
+   */
+  createLabel (label, own = false) {
+    this._label = new LivingObjectLabel( this );
+    this._label.create(label, {
+      contentClass: own ? 'own' : 'enemy'
+    });
+  }
+
+  attachLabel () {
+    this._label && this._label.attach();
+  }
+
+  detachLabel () {
+    this._label && this._label.detach();
+  }
+
+  destroyLabel () {
+    this._label && this._label.destroy();
+  }
+
+  updateLabel () {
+    this._label && this._label.update();
   }
 
   /**
@@ -270,7 +307,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @returns {WorldMap}
    */
   get map () {
-    return game.world.map;
+    return Game.getInstance().world.map;
   }
 
   /**

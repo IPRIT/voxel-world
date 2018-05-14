@@ -1,4 +1,5 @@
 import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
+import { Game } from "../../../game";
 
 export class PlayerWorldLight extends THREE.DirectionalLight {
 
@@ -35,6 +36,7 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
   }
 
   attachToWorld () {
+    const game = Game.getInstance();
     this._me.add( this );
     game.scene.add( this._lightHelper );
   }

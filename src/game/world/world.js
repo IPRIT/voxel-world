@@ -1,17 +1,11 @@
 import { WorldMap } from "./map/world-map";
 import { PlayerMe } from "../living-object/player/me/player-me";
 import { PlayerClassType } from "../living-object/player/player-class-type";
-import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
+import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { PlayerEnemy } from "../living-object/player/enemy";
+import { Game } from "../game";
 
 export class World {
-
-  /**
-   * @type {Game}
-   * @private
-   */
-  _game = null;
-
   /**
    * @type {WorldMap}
    * @private
@@ -30,22 +24,16 @@ export class World {
    */
   _players = [];
 
-  /**
-   * @param {Game} game
-   */
-  constructor (game) {
-    this._game = game;
-  }
-
   async init () {
+    const game = Game.getInstance();
     let map = new WorldMap();
     map.init();
-    this._game.scene.add( map );
     this._map = map;
+    game.scene.add( map );
 
     let coords = new THREE.Vector3( 16353.944446908708, 2, 16356.723378763674 );
 
-    for (let i = 0; i < 0; ++i) {
+    for (let i = 0; i < 10; ++i) {
       let enemy = new PlayerEnemy();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 0, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
@@ -54,8 +42,14 @@ export class World {
       enemy.init({
         classType: PlayerClassType.MYSTIC
       });
+      enemy.setPlayerData({
+        playerId: enemy.id,
+        playerName: 'Enemy player ' + enemy.id
+      });
+      enemy.createLabel( enemy.playerName );
+      enemy.attachLabel();
 
-      this._game.scene.add( enemy );
+      game.scene.add( enemy );
     }
 
     let me = new PlayerMe();
@@ -66,11 +60,17 @@ export class World {
     me.init({
       classType: PlayerClassType.MYSTIC
     });
+    me.setPlayerData({
+      playerId: me.id,
+      playerName: 'IPRIT'
+    });
+    me.createLabel( me.playerName, true );
+    me.attachLabel();
 
     game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
     game._transformControl.attach( me );
-    this._game.scene.add( game._transformControl );
-    this._game.scene.add( me );
+    game.scene.add( game._transformControl );
+    game.scene.add( me );
 
     setTimeout(_ => {
       this._runDemo();
@@ -80,7 +80,9 @@ export class World {
   update (deltaTime) {
     if (this._me) {
       this._me.update( deltaTime );
-      this.map.updateAtPosition( this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE ) );
+      this._map.updateAtPosition(
+        this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE )
+      );
     }
 
     if (this._players.length) {

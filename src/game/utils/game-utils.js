@@ -40,7 +40,7 @@ export function isVectorZeroStrict (vector) {
 export function isVectorZero (vector, eps = 1e-5) {
   const EPS = eps;
   for (let i = 0; i < 3; ++i) {
-    if (vector.getComponent( i ) > EPS) {
+    if (Math.abs(vector.getComponent( i )) > EPS) {
       return false;
     }
   }

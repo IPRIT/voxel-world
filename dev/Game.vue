@@ -14,4 +14,5 @@
 
 <style lang="scss">
   @import "../src/styles/common/index";
+  @import "../src/styles/game/index";
 </style>

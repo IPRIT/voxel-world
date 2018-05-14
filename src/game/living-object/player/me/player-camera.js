@@ -1,3 +1,5 @@
+import { Game } from "../../../game";
+
 const OrbitControls = require('three-orbit-controls')(THREE);
 
 THREE.OrbitControls = OrbitControls;
@@ -20,6 +22,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
    * @param {PlayerMe} player
    */
   constructor (player) {
+    const game = Game.getInstance();
     super( game._fov, game._aspect, game._near, game._far );
     this._me = player;
 
@@ -46,11 +49,15 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
    * Inits orbit camera for player
    */
   initOrbitControls () {
+    const game = Game.getInstance();
     this._orbitControls = new THREE.OrbitControls(this, game._renderer.domElement);
     this._orbitControls.target = this.target.position;
     this._orbitControls.enableKeys = false;
     this._orbitControls.enablePan = false;
+    this._orbitControls.enableDamping = true;
     this._orbitControls.zoomSpeed = 2;
+    this._orbitControls.dampingFactor = .3;
+    this._orbitControls.rotateSpeed = .4;
     this._orbitControls.maxPolarAngle = Math.PI / 2;
     this._orbitControls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 
@@ -61,7 +68,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
    * Makes camera active for current scene
    */
   makeActive () {
-    game._activeCamera = this;
+    game.activeCamera = this;
   }
 
   /**
