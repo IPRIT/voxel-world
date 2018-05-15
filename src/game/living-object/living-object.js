@@ -2,12 +2,13 @@ import { WorldObjectAnimated } from "../world/world-object/animated";
 import { warp } from "../utils";
 import { ObjectGravity } from "../physic";
 import { Game } from "../game";
-import { LivingObjectLabel } from "./label";
+import { SpriteLabel } from "../utils/label/sprite-label";
+import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 
 export class LivingObject extends WorldObjectAnimated {
 
   /**
-   * @type {LivingObjectLabel}
+   * @type {SpriteLabel}
    * @private
    */
   _label = null;
@@ -118,36 +119,36 @@ export class LivingObject extends WorldObjectAnimated {
       this._updateVerticalPosition( deltaTime );
     }
 
-    this.updateLabel();
-
     super.update( deltaTime );
   }
 
   /**
-   * @param {string} label
-   * @param {boolean} own
+   * @param {string} labelText
+   * @param {{fontFace: string, fontSize: number, borderWidth: number, borderColor: string, backgroundColor: string}} options
    */
-  createLabel (label, own = false) {
-    this._label = new LivingObjectLabel( this );
-    this._label.create(label, {
-      contentClass: own ? 'own' : 'enemy'
+  createLabel (labelText, options = {}) {
+    const bs = WORLD_MAP_BLOCK_SIZE;
+    this._label = new SpriteLabel( this );
+    this._label.create(labelText, new THREE.Vector3(), {
+      color: 'white',
+      strokeColor: 'black',
+      fontSize: 64
     });
+    this._label.updatePosition(
+      new THREE.Vector3(0, this.objectBlocksHeight * bs * 3, 0)
+    )
   }
 
   attachLabel () {
-    this._label && this._label.attach();
+    this._label && this._label.attachToObject();
   }
 
   detachLabel () {
-    this._label && this._label.detach();
+    this._label && this._label.detachFromObject();
   }
 
   destroyLabel () {
     this._label && this._label.destroy();
-  }
-
-  updateLabel () {
-    this._label && this._label.update();
   }
 
   /**

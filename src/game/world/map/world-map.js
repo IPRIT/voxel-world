@@ -385,16 +385,16 @@ export class WorldMap extends THREE.Group {
   placeGroundPlate () {
     let groundPlate = new THREE.Group();
 
-    let geo = new THREE.BoxGeometry(
+    let geo = new THREE.PlaneBufferGeometry(
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE,
-      WORLD_MAP_BLOCK_SIZE * 2,
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE
     );
     let mat = new THREE.MeshPhongMaterial({ color: 0x444444, shininess: 100 });
     let mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.x -= Math.PI / 2;
     mesh.position.set(
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
-      -WORLD_MAP_BLOCK_SIZE,
+      0,
       WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
     );
     mesh.receiveShadow = true;
@@ -402,22 +402,6 @@ export class WorldMap extends THREE.Group {
 
     groundPlate.add( mesh );
 
-    // base
-    geo = new THREE.BoxGeometry(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE,
-      WORLD_MAP_BLOCK_SIZE * 1000,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE
-    );
-    mat = new THREE.MeshPhongMaterial({ color: 0xd56e00 });
-    mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
-      WORLD_MAP_BLOCK_SIZE * (-1000 / 2 - 2),
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
-    );
-    mesh.receiveShadow = true;
-
-    groundPlate.add( mesh );
     this._groundPlate = groundPlate;
 
     this.add( groundPlate );

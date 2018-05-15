@@ -1,14 +1,12 @@
-import { Game } from "../../game";
 import { isVectorZero } from "../../utils";
-import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
 
-export class LivingObjectLabel {
+export class DomLabel {
 
   /**
-   * @type {LivingObject}
+   * @type {THREE.Object3D}
    * @private
    */
-  _livingObject = null;
+  _object3D = null;
 
   /**
    * @type {*}
@@ -83,11 +81,16 @@ export class LivingObjectLabel {
   _old2DPosition = new THREE.Vector3();
 
   /**
-   * @param {LivingObject} livingObject
+   * @param {THREE.Object3D|*} object3D
    */
-  constructor (livingObject) {
-    this._livingObject = livingObject;
+  constructor (object3D) {
+    this._object3D = object3D;
     this._domContainer = document.querySelector( this._containerSelector );
+    if (!this._domContainer) {
+      this._domContainer = document.createElement( 'div' );
+      this._domContainer.className = this._containerSelector;
+      document.body.appendChild( this._domContainer );
+    }
   }
 
   /**
@@ -101,8 +104,6 @@ export class LivingObjectLabel {
     this._domElement.className = `living-object-label ${this._contentClass || ''}`.trim();
     this._domElement.innerHTML = text;
 
-    this.hide();
-
     return this._domElement;
   }
 
@@ -113,8 +114,6 @@ export class LivingObjectLabel {
     if (this._domContainer) {
       this._domContainer.appendChild( this._domElement );
       this._domElementInserted = true;
-
-      setTimeout(_ => this.show(), 500);
     }
   }
 
@@ -138,9 +137,12 @@ export class LivingObjectLabel {
 
   /**
    * Update cycle
+   *
+   * @param {PerspectiveCamera} camera
+   * @param {THREE.Vector3} offset
    */
-  update () {
-    this.updatePosition();
+  update ( camera, offset ) {
+    this.updatePosition( camera, offset );
   }
 
   /**
@@ -153,12 +155,14 @@ export class LivingObjectLabel {
 
   /**
    * Updates position of the label
+   *
+   * @param {PerspectiveCamera} camera
+   * @param {THREE.Vector3} offset
    */
-  updatePosition () {
-    const bs = WORLD_MAP_BLOCK_SIZE;
-    let objectPosition = this._livingObject.position.clone();
-    let labelPosition = objectPosition.add({ x: 0, y: this._livingObject.objectBlocksHeight * bs, z: 0 });
-    let position = this._compute2DPosition( labelPosition );
+  updatePosition (camera, offset) {
+    let objectPosition = this._object3D.position.clone();
+    let labelPosition = objectPosition.add( offset );
+    let position = this._compute2DPosition( camera, labelPosition );
 
     if (isVectorZero( this._old2DPosition.clone().sub( position ), 1 )) {
       return;
@@ -215,15 +219,14 @@ export class LivingObjectLabel {
   }
 
   /**
+   * @param {PerspectiveCamera} camera
    * @param {THREE.Vector3} position
    * @returns {THREE.Vector3}
    * @private
    */
-  _compute2DPosition (position) {
+  _compute2DPosition (camera, position) {
     position = position.clone();
-    const game = Game.getInstance();
-    let activeCamera = game.activeCamera;
-    let vector = position.project( activeCamera );
+    let vector = position.project( camera );
     vector.x = (vector.x + 1) / 2 * game._screenWidth;
     vector.y = -(vector.y - 1) / 2 * game._screenHeight;
     return vector;
