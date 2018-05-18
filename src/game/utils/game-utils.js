@@ -161,3 +161,28 @@ for (let i = 0; i < 32; ++i) {
 }
 
 export const powers = { powersOfTwo, powersOfTwoInv };
+
+/**
+ * @param {THREE.Object3D} object3D
+ * @param {number} hex
+ */
+export function highlightObject (object3D, hex = 0x777777) {
+  if (object3D && object3D.mesh
+    && object3D.mesh.material && !object3D._highlighted) {
+    object3D._currentHex = object3D.mesh.material.emissive.getHex();
+    object3D._highlighted = true;
+    object3D.mesh.material.emissive.setHex( hex );
+  }
+}
+
+/**
+ * @param {THREE.Object3D} object3D
+ */
+export function unhighlightObject (object3D) {
+  if (object3D && object3D.mesh
+    && object3D.mesh.material && object3D._highlighted) {
+    object3D.mesh.material.emissive.setHex( object3D._currentHex );
+    object3D._currentHex = null;
+    object3D._highlighted = false;
+  }
+}

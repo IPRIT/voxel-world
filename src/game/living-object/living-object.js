@@ -2,13 +2,13 @@ import { WorldObjectAnimated } from "../world/world-object/animated";
 import { warp } from "../utils";
 import { ObjectGravity } from "../physic";
 import { Game } from "../game";
-import { SpriteLabel } from "../utils/label/sprite-label";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
+import { TextLabel } from "../utils/label/text-label";
 
 export class LivingObject extends WorldObjectAnimated {
 
   /**
-   * @type {SpriteLabel}
+   * @type {TextLabel}
    * @private
    */
   _label = null;
@@ -39,13 +39,13 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {number}
    * @private
    */
-  _velocityScalar = 0;
+  _velocityScalar = .2;
 
   /**
    * @type {number}
    * @private
    */
-  _objectBlocksHeight = 2;
+  _objectBlocksHeight = 1;
 
   /**
    * @type {number}
@@ -119,24 +119,33 @@ export class LivingObject extends WorldObjectAnimated {
       this._updateVerticalPosition( deltaTime );
     }
 
+    this._updateLabel();
+
     super.update( deltaTime );
   }
 
   /**
-   * @param {string} labelText
-   * @param {{fontFace: string, fontSize: number, borderWidth: number, borderColor: string, backgroundColor: string}} options
+   * @param {string} text
+   * @param {*} options
    */
-  createLabel (labelText, options = {}) {
-    const bs = WORLD_MAP_BLOCK_SIZE;
-    this._label = new SpriteLabel( this );
-    this._label.create(labelText, new THREE.Vector3(), {
-      color: 'white',
-      strokeColor: 'black',
-      fontSize: 64
-    });
-    this._label.updatePosition(
-      new THREE.Vector3(0, this.objectBlocksHeight * bs * 3, 0)
-    )
+  createLabel (text, options = {}) {
+    const defaultOptions = {
+      textSize: 3,
+      textureOptions: {
+        fontWeight: 'bold',
+        fontFamily: 'Arial, Helvetica, sans-serif'
+      },
+      materialOptions: {
+        color: 0xffffff,
+        fog: true
+      },
+    };
+    options = Object.assign( {}, defaultOptions, options );
+
+    this._label = new TextLabel( text, options, this );
+    this._label.setOffsetPosition( new THREE.Vector3(0, this.labelVerticalOffset, 0) );
+
+    this.add( this._label );
   }
 
   attachLabel () {
@@ -148,7 +157,7 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   destroyLabel () {
-    this._label && this._label.destroy();
+    this._label && this._label.dispose();
   }
 
   /**
@@ -293,8 +302,22 @@ export class LivingObject extends WorldObjectAnimated {
   /**
    * @returns {number}
    */
+  get objectHeight () {
+    return this._objectBlocksHeight * WORLD_MAP_BLOCK_SIZE;
+  }
+
+  /**
+   * @returns {number}
+   */
   get objectBlocksRadius () {
     return this._objectBlocksRadius;
+  }
+
+  /**
+   * @returns {number}
+   */
+  get objectRadius () {
+    return this._objectBlocksRadius * WORLD_MAP_BLOCK_SIZE;
   }
 
   /**
@@ -309,6 +332,20 @@ export class LivingObject extends WorldObjectAnimated {
    */
   get map () {
     return Game.getInstance().world.map;
+  }
+
+  /**
+   * @returns {TextLabel}
+   */
+  get label () {
+    return this._label;
+  }
+
+  /**
+   * @returns {number}
+   */
+  get labelVerticalOffset () {
+    return this.objectHeight * 1.5;
   }
 
   /**
@@ -441,5 +478,36 @@ export class LivingObject extends WorldObjectAnimated {
     rotationMatrix.makeRotationAxis( axis, angleSign * angle );
 
     this._rotationMatrix = rotationMatrix;
+  }
+
+  /**
+   * @private
+   */
+  _updateLabel () {
+    let { distanceToCamera } = this._label;
+    if (!distanceToCamera) {
+      return;
+    }
+
+    const minDistance = 50;
+    const maxDistance = 150;
+    const minScale = .01;
+    const maxScale = 8;
+
+    let scaleModifier = 1, verticalOffset = 0;
+    if (distanceToCamera < minDistance) {
+      const maxVerticalOffset = this.objectHeight / 2 + 1;
+      scaleModifier = Math.max(minScale, distanceToCamera / minDistance);
+      verticalOffset = (1 - scaleModifier) * maxVerticalOffset;
+    } else if (distanceToCamera > maxDistance) {
+      scaleModifier = Math.min(maxScale, distanceToCamera / maxDistance);
+    }
+
+    this._label.scaleModifier = scaleModifier;
+    if (verticalOffset) {
+      this._label.setOffsetPosition(
+        new THREE.Vector3( 0, this.labelVerticalOffset - verticalOffset, 0 )
+      );
+    }
   }
 }

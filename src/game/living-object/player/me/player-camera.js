@@ -26,9 +26,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
     super( game._fov, game._aspect, game._near, game._far );
     this._me = player;
 
-    let targetObject = new THREE.Object3D();
-    targetObject.position.set(0, 3, 0);
-    this.target = targetObject;
+    this.target = new THREE.Object3D();
   }
 
   /**
@@ -68,7 +66,15 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
    * Makes camera active for current scene
    */
   makeActive () {
+    let game = Game.getInstance();
     game.activeCamera = this;
+  }
+
+  /**
+   * Centering target camera's position to center of body
+   */
+  targetCenter () {
+    this.target.position.set(0, this._me.objectHeight / 2, 0);
   }
 
   /**
