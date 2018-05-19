@@ -57,6 +57,18 @@ export class WorldObjectBase extends THREE.Group {
   _wireframe = false;
 
   /**
+   * @type {number|*}
+   * @private
+   */
+  _currentHex = null;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _highlighted = false;
+
+  /**
    * @param {number} objectType - @type WorldObjectType
    * @param {number} modelType - @type ModelType
    */
@@ -97,6 +109,34 @@ export class WorldObjectBase extends THREE.Group {
 
   detachMesh () {
     this._mesh && this.remove( this._mesh );
+  }
+
+  /**
+   * Highlight the object with color
+   *
+   * @param {number} color
+   */
+  highlight (color = 0x777777) {
+    if (!this._mesh || !this._mesh.material) {
+      return;
+    } else if (this._highlighted) {
+      this.unhighlight();
+    }
+    this._currentHex = this._mesh.material.emissive.getHex();
+    this._highlighted = true;
+    this._mesh.material.emissive.setHex( color );
+  }
+
+  /**
+   * Unhighlight the object
+   */
+  unhighlight () {
+    if (!this._mesh || !this._mesh.material || !this._highlighted) {
+      return;
+    }
+    this._mesh.material.emissive.setHex( this._currentHex );
+    this._currentHex = null;
+    this._highlighted = false;
   }
 
   /**
@@ -168,5 +208,12 @@ export class WorldObjectBase extends THREE.Group {
    */
   get modelType () {
     return this._modelType;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isHighlighted () {
+    return this._highlighted;
   }
 }

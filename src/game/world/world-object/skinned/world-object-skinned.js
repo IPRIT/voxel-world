@@ -110,6 +110,7 @@ export class WorldObjectSkinned extends WorldObjectBase {
     skinnedMesh.receiveShadow = true;
 
     skinnedMesh.scale.set( this.worldScale, -this.worldScale, this.worldScale );
+    skinnedMesh.position.set( 0, .02, 0 );
 
     this.mesh = skinnedMesh;
   }

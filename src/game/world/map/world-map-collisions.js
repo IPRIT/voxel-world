@@ -27,7 +27,7 @@ export class WorldMapCollisions {
     let { objectBlocksRadius, objectBlocksHeight } = options;
 
     let shiftX = shiftVector.x;
-    let shiftY = shiftVector.y;
+    let shiftY = 0;
     let shiftZ = shiftVector.z;
 
     const bs = WORLD_MAP_BLOCK_SIZE;
@@ -49,6 +49,8 @@ export class WorldMapCollisions {
     let map = this._map;
 
     let changed = false;
+    let onlyFirstLevelX = true;
+    let onlyFirstLevelZ = true;
 
     // clamp for X
     if (shiftX) {
@@ -63,7 +65,7 @@ export class WorldMapCollisions {
       let blocksValues = [];
       let found = false;
 
-      for (let blockX = currentBorderBlockPosition.x - sign; blockX !== nextBorderBlockPosition.x; blockX += sign) {
+      for (let blockX = currentBorderBlockPosition.x - sign * 2; blockX !== nextBorderBlockPosition.x; blockX += sign) {
         blocksPositions = [];
         blocksValues = [];
 
@@ -96,6 +98,9 @@ export class WorldMapCollisions {
             } else if (blocksValues[ levelIndex ][ blockIndex ]) {
               // middle
               middleHasValue = true;
+            }
+            if (levelIndex > 0 && blocksValues[ levelIndex ][ blockIndex ]) {
+              onlyFirstLevelX = false;
             }
           }
         }
@@ -142,9 +147,11 @@ export class WorldMapCollisions {
         }
 
         if (shiftsX.length) {
-          shiftX = shiftX > 0
-            ? Math.min( ...shiftsX )
-            : Math.max( ...shiftsX );
+          if (!onlyFirstLevelX) {
+            shiftX = shiftX > 0
+              ? Math.min( ...shiftsX )
+              : Math.max( ...shiftsX );
+          }
           changed = true;
         }
       }
@@ -197,6 +204,9 @@ export class WorldMapCollisions {
               // middle
               middleHasValue = true;
             }
+            if (levelIndex > 0 && blocksValues[ levelIndex ][ blockIndex ]) {
+              onlyFirstLevelZ = false;
+            }
           }
         }
 
@@ -242,9 +252,11 @@ export class WorldMapCollisions {
         }
 
         if (shiftsZ.length) {
-          shiftZ = shiftZ > 0
-            ? Math.min( ...shiftsZ )
-            : Math.max( ...shiftsZ );
+          if (!onlyFirstLevelZ) {
+            shiftZ = shiftZ > 0
+              ? Math.min( ...shiftsZ )
+              : Math.max( ...shiftsZ );
+          }
           changed = true;
         }
       }

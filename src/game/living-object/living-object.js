@@ -4,6 +4,7 @@ import { ObjectGravity } from "../physic";
 import { Game } from "../game";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
+import { SelectionOverlay } from "./utils";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -104,10 +105,6 @@ export class LivingObject extends WorldObjectAnimated {
    */
   update ( deltaTime ) {
     if (this._coming) {
-      if (this._targetObject && !this._targetLocation) {
-        this._updateVelocityDirection();
-      }
-
       if (this.getComingLocationDistance() > warp( this._velocityScalar, deltaTime )) {
         this._nextPosition( deltaTime );
       } else {
@@ -166,7 +163,7 @@ export class LivingObject extends WorldObjectAnimated {
    */
   setTargetLocation (location, infinite = false) {
     if (location) {
-      this._targetLocation = new THREE.Vector3(location.x, location.y, location.z);
+      this._targetLocation = new THREE.Vector3( location.x, location.y, location.z );
       this._targetLocationInfinite = infinite;
       this._updateVelocityDirection();
       this.setComingState();
@@ -177,15 +174,14 @@ export class LivingObject extends WorldObjectAnimated {
    * @param {LivingObject} livingObject
    */
   setTargetObject (livingObject) {
-    if (livingObject) {
-      if (this._targetObject
-        && this._targetObject.id === livingObject.id) {
-        this.setComingState();
-      }
-      this._targetObject = livingObject;
-      this._targetLocation = null;
-      this._updateVelocityDirection();
+    if (!livingObject) {
+      return;
     }
+    this._targetObject = livingObject;
+  }
+
+  resetTargetObject () {
+    this._targetObject = null;
   }
 
   /**
@@ -221,7 +217,6 @@ export class LivingObject extends WorldObjectAnimated {
     if (this._targetLocation) {
       return this._targetLocation.clone();
     }
-    return this._targetObject && this.targetObject.position.clone();
   }
 
   /**
@@ -241,6 +236,25 @@ export class LivingObject extends WorldObjectAnimated {
     }
     this._isJumping = true;
     this._gravity.setVelocity( -this._objectJumpVelocity );
+  }
+
+  /**
+   * Adds selection sprite below
+   */
+  select () {
+    let overlay = SelectionOverlay.getOverlay();
+    overlay.attachToObject( this );
+  }
+
+  /**
+   * Removes selection sprite below
+   */
+  deselect () {
+    let overlay = SelectionOverlay.getOverlay();
+    if (overlay.isAttached
+      && this.id === overlay.attachedTo.id) {
+      overlay.detachFromObject();
+    }
   }
 
   /**
@@ -392,7 +406,7 @@ export class LivingObject extends WorldObjectAnimated {
     }
 
     let oldPosition = this.position.clone();
-    this.position.add( shiftPosition.setY( 0 ) );
+    this.position.add( shiftPosition );
     let distancePassed = oldPosition.distanceTo( this.position );
     if (distancePassed < .01 && !this._targetLocationInfinite) {
       this.setComingState( false );

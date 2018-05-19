@@ -79,7 +79,7 @@ export class EntityCache {
    * @private
    */
   _freeOldEntities () {
-    while (this._cacheHistory.length > this._maxEntitiesNumber) {
+    while ( this._cacheHistory.length > this._maxEntitiesNumber ) {
       this.removeEntity( this._cacheHistory.shift() );
     }
   }

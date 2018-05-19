@@ -53,6 +53,26 @@ export class PlayerMe extends Player {
     }
   }
 
+  /**
+   * @param {LivingObject} livingObject
+   */
+  setTargetObject (livingObject) {
+    if (livingObject) {
+      if (this.targetObject && livingObject.id !== this.targetObject.id) {
+        this.resetTargetObject();
+      }
+      livingObject.select();
+    }
+    super.setTargetObject( livingObject );
+  }
+
+  resetTargetObject () {
+    if (this.targetObject) {
+      this.targetObject.deselect();
+    }
+    super.resetTargetObject();
+  }
+
   jump () {
     if (!this.isJumping) {
       super.jump();

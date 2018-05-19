@@ -11,7 +11,7 @@ export class PlayerControls {
   _me = null;
 
   /**
-   * @type {THREE.Object3D}
+   * @type {WorldObjectBase}
    * @private
    */
   _highlightedObject = null;
@@ -33,6 +33,12 @@ export class PlayerControls {
    * @private
    */
   _clickedAt = { x: 0, y: 0 };
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _lastTabPressedMs = 0;
 
   /**
    * @type {THREE.Raycaster}
@@ -86,6 +92,7 @@ export class PlayerControls {
    * @private
    */
   _initMouseEvents () {
+    window.addEventListener( 'keydown', this._onKeyDown.bind(this), false );
     window.addEventListener( 'mousedown', this._onMouseDown.bind(this), false );
     window.addEventListener( 'mousemove', this._onMouseMove.bind(this), false );
     window.addEventListener( 'mouseup', this._onMouseUp.bind(this), false );
@@ -152,15 +159,37 @@ export class PlayerControls {
    * @private
    */
   _handleKeyboardEvents () {
+    const currentTimeMs = Date.now();
     let keyboardState = this._keyboardState;
     let spacePressed = keyboardState.pressed( 'space' );
     let escPressed = keyboardState.pressed( 'escape' );
+    let tabPressed = keyboardState.pressed( 'tab' );
 
     if (spacePressed) {
       this._me.jump();
     }
     if (escPressed) {
-      this._me.setComingState( false );
+      if (this._me.isComing && !this._playerWalkingByKeyboard) {
+        this._me.setComingState( false );
+      } else {
+        this._me.resetTargetObject();
+      }
+    }
+    if (tabPressed && this._lastTabPressedMs + 500 < currentTimeMs) {
+      const game = Game.getInstance();
+      const nextTargetObject = game.world.getNextLivingObject( this._me.targetObject );
+      this._me.setTargetObject( nextTargetObject );
+      this._lastTabPressedMs = currentTimeMs;
+    }
+  }
+
+  /**
+   * @param {KeyboardEvent} event
+   * @private
+   */
+  _onKeyDown (event) {
+    if ([ 9 ].includes( event.keyCode )) {
+      event.preventDefault();
     }
   }
 
@@ -195,7 +224,7 @@ export class PlayerControls {
 
     if (isLivingObject) {
       this._me.setTargetObject( object3D );
-    } else {
+    } else if (!this._playerWalkingByKeyboard) {
       this._me.setTargetLocation( intersects[0].point );
     }
   }
@@ -243,33 +272,40 @@ export class PlayerControls {
    */
   _handleHighlight (event) {
     const game = Game.getInstance();
+    const map = game.world.map;
     const mousePoint = this._normalizedCursorPoint( event );
 
     // update the picking ray with the camera and mouse position
     this._mapRaycaster.setFromCamera( mousePoint, this._me.camera );
     // calculate objects intersecting the picking ray
     const intersects = this._mapRaycaster.intersectObjects(
-      [ ...game.world.playersMeshes ]
+      [ ...game.world.playersMeshes, ...map.getMeshes() ]
     );
 
     if (!intersects.length) {
       if (this._highlightedObject) {
-        this._unhighlightObject( this._highlightedObject )
+        this._unhighlightObject( this._highlightedObject );
       }
       return;
     }
 
+    /**
+     * @type {LivingObject|*} object3D
+     */
     let object3D = intersects[0].object && intersects[0].object.parent;
     let isLivingObject = object3D instanceof LivingObject;
 
-    if (!isLivingObject || (
-      this._highlightedObject && this._highlightedObject.id === object3D.id
-    )) {
+    if (!isLivingObject
+      || this._highlightedObject
+      && this._highlightedObject.id === object3D.id) {
+      if (!isLivingObject && this._highlightedObject) {
+        this._unhighlightObject( this._highlightedObject );
+      }
       return;
     }
 
     if (this._highlightedObject) {
-      this._unhighlightObject( this._highlightedObject )
+      this._unhighlightObject( this._highlightedObject );
     }
 
     this._highlightedObject = object3D;
@@ -277,20 +313,20 @@ export class PlayerControls {
   }
 
   /**
-   * @param {THREE.Object3D} object3D
+   * @param {WorldObjectBase} objectBase
    * @private
    */
-  _highlightObject (object3D) {
-    utils.highlightObject( object3D );
-    this._highlightedObject = object3D;
+  _highlightObject (objectBase) {
+    objectBase.highlight( 0x777777 );
+    this._highlightedObject = objectBase;
   }
 
   /**
-   * @param {THREE.Object3D} object3D
+   * @param {WorldObjectBase} objectBase
    * @private
    */
-  _unhighlightObject (object3D) {
-    utils.unhighlightObject( object3D );
+  _unhighlightObject (objectBase) {
+    objectBase.unhighlight();
     this._highlightedObject = null;
   }
 
@@ -298,6 +334,7 @@ export class PlayerControls {
    * @private
    */
   _removeMouseEvents () {
+    window.removeEventListener( 'keydown', this._onKeyDown.bind(this), false );
     window.removeEventListener( 'mousedown', this._onMouseDown.bind(this), false );
     window.removeEventListener( 'mousemove', this._onMouseMove.bind(this), false );
     window.removeEventListener( 'mouseup', this._onMouseUp.bind(this), false );
