@@ -32,11 +32,11 @@ export class World {
     this._map = map;
     game.scene.add( map );
 
-    let coords = new THREE.Vector3( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 2, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE );
+    let coords = new THREE.Vector3( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 10, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE );
 
     for (let i = 0; i < 200; ++i) {
       let enemy = new PlayerEnemy();
-      let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 0, z: Math.random() * 1000 - 500 });
+      let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 100, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
       this._players.push( enemy );
 
