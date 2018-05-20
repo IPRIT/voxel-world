@@ -228,6 +228,7 @@ export class Game {
     this._renderer = new THREE.WebGLRenderer( this._rendererOptions );
     this._renderer.setSize( this._screenWidth, this._screenHeight );
     this._renderer.setPixelRatio( window.devicePixelRatio );
+    // this._renderer.setPixelRatio( .7 ); // for low performance devices
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this._renderer.setClearColor( 0xFFA1C1, 1 );

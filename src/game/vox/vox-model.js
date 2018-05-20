@@ -1,6 +1,15 @@
 export class VoxModel {
 
+  /**
+   * @type {null}
+   * @private
+   */
   _voxelData = null;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
   _rotated = false;
 
   /**

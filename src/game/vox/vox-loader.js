@@ -1,5 +1,5 @@
 import { VoxModel } from "./vox-model";
-import ParseWorker from './vox-parser.worker';
+import VoxLoaderWorker from './vox-parser.worker';
 import { voxLoadAndParse } from "./vox-parser";
 import WorkerPool from "webworker-promise/lib/pool";
 
@@ -8,7 +8,7 @@ let workerPool;
 
 if (window.Worker) {
   workerPool = WorkerPool.create({
-    create: () => new ParseWorker(),
+    create: () => new VoxLoaderWorker(),
     maxThreads: workersNumber,
     maxConcurrentPerWorker: 1
   });

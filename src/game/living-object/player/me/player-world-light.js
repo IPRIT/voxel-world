@@ -47,6 +47,12 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
   _addShadows () {
     this.castShadow = true;
 
+    /* For low performance devices */
+    /*
+    this.shadow.mapSize.width = 1 << 10;
+    this.shadow.mapSize.height = 1 << 10;
+    */
+
     this.shadow.mapSize.width = 1 << 12;
     this.shadow.mapSize.height = 1 << 12;
 
