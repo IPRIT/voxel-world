@@ -1,1 +1,1 @@
-export * from './effect-base';
+export * from './transition';

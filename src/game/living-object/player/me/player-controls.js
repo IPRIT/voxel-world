@@ -41,6 +41,18 @@ export class PlayerControls {
   _lastTabPressedMs = 0;
 
   /**
+   * @type {number}
+   * @private
+   */
+  _lastEscPressedMs = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _keyPressDelay = 250;
+
+  /**
    * @type {THREE.Raycaster}
    * @private
    */
@@ -168,16 +180,21 @@ export class PlayerControls {
     if (spacePressed) {
       this._me.jump();
     }
-    if (escPressed) {
+
+    if (escPressed && this._lastEscPressedMs + this._keyPressDelay < currentTimeMs) {
       if (this._me.isComing && !this._playerWalkingByKeyboard) {
+        console.log(1);
         this._me.setComingState( false );
       } else {
+        console.log(1);
         this._me.resetTargetObject();
       }
+      this._lastEscPressedMs = currentTimeMs;
     }
-    if (tabPressed && this._lastTabPressedMs + 500 < currentTimeMs) {
+
+    if (tabPressed && this._lastTabPressedMs + this._keyPressDelay < currentTimeMs) {
       const game = Game.getInstance();
-      const nextTargetObject = game.world.getNextLivingObject( this._me.targetObject );
+      const nextTargetObject = game.world.getNextLivingObject( this._me, this._me.targetObject || this._me );
       this._me.setTargetObject( nextTargetObject );
       this._lastTabPressedMs = currentTimeMs;
     }

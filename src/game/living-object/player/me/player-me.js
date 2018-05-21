@@ -2,6 +2,8 @@ import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
 import { PlayerWorldLight } from "./player-world-light";
 import { PlayerControls } from "./player-controls";
+import { Transition } from "../../../effects";
+import { Game } from "../../../game";
 
 export class PlayerMe extends Player {
 

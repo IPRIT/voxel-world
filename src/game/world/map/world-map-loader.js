@@ -25,7 +25,7 @@ export class WorldMapLoader extends VoxModelLoader {
    */
   async load (chunkIndex) {
     let [ x, z ] = chunkIndex.split('|').map(Number);
-    x = 0; z = 0;
+    x = x % 2; z = z % 2;
     let chunkFileName = `world-chunk-${x}-${z}.vox`;
     let pathToFile = `resources/models/chunks/`;
     let modelUrl = `${pathToFile}${chunkFileName}`;

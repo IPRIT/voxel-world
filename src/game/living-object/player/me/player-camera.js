@@ -56,7 +56,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
     this._orbitControls.zoomSpeed = 2;
     this._orbitControls.dampingFactor = .3;
     this._orbitControls.rotateSpeed = .4;
-    this._orbitControls.maxPolarAngle = Math.PI / 2;
+    this._orbitControls.maxPolarAngle = Math.PI / 2 + .01;
     this._orbitControls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 
     this.update();

@@ -5,6 +5,7 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
 import { PlayerEnemy } from "../living-object/player/enemy";
 import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
+import { ParticlesPool } from "../effects/particles-pool";
 
 export class World {
   /**
@@ -34,7 +35,7 @@ export class World {
 
     let coords = new THREE.Vector3( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 10, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE );
 
-    for (let i = 0; i < 50; ++i) {
+    for (let i = 0; i < 100; ++i) {
       let enemy = new PlayerEnemy();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 100, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
@@ -73,9 +74,13 @@ export class World {
 
     setTimeout(_ => {
       this._runDemo();
-    }, 1000);
+    }, 4000);
 
     SelectionOverlay.getOverlay(); // just init selection overlay once
+    const particlesPool = ParticlesPool.getPool(); // init once
+    particlesPool.createPool();
+
+    console.log(particlesPool);
   }
 
   update (deltaTime) {
@@ -101,41 +106,35 @@ export class World {
   }
 
   /**
-   * @param {LivingObject} livingObject
+   * @param {LivingObject} targetLivingObject
+   * @param {LivingObject} currentLivingObject
    * @returns {LivingObject}
    */
-  getNextLivingObject (livingObject) {
-    let livingObjects = [].concat( this._players );
-    const objectsLength = livingObjects.length;
-    if (!objectsLength) {
+  getNextLivingObject (targetLivingObject, currentLivingObject) {
+    let sortedObjects = this.getNearestLivingObjects( targetLivingObject );
+    if (!sortedObjects.length) {
       return null;
     }
 
-    let objectIndex = livingObject && this._players.findIndex(_player => {
-      return _player.id === livingObject.id;
+    let objectIndex = sortedObjects.findIndex(({ object }) => {
+      return object.id === currentLivingObject.id;
     });
-    if (!livingObject || objectIndex < 0) {
-      return this.getNearestPlayer( this._me );
-    }
 
-    return this._players[ (objectIndex + 1) % objectsLength ];
+    return sortedObjects[ (objectIndex + 1) % sortedObjects.length ].object;
   }
 
   /**
-   * @param {Player} player
-   * @returns {Player}
+   * @param {LivingObject} target
+   * @returns {{ object: LivingObject, distance: number }}
    */
-  getNearestPlayer (player) {
-    if (!this._players.length) {
-      return null;
-    }
-    let distances = this._players.map(target => {
-      const distance = player.position.distanceTo( target.position );
-      return { target, distance };
+  getNearestLivingObjects (target) {
+    let objects = [].concat( this._players );
+    return objects.map(object => {
+      const distance = object.position.distanceTo( target.position );
+      return { object, distance };
     }).sort((distanceA, distanceB) => {
       return distanceA.distance - distanceB.distance;
     });
-    return distances[ 0 ].target;
   }
 
   /**
@@ -167,6 +166,12 @@ export class World {
   _runDemo () {
     this._players.forEach(player => {
       this._runDemoForPlayer( player );
+    });
+
+    this._players.forEach(player => {
+      setInterval(_ => {
+        player.setTargetObject( this._me );
+      }, Math.random() * 2000 + 500);
     });
   }
 

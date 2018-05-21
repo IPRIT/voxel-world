@@ -5,6 +5,8 @@ import { Game } from "../game";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
+import { Transition } from "../effects";
+import { ParticlesPool } from "../effects/particles-pool";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -118,6 +120,30 @@ export class LivingObject extends WorldObjectAnimated {
 
     this._updateLabel();
 
+    if (this._effects && this._effects.length) {
+      this._effects.forEach(effect => {
+        effect.update( deltaTime );
+        let promise = effect._promise;
+        let particle = promise.particles && promise.particles[ 0 ];
+        if (particle) {
+          particle.position.copy( effect.currentPosition );
+          particle.rotation.x += .01;
+          particle.rotation.z += .01;
+        }
+        if (effect.isFinished) {
+          particle && Game.getInstance().scene.remove( particle );
+          promise && promise.dispose();
+          effect._promise = null;
+          let index = this._effects.findIndex(target => target.id === effect.id);
+          index >= 0 && this._effects.splice(
+            index, 1
+          );
+          effect.dispose();
+          effect = null;
+        }
+      });
+    }
+
     super.update( deltaTime );
   }
 
@@ -145,14 +171,23 @@ export class LivingObject extends WorldObjectAnimated {
     this.add( this._label );
   }
 
+  /**
+   * Attaches label to object
+   */
   attachLabel () {
     this._label && this._label.attachToObject();
   }
 
+  /**
+   * Detaches label from object
+   */
   detachLabel () {
     this._label && this._label.detachFromObject();
   }
 
+  /**
+   * Destroys label for object
+   */
   destroyLabel () {
     this._label && this._label.dispose();
   }
@@ -177,9 +212,41 @@ export class LivingObject extends WorldObjectAnimated {
     if (!livingObject) {
       return;
     }
+
+    let pool = ParticlesPool.getPool();
+    let promise = pool.take( 1 );
+
+    let particle = promise.particles && promise.particles[ 0 ];
+    if (particle) {
+      let effect = new Transition(this, livingObject, {
+        velocity: 5 + Math.random() * 30,
+        acceleration: .1
+      });
+      effect.start();
+
+      const scene = Game.getInstance().scene;
+
+      scene.add( particle );
+      promise.then(particles => {
+        scene.remove( ...particles );
+      });
+
+      particle.position.copy( effect.currentPosition );
+
+      effect._promise = promise;
+
+      this._effects = this._effects || [];
+      this._effects.push( effect );
+    } else {
+      promise.dispose();
+    }
+
     this._targetObject = livingObject;
   }
 
+  /**
+   * Resets target object to null
+   */
   resetTargetObject () {
     this._targetObject = null;
   }

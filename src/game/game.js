@@ -232,6 +232,7 @@ export class Game {
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this._renderer.setClearColor( 0xFFA1C1, 1 );
+    // this._renderer.setClearColor( 0x0b091c, 1 );
   }
 
   /**
@@ -262,14 +263,14 @@ export class Game {
    * @private
    */
   _initFog () {
-    this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
+    // this._scene.fog = new THREE.Fog(0xffa1c1, 20 * WORLD_MAP_BLOCK_SIZE, 300 * WORLD_MAP_BLOCK_SIZE);
   }
 
   /**
    * @private
    */
   _addWorldLight () {
-    const ambientLight = new THREE.AmbientLight( 0xd68973 );
+    const ambientLight = new THREE.AmbientLight( 0xf794ab );
     this._scene.add( ambientLight );
 
     const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 0.6 );
