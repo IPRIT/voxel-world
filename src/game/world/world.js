@@ -63,7 +63,7 @@ export class World {
     });
     me.setPlayerData({
       playerId: me.id,
-      playerName: 'Лисёнок'
+      playerName: 'Lorem ipsum\ndolor sit amet' // 'Лисёнок'
     });
     me.createLabel( me.playerName );
 
