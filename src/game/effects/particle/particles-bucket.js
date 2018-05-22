@@ -38,7 +38,7 @@ export class ParticlesBucket {
    * @type {number}
    * @private
    */
-  _timeoutMs = 5000 * 1000; // todo: decrease later
+  _timeoutMs = 1000 * 1000; // todo: decrease later
 
   /**
    * @type {*}
