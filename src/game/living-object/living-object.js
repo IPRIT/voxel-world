@@ -5,8 +5,8 @@ import { Game } from "../game";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
-import { Transition } from "../effects";
-import { ParticlesPool } from "../effects/particles-pool";
+import { TransitionPlayback } from "../effects";
+import { ParticlesPool } from "../effects/particle/particles-pool";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -120,26 +120,26 @@ export class LivingObject extends WorldObjectAnimated {
 
     this._updateLabel();
 
-    if (this._effects && this._effects.length) {
-      this._effects.forEach(effect => {
-        effect.update( deltaTime );
-        let promise = effect._promise;
-        let particle = promise.particles && promise.particles[ 0 ];
+    if (this._transitions && this._transitions.length) {
+      this._transitions.forEach(transition => {
+        transition.update( deltaTime );
+        let bucket = transition._bucket;
+        let particle = bucket.particles && bucket.particles[ 0 ];
         if (particle) {
-          particle.position.copy( effect.currentPosition );
+          particle.position.copy( transition.currentPosition );
           particle.rotation.x += .01;
           particle.rotation.z += .01;
         }
-        if (effect.isFinished) {
+        if (transition.isFinished) {
           particle && Game.getInstance().scene.remove( particle );
-          promise && promise.dispose();
-          effect._promise = null;
-          let index = this._effects.findIndex(target => target.id === effect.id);
-          index >= 0 && this._effects.splice(
+          bucket && bucket.dispose();
+          transition._bucket = null;
+          let index = this._transitions.findIndex(target => target.id === transition.id);
+          index >= 0 && this._transitions.splice(
             index, 1
           );
-          effect.dispose();
-          effect = null;
+          transition.dispose();
+          transition = null;
         }
       });
     }
@@ -214,31 +214,31 @@ export class LivingObject extends WorldObjectAnimated {
     }
 
     let pool = ParticlesPool.getPool();
-    let promise = pool.take( 1 );
+    let bucket = pool.take( 1 );
 
-    let particle = promise.particles && promise.particles[ 0 ];
+    let particle = bucket.particles && bucket.particles[ 0 ];
     if (particle) {
-      let effect = new Transition(this, livingObject, {
+      let transition = new TransitionPlayback(this, livingObject, {
         velocity: 5 + Math.random() * 30,
         acceleration: .1
       });
-      effect.start();
+      transition.start();
 
       const scene = Game.getInstance().scene;
 
       scene.add( particle );
-      promise.then(particles => {
+      bucket.onRelease(particles => {
         scene.remove( ...particles );
       });
 
-      particle.position.copy( effect.currentPosition );
+      particle.position.copy( transition.currentPosition );
 
-      effect._promise = promise;
+      transition._bucket = bucket;
 
-      this._effects = this._effects || [];
-      this._effects.push( effect );
+      this._transitions = this._transitions || [];
+      this._transitions.push( transition );
     } else {
-      promise.dispose();
+      bucket.release();
     }
 
     this._targetObject = livingObject;

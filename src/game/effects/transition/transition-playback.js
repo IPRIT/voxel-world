@@ -1,9 +1,9 @@
 import { TransitionState } from "./transition-state";
-import { warp } from "../utils";
+import { warp } from "../../utils/index";
 
 let TRANSITION_ID = 1;
 
-export class Transition {
+export class TransitionPlayback {
 
   /**
    * @type {number}

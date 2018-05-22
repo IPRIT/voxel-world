@@ -5,7 +5,7 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
 import { PlayerEnemy } from "../living-object/player/enemy";
 import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
-import { ParticlesPool } from "../effects/particles-pool";
+import { ParticlesPool } from "../effects/particle/particles-pool";
 
 export class World {
   /**

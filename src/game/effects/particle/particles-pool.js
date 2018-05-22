@@ -1,5 +1,6 @@
-import { WORLD_MAP_BLOCK_SIZE } from "../settings";
-import { ParticlesPromise } from "./particles-promise";
+import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
+import { ParticlesBucket } from "./particles-bucket";
+import { CubeParticle } from "./cube-particle";
 
 const PARTICLES_DEFAULT_POOL_SIZE = 1e4;
 
@@ -28,7 +29,7 @@ export class ParticlesPool {
   _poolSize = PARTICLES_DEFAULT_POOL_SIZE;
 
   /**
-   * @type {Array<THREE.Mesh>}
+   * @type {Array<Particle>}
    * @private
    */
   _pool = [];
@@ -40,13 +41,13 @@ export class ParticlesPool {
   _poolReady = false;
 
   /**
-   * @type {Array<ParticlesPromise>}
+   * @type {Array<ParticlesBucket>}
    * @private
    */
-  _promises = [];
+  _buckets = [];
 
   /**
-   * @param {THREE.Mesh} sourceObject
+   * @param {Particle} sourceObject
    */
   createPool (sourceObject = null) {
     if (this._poolReady) {
@@ -56,7 +57,7 @@ export class ParticlesPool {
     sourceObject = sourceObject || this._createSourceObject();
 
     for (let i = 0; i < this._poolSize; ++i) {
-     this._createParticle( sourceObject );
+     this._cloneParticle( sourceObject );
     }
 
     this._poolReady = true;
@@ -64,7 +65,7 @@ export class ParticlesPool {
 
   /**
    * @param {number} particlesNumber
-   * @returns {ParticlesPromise}
+   * @returns {ParticlesBucket}
    */
   take (particlesNumber = 0) {
     particlesNumber = Math.min( Math.max( particlesNumber, 0 ), this.poolFreeSize );
@@ -76,28 +77,27 @@ export class ParticlesPool {
     // console.info(`[ParticlesPool] got ${particlesNumber} particles from the pool`);
 
     let particles = this._pool.splice( 0, particlesNumber );
-    let promise = new ParticlesPromise( particles );
+    let bucket = new ParticlesBucket( particles );
 
-    this._promises.push( promise );
-    return promise;
+    this._buckets.push( bucket );
+    return bucket;
   }
 
   /**
-   * @param {ParticlesPromise} targetPromise
+   * @param {ParticlesBucket} particlesBucket
    */
-  transfer (targetPromise) {
-    // console.info(`[ParticlesPool] transferring ${targetPromise.size} particles back to the pool`);
-
-    let promiseIndex = this._findPromiseIndex( targetPromise );
-    if (promiseIndex >= 0) {
-      this._promises.splice( promiseIndex, 1 );
+  transfer (particlesBucket) {
+    if (!particlesBucket.isReleased) {
+      return particlesBucket.release();
     }
 
-    let particles = targetPromise.particles || [];
-    this._pool = this._pool.concat( particles );
+    let bucketIndex = this._findBucketIndex( particlesBucket );
+    if (bucketIndex >= 0) {
+      this._buckets.splice( bucketIndex, 1 );
+    }
 
-    targetPromise.onFulfill( particles );
-    targetPromise.dispose();
+    let particles = particlesBucket.particles || [];
+    this._pool = this._pool.concat( particles );
   }
 
   /**
@@ -117,8 +117,8 @@ export class ParticlesPool {
   /**
    * @returns {Array<*>}
    */
-  get promises () {
-    return this._promises;
+  get buckets () {
+    return this._buckets;
   }
 
   /**
@@ -140,39 +140,32 @@ export class ParticlesPool {
   }
 
   /**
-   * @returns {THREE.Mesh}
+   * @returns {Particle}
    * @private
    */
   _createSourceObject () {
-    const bs = WORLD_MAP_BLOCK_SIZE / 2;
-
-    let geometry = new THREE.CubeGeometry( bs, bs, bs );
-    let material = new THREE.MeshLambertMaterial({ color: 0xffffff });
-    let mesh = new THREE.Mesh( geometry, material );
-
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-
-    return mesh;
+    const particle = new CubeParticle();
+    particle.shadows = true;
+    return particle;
   }
 
   /**
-   * @param {THREE.Mesh} sourceObject
+   * @param {Particle} sourceObject
    * @private
    */
-  _createParticle (sourceObject) {
+  _cloneParticle (sourceObject) {
     let particle = sourceObject.clone();
     this._pool.push( particle );
   }
 
   /**
-   * @param {ParticlesPromise} targetPromise
+   * @param {ParticlesBucket} particlesBucket
    * @returns {number}
    * @private
    */
-  _findPromiseIndex (targetPromise) {
-    return this._promises.findIndex(promise => {
-      return promise.id === targetPromise.id;
+  _findBucketIndex (particlesBucket) {
+    return this._buckets.findIndex(bucket => {
+      return bucket.id === particlesBucket.id;
     });
   }
 }

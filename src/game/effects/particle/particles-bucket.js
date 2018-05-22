@@ -1,14 +1,14 @@
 import { ParticlesPool } from "./particles-pool";
 
-let PARTICLES_PROMISE_ID = 1;
+let PARTICLES_BUCKET_ID = 1;
 
-export class ParticlesPromise {
+export class ParticlesBucket {
 
   /**
    * @type {number}
    * @private
    */
-  _id = PARTICLES_PROMISE_ID++;
+  _id = PARTICLES_BUCKET_ID++;
 
   /**
    * @type {Array<THREE.Mesh>}
@@ -20,7 +20,13 @@ export class ParticlesPromise {
    * @type {boolean}
    * @private
    */
-  _resolved = false;
+  _released = false;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _disposed = false;
 
   /**
    * @type {Array<Function>}
@@ -32,7 +38,7 @@ export class ParticlesPromise {
    * @type {number}
    * @private
    */
-  _timeoutMs = 100 * 1000;
+  _timeoutMs = 5000 * 1000; // todo: decrease later
 
   /**
    * @type {*}
@@ -48,29 +54,37 @@ export class ParticlesPromise {
     this._setSelfDestructTimer();
   }
 
-  resolve () {
-    if (this._resolved) {
+  release () {
+    if (this._released) {
       return;
     }
-    this._resolved = true;
+
+    this._released = true;
     let pool = ParticlesPool.getPool();
     pool.transfer( this );
 
-    this._clearSelfDestructTimer();
+    this.fulfill( this._particles );
+    this.dispose();
   }
 
   dispose () {
-    if (!this._resolved) {
-      this.resolve();
+    if (this._disposed) {
+      return;
     }
+    if (!this._released) {
+      this.release();
+    }
+    this._clearSelfDestructTimer();
     this._particles = null;
+    this._onFulfill = null;
+    this._disposed = true;
   }
 
   /**
    * @param {Function} onFulfill
-   * @returns {ParticlesPromise}
+   * @returns {ParticlesBucket}
    */
-  then (onFulfill) {
+  onRelease (onFulfill) {
     this._onFulfill.push( onFulfill );
     return this;
   }
@@ -78,7 +92,7 @@ export class ParticlesPromise {
   /**
    * @param {THREE.Mesh[]} particles
    */
-  onFulfill (particles) {
+  fulfill (particles) {
     let lastResult = particles;
     for (let i = 0; i < this._onFulfill.length; ++i) {
       lastResult = this._onFulfill[ i ]( lastResult );
@@ -107,10 +121,24 @@ export class ParticlesPromise {
   }
 
   /**
+   * @returns {boolean}
+   */
+  get isReleased () {
+    return this._released;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isDisposed () {
+    return this._disposed;
+  }
+
+  /**
    * @private
    */
   _setSelfDestructTimer() {
-    this._timeout = setTimeout(_ => this.dispose(), this._timeoutMs);
+    this._timeout = setTimeout(_ => this.release(), this._timeoutMs);
   }
 
   /**
