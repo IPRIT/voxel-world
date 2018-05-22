@@ -11,7 +11,7 @@ export class ParticlesBucket {
   _id = PARTICLES_BUCKET_ID++;
 
   /**
-   * @type {Array<THREE.Mesh>}
+   * @type {Array<Particle>}
    * @private
    */
   _particles = [];
@@ -47,13 +47,16 @@ export class ParticlesBucket {
   _timeout = null;
 
   /**
-   * @param {Array<THREE.Mesh>} particles
+   * @param {Array<Particle>} particles
    */
   constructor (particles = []) {
     this._particles = particles;
     this._setSelfDestructTimer();
   }
 
+  /**
+   * Particles from the bucket returns back to the pool
+   */
   release () {
     if (this._released) {
       return;
@@ -67,6 +70,9 @@ export class ParticlesBucket {
     this.dispose();
   }
 
+  /**
+   * Release and destroy the bucket
+   */
   dispose () {
     if (this._disposed) {
       return;
@@ -90,7 +96,7 @@ export class ParticlesBucket {
   }
 
   /**
-   * @param {THREE.Mesh[]} particles
+   * @param {Array<Particle>} particles
    */
   fulfill (particles) {
     let lastResult = particles;
@@ -107,7 +113,7 @@ export class ParticlesBucket {
   }
 
   /**
-   * @returns {Array<THREE.Mesh>}
+   * @returns {Array<Particle>}
    */
   get particles () {
     return this._particles;
