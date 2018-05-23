@@ -120,28 +120,8 @@ export class LivingObject extends WorldObjectAnimated {
 
     this._updateLabel();
 
-    if (this._transitions && this._transitions.length) {
-      this._transitions.forEach(transition => {
-        transition.update( deltaTime );
-        let bucket = transition._bucket;
-        let particle = bucket.particles && bucket.particles[ 0 ];
-        if (particle) {
-          particle.position.copy( transition.currentPosition );
-          particle.rotation.x += .01;
-          particle.rotation.z += .01;
-        }
-        if (transition.isFinished) {
-          particle && Game.getInstance().scene.remove( particle );
-          bucket && bucket.dispose();
-          transition._bucket = null;
-          let index = this._transitions.findIndex(target => target.id === transition.id);
-          index >= 0 && this._transitions.splice(
-            index, 1
-          );
-          transition.dispose();
-          transition = null;
-        }
-      });
+    if (this.__particle) {
+      this.__particle.update( deltaTime );
     }
 
     super.update( deltaTime );
@@ -212,35 +192,6 @@ export class LivingObject extends WorldObjectAnimated {
     if (!livingObject) {
       return;
     }
-
-    let pool = ParticlesPool.getPool();
-    let bucket = pool.take( 1 );
-
-    let particle = bucket.particles && bucket.particles[ 0 ];
-    if (particle) {
-      let transition = new TransitionPlayback(this, livingObject, {
-        velocity: 5 + Math.random() * 30,
-        acceleration: .1
-      });
-      transition.start();
-
-      const scene = Game.getInstance().scene;
-
-      scene.add( particle );
-      bucket.onRelease(particles => {
-        scene.remove( ...particles );
-      });
-
-      particle.position.copy( transition.currentPosition );
-
-      transition._bucket = bucket;
-
-      this._transitions = this._transitions || [];
-      this._transitions.push( transition );
-    } else {
-      bucket.release();
-    }
-
     this._targetObject = livingObject;
   }
 

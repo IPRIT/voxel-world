@@ -4,6 +4,7 @@ import { PlayerWorldLight } from "./player-world-light";
 import { PlayerControls } from "./player-controls";
 import { TransitionPlayback } from "../../../effects";
 import { Game } from "../../../game";
+import { ParticlesPool } from "../../../effects/particle/particles-pool";
 
 export class PlayerMe extends Player {
 
@@ -33,6 +34,7 @@ export class PlayerMe extends Player {
     this._initCamera();
     this._initLights();
     this._initControls();
+    this.__particles = [];
     return super.init(options).then(_ => {
       this._camera.targetCenter();
     });
@@ -52,6 +54,44 @@ export class PlayerMe extends Player {
     }
     if (this._light) {
       this._light.update();
+    }
+
+    const timeScale = .3;
+
+    let pool = ParticlesPool.getPool();
+    let bucket = pool.take( 2 );
+
+    let particles = bucket.particles;
+    for (let i = 0; i < particles.length; ++i) {
+      const particle = particles[ i ];
+      let randX = Math.random() * 2 - 1;
+      let randZ = Math.random() * 2 - 1;
+      particle.setOptions({
+        velocity: new THREE.Vector3(randX, 1, randZ).normalize().multiplyScalar( 120 ).setY(50),
+        rotationVelocity: new THREE.Vector3(randX, Math.random() / 10, randZ),
+        acceleration: new THREE.Vector3(-randX, 10, -randZ).normalize().multiplyScalar(5),
+        position: this.position.clone().sub( new THREE.Vector3(randX, 0, randZ).normalize().multiplyScalar(8) ), // .add({ x: 0, y: this.objectHeight / 2, z: 0 }),
+        lifetime: 200,
+        scale: Math.random() + .5,
+        timeScale
+      });
+      Game.getInstance().scene.add( particle );
+      particle.start();
+      this.__particles.push({
+        bucket,
+        particle
+      });
+    }
+
+    for (let i = 0; i < this.__particles.length; ++i) {
+      this.__particles[i].particle.update( deltaTime );
+      if (this.__particles[i].particle.isStopped) {
+        Game.getInstance().scene.remove( this.__particles[i].particle );
+        if (!this.__particles[i].bucket.isReleased) {
+          this.__particles[i].bucket.release();
+        }
+        this.__particles.splice( i--, 1 );
+      }
     }
   }
 

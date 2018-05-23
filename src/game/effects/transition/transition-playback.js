@@ -156,7 +156,7 @@ export class TransitionPlayback {
    * @returns {number}
    */
   get velocity () {
-    return this._velocity * this._timeScale;
+    return this._velocity;
   }
 
   /**
