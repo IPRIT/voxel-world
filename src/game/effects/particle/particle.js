@@ -117,6 +117,9 @@ export class Particle extends THREE.Mesh {
   }
 
   beforeRelease () {
+    if (this.parent) {
+      this.parent.remove( this );
+    }
   }
 
   release () {

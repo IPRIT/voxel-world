@@ -38,7 +38,7 @@ export class ParticlesBucket {
    * @type {number}
    * @private
    */
-  _timeoutMs = 1000 * 1000; // todo: decrease later
+  _timeoutMs = 5 * 1000; // todo: decrease later
 
   /**
    * @type {*}
@@ -61,12 +61,12 @@ export class ParticlesBucket {
     if (this._released) {
       return;
     }
-
+    this.fulfill( this._particles );
     this._released = true;
+
     let pool = ParticlesPool.getPool();
     pool.transfer( this );
 
-    this.fulfill( this._particles );
     this.dispose();
   }
 
@@ -90,7 +90,7 @@ export class ParticlesBucket {
    * @param {Function} onFulfill
    * @returns {ParticlesBucket}
    */
-  onRelease (onFulfill) {
+  beforeRelease (onFulfill) {
     this._onFulfill.push( onFulfill );
     return this;
   }
@@ -102,6 +102,37 @@ export class ParticlesBucket {
     let lastResult = particles;
     for (let i = 0; i < this._onFulfill.length; ++i) {
       lastResult = this._onFulfill[ i ]( lastResult );
+    }
+  }
+
+  /**
+   * @param {number} colorFrom
+   * @param {number|*} colorTo
+   */
+  setHexRange (colorFrom, colorTo = colorFrom) {
+    for (let i = 0; i < this._particles.length; ++i) {
+      const particle = this._particles[ i ];
+      if (particle) {
+        particle.material.color.setHex(
+          Math.abs( colorTo - colorFrom ) * Math.random() + Math.min( colorFrom, colorTo )
+        )
+      }
+    }
+  }
+
+  /**
+   * @param {THREE.Vector3} hslFrom
+   * @param {THREE.Vector3} hslTo
+   */
+  setHSLRange (hslFrom, hslTo = hslFrom) {
+    let [ h1, s1, l1 ] = [ hslFrom.x, hslFrom.y, hslFrom.z ];
+    let [ h2, s2, l2 ] = [ hslTo.x, hslTo.y, hslTo.z ];
+    for (let i = 0; i < this._particles.length; ++i) {
+      const particle = this._particles[ i ];
+      const dh = Math.abs( h2 - h1 ) * Math.random() + Math.min( h1, h2 );
+      const ds = Math.abs( s2 - s1 ) * Math.random() + Math.min( s1, s2 );
+      const dl = Math.abs( l2 - l1 ) * Math.random() + Math.min( l1, l2 );
+      particle.material.color.setHSL( dh, ds, dl );
     }
   }
 
