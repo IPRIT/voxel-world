@@ -73,7 +73,7 @@ export class World {
     game.scene.add( me );
 
     setTimeout(_ => {
-      // this._runDemo();
+      this._runDemo();
     }, 4000);
 
     SelectionOverlay.getOverlay(); // just init selection overlay once
@@ -171,7 +171,7 @@ export class World {
     this._players.forEach(player => {
       setInterval(_ => {
         player.setTargetObject( this._me );
-      }, Math.random() * 2000 + 500);
+      }, Math.random() * 200000 + 5000);
     });
   }
 

@@ -11,10 +11,34 @@ export class ParticleSystem extends THREE.Object3D {
   _options = {};
 
   /**
+   * @type {boolean}
+   * @private
+   */
+  _cacheGeneratedOptions = true;
+
+  /**
+   * @type {Array<*>}
+   * @private
+   */
+  _optionsCache = [];
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _opttionsCacheCursor = 0;
+
+  /**
    * @type {THREE.Object3D|*}
    * @private
    */
   _container = null;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _local = false;
 
   /**
    * @type {number}
@@ -196,6 +220,7 @@ export class ParticleSystem extends THREE.Object3D {
    */
   dispose () {
     this._options = null;
+    this._optionsCache = null;
     this._particleOptions = null;
     this._bucket = null;
     this._axis = null;
@@ -244,8 +269,13 @@ export class ParticleSystem extends THREE.Object3D {
       maxParticlesNumber = 10,
       spawnRate = 1000,
       axis = new THREE.Vector3(0, 1, 0),
-      container = Game.getInstance().scene
+      container = Game.getInstance().scene,
+      local = false
     } = options;
+
+    if (local) {
+      container = this;
+    }
 
     let {
       generateContext = () => {},
@@ -265,6 +295,7 @@ export class ParticleSystem extends THREE.Object3D {
     this._options = options;
 
     this._container = container;
+    this._local = local;
     this._timeScale = timeScale;
     this._axis = axis;
     this._spawnRate = spawnRate;
@@ -303,10 +334,10 @@ export class ParticleSystem extends THREE.Object3D {
   _updateParticles (deltaTime) {
     for (let i = 0; i < this._usingParticles.length; ++i) {
       const particle = this._usingParticles[ i ];
-      if (particle.isStopped) {
-        this._releaseParticle( particle, i );
-      }
       particle.update( deltaTime );
+      if (particle.isStopped) {
+        this._releaseParticle( particle, i-- );
+      }
     }
   }
 
@@ -341,7 +372,20 @@ export class ParticleSystem extends THREE.Object3D {
     if (!this._freeParticles.length) {
       return;
     }
-    const particleOptions = this._generateParticleOptions();
+    let particleOptions;
+    if (this._cacheGeneratedOptions) {
+      if (this._optionsCache.length < this._maxParticlesNumber) {
+        particleOptions = this._generateParticleOptions();
+        this._optionsCache.push( particleOptions );
+      } else {
+        particleOptions = this._updateOptionsPosition(
+          this._optionsCache[ this._opttionsCacheCursor++ % this._optionsCache.length ]
+        );
+      }
+    } else {
+      particleOptions = this._generateParticleOptions();
+    }
+
     const particle = this._freeParticles.shift();
 
     particle.setOptions( particleOptions );
@@ -367,18 +411,36 @@ export class ParticleSystem extends THREE.Object3D {
    */
   _generateParticleOptions () {
     const context = this._particleGenerateContext();
-    const position = this.position.clone().add(
+    const origin = this._local
+      ? new THREE.Vector3() : this.position.clone();
+    const position = origin.add(
       this._getOrInvoke( this._particlePositionOffset, context )
     );
+
     return {
+      context,
+      position,
       velocity: this._getOrInvoke( this._particleVelocity, context ),
       rotationVelocity: this._getOrInvoke( this._particleRotationVelocity, context ),
       acceleration: this._getOrInvoke( this._particleAcceleration, context ),
-      position,
       scale: this._getOrInvoke( this._particleScale, context ),
       lifetime: this._getOrInvoke( this._particleLifetime, context ),
       timeScale: this._timeScale
     };
+  }
+
+  /**
+   * @param {*} options
+   * @returns {*}
+   * @private
+   */
+  _updateOptionsPosition (options) {
+    const origin = this._local
+      ? new THREE.Vector3() : this.position.clone();
+    options.position = origin.add(
+      this._getOrInvoke( this._particlePositionOffset, options.context )
+    );
+    return options;
   }
 
   /**
@@ -390,8 +452,6 @@ export class ParticleSystem extends THREE.Object3D {
   _getOrInvoke (fnOrValue, fnContext = {}) {
     if (typeof fnOrValue === 'function') {
       return fnOrValue( fnContext );
-    } else if (typeof fnOrValue === 'object') {
-      return fnOrValue.clone();
     }
     return fnOrValue;
   }

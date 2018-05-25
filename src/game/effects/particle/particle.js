@@ -73,9 +73,9 @@ export class Particle extends THREE.Mesh {
       timeScale = 1,
     } = options;
 
-    this._velocity = velocity;
-    this._acceleration = acceleration;
-    this._rotationVelocity = rotationVelocity;
+    this._velocity = velocity.clone();
+    this._acceleration = acceleration.clone();
+    this._rotationVelocity = rotationVelocity.clone();
     this._timeScale = timeScale;
     this._lifetimeMs = lifetime;
 

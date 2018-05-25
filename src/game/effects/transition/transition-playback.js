@@ -133,9 +133,11 @@ export class TransitionPlayback {
    * Destroys the transition
    */
   dispose () {
-    this.finish();
+    !this.isFinished && this.finish();
     this._fromObject = null;
     this._toObject = null;
+    this._currentPosition = null;
+    this._startPosition = null;
   }
 
   /**
