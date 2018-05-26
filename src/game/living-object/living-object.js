@@ -121,7 +121,20 @@ export class LivingObject extends WorldObjectAnimated {
 
     this._updateLabel();
 
-    this._effects && this._effects.forEach(effect => effect.update( deltaTime ));
+    /**
+     * @type {Effect}
+     */
+    this._effects && this._effects.forEach((_, index) => {
+      /**
+       * @type {Effect}
+       */
+      let effect = _;
+      effect.update( deltaTime );
+
+      if (effect.isFinished) {
+        this._effects.splice( index, 1 );
+      }
+    });
 
     super.update( deltaTime );
   }
