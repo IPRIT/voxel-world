@@ -172,12 +172,14 @@ export class ParticleSystem extends THREE.Object3D {
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (this.isStopped) {
+    if (this.isFinished) {
       return;
     }
     deltaTime *= this._timeScale;
     this._timeElapsed += deltaTime * 1000;
-    this._spawnParticles();
+    if (!this.isStopped) {
+      this._spawnParticles();
+    }
     this._updateParticles( deltaTime );
   }
 
@@ -204,14 +206,14 @@ export class ParticleSystem extends THREE.Object3D {
     this._state = ParticleSystemState.RUNNING;
   }
 
-  /**
-   * Stops the system
-   */
   stop () {
-    // we shouldn't change the state here
-    // because we have `_beforeBucketRelease` method
-    // which will called inside `release` function
-    // and will mutate state to NOT_RUNNING
+    this._state = ParticleSystemState.NOT_RUNNING;
+  }
+
+  /**
+   * Release the particles
+   */
+  release () {
     this._bucket && this._bucket.release();
   }
 
@@ -256,6 +258,13 @@ export class ParticleSystem extends THREE.Object3D {
    */
   get isStopped () {
     return this._state === ParticleSystemState.NOT_RUNNING;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isFinished () {
+    return !(this._usingParticles && this._usingParticles.length) && this.isStopped;
   }
 
   /**

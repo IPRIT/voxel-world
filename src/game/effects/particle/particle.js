@@ -52,7 +52,7 @@ export class Particle extends THREE.Mesh {
   _acceleration = new THREE.Vector3();
 
   /**
-   * @param {THREE.Geometry} geometry
+   * @param {THREE.BufferGeometry|THREE.Geometry} geometry
    * @param {THREE.Material} material
    */
   constructor (geometry, material) {

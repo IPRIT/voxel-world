@@ -1,5 +1,6 @@
 import { TransitionState } from "./transition-state";
 import { warp } from "../../utils/index";
+import { LivingObject } from "../../living-object";
 
 let TRANSITION_ID = 1;
 
@@ -45,10 +46,22 @@ export class TransitionPlayback {
   _fromObject = null;
 
   /**
+   * @type {THREE.Vector3}
+   * @private
+   */
+  _fromPosition = null;
+
+  /**
    * @type {LivingObject}
    * @private
    */
   _toObject = null;
+
+  /**
+   * @type {THREE.Vector3}
+   * @private
+   */
+  _toPosition = null;
 
   /**
    * @type {THREE.Vector3}
@@ -69,50 +82,97 @@ export class TransitionPlayback {
   _options = {};
 
   /**
-   * @param {LivingObject} fromObject
-   * @param {LivingObject} toObject
+   * @type {Array<Function>}
+   * @private
+   */
+  _onFinishedFns = [];
+
+  /**
+   * @param {LivingObject|THREE.Vector3} from
+   * @param {LivingObject|THREE.Vector3} to
    * @param {*} options
    */
-  constructor (fromObject, toObject, options = {}) {
-    this._fromObject = fromObject;
-    this._toObject = toObject;
-    this._initOptions( options );
-  }
-
-  start () {
-    if (this._fromObject && this._toObject && !this.isRunning) {
-      this._startPosition = this._fromObject.position.clone().add({
-        x: 0, y: this._toObject.objectHeight / 2, z: 0
-      });
-      this._currentPosition = this._startPosition.clone();
-      this._state = TransitionState.RUNNING;
+  constructor (from, to, options = {}) {
+    if (from instanceof LivingObject) {
+      this._fromObject = from;
+    } else {
+      this._fromPosition = from;
     }
+
+    if (to instanceof LivingObject) {
+      this._toObject = to;
+    } else {
+      this._toPosition = to;
+    }
+
+    this._initOptions( options );
   }
 
   /**
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (this.isPaused) {
+    if (this.isPaused || this.isFinished) {
       return;
     }
     this._updateVelocity( deltaTime );
     this._updateCurrentPosition( deltaTime );
   }
 
+  /**
+   * Play transition
+   */
+  start () {
+    if ((this._fromObject || this._fromPosition)
+      && (this._toObject || this._toPosition)
+      && !this.isRunning) {
+
+      this._startPosition = this.fromPosition.clone();
+      if (this._fromObject) {
+        this._startPosition.add({
+          x: 0, y: this._fromObject.objectHeight / 2, z: 0
+        });
+      }
+
+      this._currentPosition = this._startPosition.clone();
+      this._state = TransitionState.RUNNING;
+    }
+  }
+
+  /**
+   * Pause transition
+   */
   pause () {
     this._state = TransitionState.PAUSED;
   }
 
+  /**
+   * Finish the transition and dispatch `onFinished` event
+   */
   finish () {
     this._state = TransitionState.FINISHED;
+
+    for (let i = 0, length = this._onFinishedFns.length; i < length; ++i) {
+      this._onFinishedFns[ i ]();
+    }
   }
 
+  /**
+   * Reset transition
+   */
   reset () {
-    this.finish();
+    !this.isFinished && this.finish();
     this._initOptions( this._options );
     this._currentPosition = new THREE.Vector3();
     this._startPosition = new THREE.Vector3();
+    this._onFinishedFns = [];
+  }
+
+  /**
+   * @param {Function} callback
+   */
+  onFinished (callback) {
+    this._onFinishedFns.push( callback );
   }
 
   /**
@@ -135,9 +195,13 @@ export class TransitionPlayback {
   dispose () {
     !this.isFinished && this.finish();
     this._fromObject = null;
+    this._fromPosition = null;
     this._toObject = null;
+    this._toPosition = null;
     this._currentPosition = null;
     this._startPosition = null;
+    this._options = null;
+    this._onFinishedFns = null;
   }
 
   /**
@@ -185,6 +249,22 @@ export class TransitionPlayback {
   /**
    * @returns {THREE.Vector3}
    */
+  get fromPosition () {
+    return this._fromObject && this._fromObject.position
+      || this._fromPosition;
+  }
+
+  /**
+   * @returns {THREE.Vector3}
+   */
+  get toPosition () {
+    return this._toObject && this._toObject.position
+      || this._toPosition;
+  }
+
+  /**
+   * @returns {THREE.Vector3}
+   */
   get startPosition () {
     return this._startPosition.clone();
   }
@@ -197,12 +277,20 @@ export class TransitionPlayback {
   }
 
   /**
-   * @returns {THREE.Vector3|*}
+   * @returns {THREE.Vector3}
    */
   get destinationPosition () {
-    return this._toObject && this._toObject.position.clone().add({
-      x: 0, y: this._toObject.objectHeight / 2, z: 0
-    });
+    const toPosition = this.toPosition;
+    const destinationPosition = toPosition && toPosition.clone();
+
+    if (this._toObject && destinationPosition) {
+      destinationPosition.add({
+        x: 0, y: this._toObject.objectHeight / 2, z: 0
+      });
+      this._toPosition = destinationPosition;
+    }
+
+    return destinationPosition;
   }
 
   /**
@@ -234,7 +322,7 @@ export class TransitionPlayback {
    * @private
    */
   _updateCurrentPosition (deltaTime) {
-    if (!this._toObject) {
+    if (!this.toPosition) {
       return this.dispose();
     }
     let direction = this.destinationPosition

@@ -183,10 +183,8 @@ export class PlayerControls {
 
     if (escPressed && this._lastEscPressedMs + this._keyPressDelay < currentTimeMs) {
       if (this._me.isComing && !this._playerWalkingByKeyboard) {
-        console.log(1);
         this._me.setComingState( false );
       } else {
-        console.log(1);
         this._me.resetTargetObject();
       }
       this._lastEscPressedMs = currentTimeMs;
@@ -311,6 +309,7 @@ export class PlayerControls {
      */
     let object3D = intersects[0].object && intersects[0].object.parent;
     let isLivingObject = object3D instanceof LivingObject;
+
 
     if (!isLivingObject
       || this._highlightedObject

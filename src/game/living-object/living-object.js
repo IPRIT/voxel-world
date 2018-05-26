@@ -5,9 +5,9 @@ import { Game } from "../game";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
-import { TransitionPlayback } from "../effects";
-import { ParticlesPool } from "../effects/particle/particles-pool";
-import { ParticleSystem } from "../effects/particle";
+import { Effect } from "../effects/effect";
+import { FireBallEffect } from "../effects/examples/fireball";
+import { FountainEffect } from "../effects/examples/fountain";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -95,12 +95,6 @@ export class LivingObject extends WorldObjectAnimated {
   _needsVerticalUpdate = true;
 
   /**
-   * @type {Array<TransitionPlayback>}
-   * @private
-   */
-  _transitions = [];
-
-  /**
    * @param {object} options
    * @returns {*}
    */
@@ -127,81 +121,9 @@ export class LivingObject extends WorldObjectAnimated {
 
     this._updateLabel();
 
-    if (this._transitions) {
-      for (let i = 0; i < this._transitions.length; ++i) {
-        let transition = this._transitions[ i ];
-        transition.update( deltaTime );
-
-        if (transition._particleSystem) {
-          let particleSystem = transition._particleSystem;
-          particleSystem.position.copy( transition.currentPosition );
-          particleSystem.update( deltaTime );
-
-          if (particleSystem.isStopped) {
-            Game.getInstance().scene.remove( particleSystem );
-            transition._particleSystem = null;
-          }
-        }
-
-        if (transition.isFinished) {
-          if (transition._particleSystem) {
-            setTimeout(((index) => {
-              Game.getInstance().scene.remove( transition._particleSystem );
-              transition._particleSystem.stop();
-              this._transitions.splice(index, 1);
-              transition.dispose();
-            }).bind(null, i), 850);
-          }
-        }
-      }
-    }
+    this._effects && this._effects.forEach(effect => effect.update( deltaTime ));
 
     super.update( deltaTime );
-  }
-
-  /**
-   * @param {string} text
-   * @param {*} options
-   */
-  createLabel (text, options = {}) {
-    const defaultOptions = {
-      textSize: 3,
-      textureOptions: {
-        fontWeight: 'bold',
-        fontFamily: 'Arial, Helvetica, sans-serif'
-      },
-      materialOptions: {
-        color: 0xffffff,
-        fog: true
-      },
-    };
-    options = Object.assign( {}, defaultOptions, options );
-
-    this._label = new TextLabel( text, options, this );
-    this._label.setOffsetPosition( new THREE.Vector3(0, this.labelVerticalOffset, 0) );
-
-    this.add( this._label );
-  }
-
-  /**
-   * Attaches label to object
-   */
-  attachLabel () {
-    this._label && this._label.attachToObject();
-  }
-
-  /**
-   * Detaches label from object
-   */
-  detachLabel () {
-    this._label && this._label.detachFromObject();
-  }
-
-  /**
-   * Destroys label for object
-   */
-  destroyLabel () {
-    this._label && this._label.dispose();
   }
 
   /**
@@ -225,68 +147,14 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    const h = (Math.random() * 360) | 0;
-    const s = (Math.random() * 100) | 0;
-    const l = Math.max(20, Math.min(80, Math.random() * 100)) | 0;
+    const effect = new FireBallEffect();
+    effect.setFrom( this );
+    effect.setTo( livingObject );
 
-    const particleSystem = new ParticleSystem({
-      timeScale: .5,
-      spawnRate: .1,
-      maxParticlesNumber: 50,
-      local: Math.round( Math.random() ),
-      particleOptions: {
-        generateContext: () => {
-          return {
-            x: Math.random() * Math.random() * 2 - Math.random(),
-            y: Math.random() * Math.random() * 2 - Math.random(),
-            z: Math.random() * Math.random() * 2 - Math.random()
-          };
-        },
-        colorRange: [
-          new THREE.Vector3( h / 360, s / 100, (l - 20) / 100 ),
-          new THREE.Vector3( h / 360, s / 100, (l + 20) / 100 )
-        ],
-        isHSLRange: true,
-        lifetime: 220,
-        velocity: (context) => {
-          return new THREE.Vector3( -context.x, -context.y, -context.z )
-            .normalize()
-            .multiplyScalar( 50 )
-        },
-        rotationVelocity: (context) => {
-          return new THREE.Vector3( context.x, context.y, context.z )
-        },
-        positionOffset: (context) => {
-          return new THREE.Vector3( -context.x, -context.y, -context.z )
-            .normalize()
-            .multiplyScalar( 2 )
-            // .add({ x: 0, y: this.objectHeight / 2, z: 0 })
-        },
-        acceleration: (context) => {
-          return new THREE.Vector3( context.x, context.y, context.z )
-            .normalize()
-            .multiplyScalar( 10 )
-        },
-        scale: () => {
-          return Math.random() * 2 + .5;
-        }
-      }
-    });
+    effect.init();
+    effect.start();
 
-    particleSystem.start();
-
-    const transition = new TransitionPlayback(this, livingObject, {
-      timeScale: 1,
-      velocity: 80,
-      acceleration: .5
-    });
-    transition.start();
-
-    this._transitions = this._transitions || [];
-    this._transitions.push( transition );
-
-    Game.getInstance().scene.add( particleSystem );
-    transition._particleSystem = particleSystem;
+    this._effects = (this._effects || []).concat( effect );
 
     this._targetObject = livingObject;
   }
@@ -369,6 +237,51 @@ export class LivingObject extends WorldObjectAnimated {
       && this.id === overlay.attachedTo.id) {
       overlay.detachFromObject();
     }
+  }
+
+  /**
+   * @param {string} text
+   * @param {*} options
+   */
+  createLabel (text, options = {}) {
+    const defaultOptions = {
+      textSize: 3,
+      textureOptions: {
+        fontWeight: 'bold',
+        fontFamily: 'Arial, Helvetica, sans-serif'
+      },
+      materialOptions: {
+        color: 0xffffff,
+        fog: true
+      },
+    };
+    options = Object.assign( {}, defaultOptions, options );
+
+    this._label = new TextLabel( text, options, this );
+    this._label.setOffsetPosition( new THREE.Vector3(0, this.labelVerticalOffset, 0) );
+
+    this.add( this._label );
+  }
+
+  /**
+   * Attaches label to object
+   */
+  attachLabel () {
+    this._label && this._label.attachToObject();
+  }
+
+  /**
+   * Detaches label from object
+   */
+  detachLabel () {
+    this._label && this._label.detachFromObject();
+  }
+
+  /**
+   * Destroys label for object
+   */
+  destroyLabel () {
+    this._label && this._label.dispose();
   }
 
   /**

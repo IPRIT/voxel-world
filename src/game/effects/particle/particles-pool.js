@@ -1,4 +1,3 @@
-import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
 import { ParticlesBucket } from "./particles-bucket";
 import { CubeParticle } from "./cube-particle";
 
