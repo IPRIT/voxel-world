@@ -8,6 +8,7 @@ import { SelectionOverlay } from "./utils";
 import { FireBallEffect } from "../effects/examples/fireball";
 import { FountainEffect } from "../effects/examples/fountain";
 import { TornadoEffect } from "../effects/examples/tornado";
+import { SmokeTailEffect } from "../effects/examples/smoke-tail";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -160,18 +161,21 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    let effects = [ FireBallEffect, FountainEffect, TornadoEffect ];
+    let effects = [ [FireBallEffect, SmokeTailEffect], FountainEffect, TornadoEffect ];
 
     this._effectIndex = this._effectIndex || 0;
 
-    const effect = new effects[ this._effectIndex++ % effects.length ]();
-    effect.setFrom( this );
-    effect.setTo( livingObject );
+    let selectedEffects = [].concat( effects[ this._effectIndex++ % effects.length ] );
+    for (let i = 0; i < selectedEffects.length; ++i) {
+      const effect = new selectedEffects[ i ]();
+      effect.setFrom( this );
+      effect.setTo( livingObject );
 
-    effect.init();
-    effect.start();
+      effect.init();
+      effect.start();
 
-    this._effects = (this._effects || []).concat( effect );
+      this._effects = (this._effects || []).concat( effect );
+    }
 
     this._targetObject = livingObject;
   }

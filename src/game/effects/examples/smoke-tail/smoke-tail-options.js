@@ -4,23 +4,23 @@
 export function optionsFactory () {
 
   // HSL color ranges
-  const h1 = 21;
-  const h2 = 33;
+  const h1 = 73;
+  const h2 = h1 + 10;
 
-  const s1 = 100;
-  const s2 = 100;
+  const s1 = 26;
+  const s2 = 65;
 
-  const l1 = 10;
-  const l2 = 51;
+  const l1 = 55;
+  const l2 = 95;
 
   return {
     duration: 0,
     attachToTarget: false,
     particleSystemOptions: {
-      attachParticlesToLocal: true,
-      timeScale: .5,
+      attachParticlesToLocal: false,
+      timeScale: .3,
       spawnRate: .1,
-      maxParticlesNumber: 30,
+      maxParticlesNumber: 40,
       particleOptions: {
         generateContext: () => {
           return {
@@ -34,27 +34,22 @@ export function optionsFactory () {
           new THREE.Vector3( h2 / 360, s2 / 100, l2 / 100 )
         ],
         isHSLRange: true,
-        lifetime: 220,
+        lifetime: 120,
         velocity: (context) => {
-          return new THREE.Vector3( -context.x, -context.y, -context.z )
-            .normalize()
-            .multiplyScalar( 50 )
+          return new THREE.Vector3( 0, 35 + 50 * context.y, 0 );
         },
         rotationVelocity: (context) => {
           return new THREE.Vector3( context.x, context.y, context.z )
         },
         positionOffset: (context) => {
-          return new THREE.Vector3( -context.x, -context.y, -context.z )
-            .normalize()
+          return new THREE.Vector3( context.x, context.y, context.z )
             .multiplyScalar( 2 )
         },
         acceleration: (context) => {
-          return new THREE.Vector3( context.x, context.y, context.z )
-            .normalize()
-            .multiplyScalar( 10 )
+          return new THREE.Vector3( 0, 4 * Math.abs( context.y ) + 10, 0 )
         },
         scale: () => {
-          return Math.random() * 2.5 + .5;
+          return Math.random() * 1.5 + .5;
         }
       }
     },

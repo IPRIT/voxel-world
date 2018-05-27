@@ -4,16 +4,14 @@
 export function optionsFactory () {
 
   // HSL color ranges
-  // from: hsl(0, 0%, 60%)
-  // to: hsl(0, 0%, 95%)
-  const h1 = 0;
-  const h2 = 0;
+  const h1 = 10;
+  const h2 = 147;
 
-  const s1 = 0;
-  const s2 = 0;
+  const s1 = 82;
+  const s2 = 91;
 
-  const l1 = 40;
-  const l2 = 70;
+  const l1 = 62;
+  const l2 = 82;
 
   return {
     duration: 1500,
@@ -21,7 +19,7 @@ export function optionsFactory () {
     particleSystemOptions: {
       timeScale: .6,
       spawnRate: .15,
-      maxParticlesNumber: 50,
+      maxParticlesNumber: 70,
       attachParticlesToLocal: true,
       rotationVelocity: new THREE.Vector3(0, .2, 0),
       particleOptions: {

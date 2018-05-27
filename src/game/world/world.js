@@ -74,7 +74,7 @@ export class World {
 
     setTimeout(_ => {
       this._runDemo();
-    }, 4000);
+    }, 100);
 
     SelectionOverlay.getOverlay(); // just init selection overlay once
     const particlesPool = ParticlesPool.getPool(); // init once
@@ -171,7 +171,7 @@ export class World {
     this._players.forEach(player => {
       setInterval(_ => {
         player.setTargetObject( this._me );
-      }, Math.random() * 200000 + 10000);
+      }, Math.random() * 100000 + 5000);
     });
   }
 
