@@ -1,6 +1,9 @@
 import { ParticleSystemState } from "./particle-system-state";
 import { ParticlesPool } from "./particles-pool";
 import { Game } from "../../game";
+import { isVectorZeroStrict, warp } from "../../utils";
+
+const zeroVector = new THREE.Vector3();
 
 export class ParticleSystem extends THREE.Object3D {
 
@@ -26,19 +29,19 @@ export class ParticleSystem extends THREE.Object3D {
    * @type {number}
    * @private
    */
-  _opttionsCacheCursor = 0;
+  _optionsCacheCursor = 0;
 
   /**
-   * @type {THREE.Object3D|*}
+   * @type {THREE.Object3D|LivingObject|*}
    * @private
    */
-  _container = null;
+  _parentContainer = null;
 
   /**
    * @type {boolean}
    * @private
    */
-  _local = false;
+  _attachParticlesToLocal = false;
 
   /**
    * @type {number}
@@ -69,6 +72,12 @@ export class ParticleSystem extends THREE.Object3D {
    * @private
    */
   _axis = null;
+
+  /**
+   * @type {THREE.Vector3}
+   * @private
+   */
+  _rotationVelocity = null;
 
   /**
    * @type {*}
@@ -177,10 +186,8 @@ export class ParticleSystem extends THREE.Object3D {
     }
     deltaTime *= this._timeScale;
     this._timeElapsed += deltaTime * 1000;
-    if (!this.isStopped) {
-      this._spawnParticles();
-    }
-    this._updateParticles( deltaTime );
+
+    this._updateSystem( deltaTime );
   }
 
   /**
@@ -194,6 +201,7 @@ export class ParticleSystem extends THREE.Object3D {
    * Starts the system
    */
   start () {
+    console.log('[ParticleSystem] starting...');
     this._bucket = this.pool.take( this._maxParticlesNumber );
     this._particleIsHSLRange
       ? this._bucket.setHSLRange( ...this._particleColorRange )
@@ -207,6 +215,7 @@ export class ParticleSystem extends THREE.Object3D {
   }
 
   stop () {
+    console.log('[ParticleSystem] stopping...');
     this._state = ParticleSystemState.NOT_RUNNING;
   }
 
@@ -214,6 +223,7 @@ export class ParticleSystem extends THREE.Object3D {
    * Release the particles
    */
   release () {
+    console.log('[ParticleSystem] releasing...');
     this._bucket && this._bucket.release();
   }
 
@@ -221,6 +231,7 @@ export class ParticleSystem extends THREE.Object3D {
    * Disposes the system
    */
   dispose () {
+    console.log('[ParticleSystem] disposing...');
     this._options = null;
     this._optionsCache = null;
     this._particleOptions = null;
@@ -244,6 +255,29 @@ export class ParticleSystem extends THREE.Object3D {
    */
   get pool () {
     return ParticlesPool.getPool();
+  }
+
+  /**
+   * @returns {THREE.Scene}
+   */
+  get scene () {
+    return Game.getInstance().scene;
+  }
+
+  /**
+   * @returns {THREE.Scene|THREE.Object3D|LivingObject}
+   */
+  get parentContainer () {
+    return !this._attachParticlesToLocal
+      ? (this._parentContainer || this.scene)
+      : this;
+  }
+
+  /**
+   * @returns {THREE.Vector3}
+   */
+  get originPosition () {
+    return this._attachParticlesToLocal ? zeroVector : this.position;
   }
 
   /**
@@ -278,48 +312,48 @@ export class ParticleSystem extends THREE.Object3D {
       maxParticlesNumber = 10,
       spawnRate = 1000,
       axis = new THREE.Vector3(0, 1, 0),
-      container = Game.getInstance().scene,
-      local = false
+      rotationVelocity = new THREE.Vector3(),
+      container = null,
+      attachParticlesToLocal = false
     } = options;
-
-    if (local) {
-      container = this;
-    }
-
-    let {
-      generateContext = () => {},
-      colorRange = [ 0x000000, 0xffffff ],
-      isHSLRange = false,
-      lifetime = () => {
-        return Math.random() * 1000;
-      },
-      velocity = new THREE.Vector3(1, 1, 1),
-      rotationVelocity = new THREE.Vector3(1, 1, 1),
-      positionOffset = new THREE.Vector3(1, 1, 1),
-      acceleration = new THREE.Vector3(1, 1, 1),
-      scale = 1
-    } = particleOptions;
 
     this._particleOptions = particleOptions;
     this._options = options;
 
-    this._container = container;
-    this._local = local;
+    this._parentContainer = container;
+    this._attachParticlesToLocal = attachParticlesToLocal;
     this._timeScale = timeScale;
     this._axis = axis;
+    this._rotationVelocity = this._extractValue( rotationVelocity );
     this._spawnRate = spawnRate;
 
     this._maxParticlesNumber = maxParticlesNumber;
 
-    this._particleColorRange = colorRange;
-    this._particleIsHSLRange = isHSLRange;
-    this._particleLifetime = lifetime;
-    this._particleVelocity = velocity;
-    this._particleRotationVelocity = rotationVelocity;
-    this._particlePositionOffset = positionOffset;
-    this._particleAcceleration = acceleration;
-    this._particleScale = scale;
-    this._particleGenerateContext = generateContext;
+    {
+      let {
+        generateContext = () => {},
+        colorRange = [ 0x000000, 0xffffff ],
+        isHSLRange = false,
+        lifetime = () => {
+          return Math.random() * 1000;
+        },
+        velocity = new THREE.Vector3(1, 1, 1),
+        rotationVelocity = new THREE.Vector3(1, 1, 1),
+        positionOffset = new THREE.Vector3(1, 1, 1),
+        acceleration = new THREE.Vector3(1, 1, 1),
+        scale = 1
+      } = particleOptions;
+
+      this._particleColorRange = colorRange;
+      this._particleIsHSLRange = isHSLRange;
+      this._particleLifetime = lifetime;
+      this._particleVelocity = velocity;
+      this._particleRotationVelocity = rotationVelocity;
+      this._particlePositionOffset = positionOffset;
+      this._particleAcceleration = acceleration;
+      this._particleScale = scale;
+      this._particleGenerateContext = generateContext;
+    }
   }
 
   /**
@@ -327,13 +361,33 @@ export class ParticleSystem extends THREE.Object3D {
    * @private
    */
   _beforeBucketRelease (particles) {
+    console.log('[ParticleSystem] before release...');
     if (this.isRunning) {
       this._state = ParticleSystemState.NOT_RUNNING;
     }
+
     for (let i = 0; i < this._usingParticles.length; ++i) {
       this._usingParticles[ i ].release();
     }
+
+    // removing yourself
+    if (this.parent) {
+      this.parent.remove( this );
+    }
+
     this.dispose();
+  }
+
+  /**
+   * @param {number} deltaTime
+   * @private
+   */
+  _updateSystem (deltaTime) {
+    if (!this.isStopped) {
+      this._spawnParticles();
+    }
+    this._updateParticles( deltaTime );
+    this._updateRotation( deltaTime );
   }
 
   /**
@@ -344,20 +398,41 @@ export class ParticleSystem extends THREE.Object3D {
     for (let i = 0; i < this._usingParticles.length; ++i) {
       const particle = this._usingParticles[ i ];
       particle.update( deltaTime );
+
       if (particle.isStopped) {
-        this._releaseParticle( particle, i-- );
+        this._swapParticle( particle, i-- );
       }
     }
   }
 
   /**
-   * @param {Particle} particle
-   * @param {number} index
+   * @param {number} deltaTime
    * @private
    */
-  _releaseParticle (particle, index) {
-    this._usingParticles.splice( index, 1 );
-    this._freeParticles.push( particle );
+  _updateRotation (deltaTime) {
+    if (isVectorZeroStrict( this._rotationVelocity )) {
+      return;
+    }
+    const timeWarp = warp( 1, deltaTime );
+    this.rotation.x += this._rotationVelocity.x * timeWarp;
+    this.rotation.y += this._rotationVelocity.y * timeWarp;
+    this.rotation.z += this._rotationVelocity.z * timeWarp;
+  }
+
+  /**
+   * @param {Particle} targetParticle
+   * @param {number} index
+   * @param {boolean} release
+   * @private
+   */
+  _swapParticle (targetParticle, index, release = true) {
+    if (release) {
+      this._usingParticles.splice( index, 1 );
+      this._freeParticles.push( targetParticle );
+    } else {
+      this._freeParticles.splice( index, 1 );
+      this._usingParticles.push( targetParticle );
+    }
   }
 
   /**
@@ -381,29 +456,39 @@ export class ParticleSystem extends THREE.Object3D {
     if (!this._freeParticles.length) {
       return;
     }
+    const particle = this._freeParticles.shift();
+
+    let particleOptions = this._createParticleOptions();
+    particle.setOptions( particleOptions );
+    particle.start();
+
+    this.parentContainer.add( particle );
+    this._particlesSpawned++;
+
+    this._usingParticles.push( particle );
+  }
+
+  /**
+   * @returns {*}
+   * @private
+   */
+  _createParticleOptions () {
     let particleOptions;
+
     if (this._cacheGeneratedOptions) {
       if (this._optionsCache.length < this._maxParticlesNumber) {
         particleOptions = this._generateParticleOptions();
         this._optionsCache.push( particleOptions );
       } else {
         particleOptions = this._updateOptionsPosition(
-          this._optionsCache[ this._opttionsCacheCursor++ % this._optionsCache.length ]
+          this._optionsCache[ this._optionsCacheCursor++ % this._optionsCache.length ]
         );
       }
     } else {
       particleOptions = this._generateParticleOptions();
     }
 
-    const particle = this._freeParticles.shift();
-
-    particle.setOptions( particleOptions );
-    particle.start();
-
-    this._container.add( particle );
-    this._particlesSpawned++;
-
-    this._usingParticles.push( particle );
+    return particleOptions;
   }
 
   /**
@@ -420,20 +505,19 @@ export class ParticleSystem extends THREE.Object3D {
    */
   _generateParticleOptions () {
     const context = this._particleGenerateContext();
-    const origin = this._local
-      ? new THREE.Vector3() : this.position.clone();
+    const origin = this.originPosition.clone();
     const position = origin.add(
-      this._getOrInvoke( this._particlePositionOffset, context )
+      this._extractValue( this._particlePositionOffset, context )
     );
 
     return {
       context,
       position,
-      velocity: this._getOrInvoke( this._particleVelocity, context ),
-      rotationVelocity: this._getOrInvoke( this._particleRotationVelocity, context ),
-      acceleration: this._getOrInvoke( this._particleAcceleration, context ),
-      scale: this._getOrInvoke( this._particleScale, context ),
-      lifetime: this._getOrInvoke( this._particleLifetime, context ),
+      velocity: this._extractValue( this._particleVelocity, context ),
+      rotationVelocity: this._extractValue( this._particleRotationVelocity, context ),
+      acceleration: this._extractValue( this._particleAcceleration, context ),
+      scale: this._extractValue( this._particleScale, context ),
+      lifetime: this._extractValue( this._particleLifetime, context ),
       timeScale: this._timeScale
     };
   }
@@ -444,10 +528,9 @@ export class ParticleSystem extends THREE.Object3D {
    * @private
    */
   _updateOptionsPosition (options) {
-    const origin = this._local
-      ? new THREE.Vector3() : this.position.clone();
+    const origin = this.originPosition.clone();
     options.position = origin.add(
-      this._getOrInvoke( this._particlePositionOffset, options.context )
+      this._extractValue( this._particlePositionOffset, options.context )
     );
     return options;
   }
@@ -458,7 +541,7 @@ export class ParticleSystem extends THREE.Object3D {
    * @returns {*}
    * @private
    */
-  _getOrInvoke (fnOrValue, fnContext = {}) {
+  _extractValue (fnOrValue, fnContext = {}) {
     if (typeof fnOrValue === 'function') {
       return fnOrValue( fnContext );
     }

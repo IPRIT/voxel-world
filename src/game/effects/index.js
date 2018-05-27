@@ -1,2 +1,3 @@
+export * from './effect/index';
 export * from './particle';
-export * from './transition/index';
+export * from './transition';

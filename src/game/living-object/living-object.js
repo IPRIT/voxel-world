@@ -5,9 +5,9 @@ import { Game } from "../game";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
-import { Effect } from "../effects/effect";
 import { FireBallEffect } from "../effects/examples/fireball";
 import { FountainEffect } from "../effects/examples/fountain";
+import { TornadoEffect } from "../effects/examples/tornado";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -122,11 +122,11 @@ export class LivingObject extends WorldObjectAnimated {
     this._updateLabel();
 
     /**
-     * @type {Effect}
+     * @type {ParticleEffect}
      */
     this._effects && this._effects.forEach((_, index) => {
       /**
-       * @type {Effect}
+       * @type {ParticleEffect}
        */
       let effect = _;
       effect.update( deltaTime );
@@ -160,7 +160,11 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    const effect = new FireBallEffect();
+    let effects = [ FireBallEffect, FountainEffect, TornadoEffect ];
+
+    this._effectIndex = this._effectIndex || 0;
+
+    const effect = new effects[ this._effectIndex++ % effects.length ]();
     effect.setFrom( this );
     effect.setTo( livingObject );
 
@@ -225,6 +229,9 @@ export class LivingObject extends WorldObjectAnimated {
       ) || 0;
   }
 
+  /**
+   * Object jump with own velocity
+   */
   jump () {
     if (!this._needsVerticalUpdate) {
       this._resumeVerticalUpdate();

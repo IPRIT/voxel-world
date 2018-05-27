@@ -1,7 +1,7 @@
-import { optionsFactory } from "./fountain-options";
+import { optionsFactory } from "./tornado-options";
 import { ParticleEffect } from "../../effect";
 
-export class FountainEffect extends ParticleEffect {
+export class TornadoEffect extends ParticleEffect {
 
   constructor () {
     super();

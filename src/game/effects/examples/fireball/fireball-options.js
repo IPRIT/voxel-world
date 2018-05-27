@@ -1,24 +1,28 @@
 /**
- * @returns {{particleSystemOptions: {timeScale: number, spawnRate: number, maxParticlesNumber: number, local: number, particleOptions: {generateContext: (function(): {x: number, y: number, z: number}), colorRange: *[], isHSLRange: boolean, lifetime: number, velocity: (function(*): *), rotationVelocity: (function(*): THREE.Vector3), positionOffset: (function(*): *), acceleration: (function(*): *), scale: (function(): number)}}, transitionOptions: {timeScale: number, velocity: number, acceleration: number}}}
+ * @returns {{duration: number, attachToTarget: boolean, particleSystemOptions: {attachParticlesToLocal: boolean, timeScale: number, spawnRate: number, maxParticlesNumber: number, particleOptions: {generateContext: (function(): {x: number, y: number, z: number}), colorRange: *[], isHSLRange: boolean, lifetime: number, velocity: (function(*): *), rotationVelocity: (function(*): THREE.Vector3), positionOffset: (function(*): *), acceleration: (function(*): *), scale: (function(): number)}}, transitionOptions: {timeScale: number, velocity: number, acceleration: number}}}
  */
 export function optionsFactory () {
 
   // HSL color ranges
+  // from: hsl(21, 100%, 10%)
+  // to: hsl(33, 100%, 51%)
   const h1 = 21;
-  const h2 = 43;
+  const h2 = 33;
 
   const s1 = 100;
   const s2 = 100;
 
-  const l1 = 20;
-  const l2 = 58;
+  const l1 = 10;
+  const l2 = 51;
 
   return {
+    duration: 0,
+    attachToTarget: false,
     particleSystemOptions: {
+      attachParticlesToLocal: true,
       timeScale: .5,
       spawnRate: .1,
       maxParticlesNumber: 50,
-      local: true,
       particleOptions: {
         generateContext: () => {
           return {

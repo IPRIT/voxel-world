@@ -76,8 +76,7 @@ export class ParticlesBucket {
   dispose () {
     if (this._disposed) {
       return;
-    }
-    if (!this._released) {
+    } else if (!this._released) {
       this.release();
     }
     this._clearSelfDestructTimer();

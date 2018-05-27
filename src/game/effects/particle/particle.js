@@ -1,7 +1,15 @@
 import { warp } from "../../utils";
 import { ParticleState } from "./particle-state";
 
+let PARTICLE_ID = 1;
+
 export class Particle extends THREE.Mesh {
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _id = PARTICLE_ID++;
 
   /**
    * @type {number}
@@ -128,6 +136,13 @@ export class Particle extends THREE.Mesh {
   }
 
   /**
+   * @returns {number}
+   */
+  get id () {
+    return this._id;
+  }
+
+  /**
    * @returns {boolean}
    */
   get shadows () {
@@ -231,9 +246,10 @@ export class Particle extends THREE.Mesh {
    * @private
    */
   _updateRotation (deltaTime) {
-    this.rotation.x += warp( this._rotationVelocity.x, deltaTime );
-    this.rotation.y += warp( this._rotationVelocity.y, deltaTime );
-    this.rotation.z += warp( this._rotationVelocity.z, deltaTime );
+    const timeWarp = warp( 1, deltaTime );
+    this.rotation.x += this._rotationVelocity.x * timeWarp;
+    this.rotation.y += this._rotationVelocity.y * timeWarp;
+    this.rotation.z += this._rotationVelocity.z * timeWarp;
   }
 
   /**

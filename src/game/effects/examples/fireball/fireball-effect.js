@@ -1,11 +1,10 @@
-import { Effect } from "../../effect";
 import { optionsFactory } from "./fireball-options";
+import { FlowingEffect } from "../../effect";
 
-export class FireBallEffect extends Effect {
+export class FireBallEffect extends FlowingEffect {
 
   constructor () {
     super();
     this.setOptions( optionsFactory() );
-    this.onFinished(_ => this.dispose());
   }
 }
