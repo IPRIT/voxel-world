@@ -34,6 +34,8 @@ export class FlowingEffect extends ParticleEffect {
       return;
     }
     super.update( deltaTime );
+
+    deltaTime *= this.timeScale;
     this._updateTransition( deltaTime );
   }
 

@@ -15,6 +15,7 @@ export function optionsFactory () {
 
   return {
     duration: 0,
+    timeScale: 1,
     attachToTarget: false,
     particleSystemOptions: {
       attachParticlesToLocal: false,

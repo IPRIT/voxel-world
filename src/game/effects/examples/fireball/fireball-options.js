@@ -15,12 +15,14 @@ export function optionsFactory () {
 
   return {
     duration: 0,
+    timeScale: 1,
     attachToTarget: false,
     particleSystemOptions: {
-      attachParticlesToLocal: true,
       timeScale: .5,
       spawnRate: .1,
       maxParticlesNumber: 30,
+      attachParticlesToLocal: true,
+      rotationVelocity: new THREE.Vector3(0, 0, -.2),
       particleOptions: {
         generateContext: () => {
           return {

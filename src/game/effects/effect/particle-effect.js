@@ -73,6 +73,12 @@ export class ParticleEffect {
    */
   _timeElapsed = 0;
 
+  /**
+   * @type {number}
+   * @private
+   */
+  _timeScale = 1;
+
   init () {
     console.log('[ParticleEffect] initializing...');
     this._particleSystem = new ParticleSystem( this._particleSystemOptions );
@@ -87,6 +93,7 @@ export class ParticleEffect {
     if (this.isFinished || this.isPaused) {
       return;
     }
+    deltaTime *= this._timeScale;
     this._updateParticleSystem( deltaTime );
 
     this._timeElapsed += deltaTime * 1000;
@@ -141,11 +148,13 @@ export class ParticleEffect {
     let {
       attachToTarget = false,
       duration = 0,
+      timeScale = 1,
       particleSystemOptions = {}
     } = this._options;
 
     this._attachedToTarget = attachToTarget;
     this._duration = duration;
+    this._timeScale = timeScale;
     this._particleSystemOptions = particleSystemOptions;
   }
 
@@ -161,6 +170,13 @@ export class ParticleEffect {
    */
   setTo (to) {
     this._to = to;
+  }
+
+  /**
+   * @param {number} timeScale
+   */
+  setTimeScale (timeScale = 1) {
+    this._timeScale = timeScale;
   }
 
   /**
@@ -219,6 +235,13 @@ export class ParticleEffect {
    */
   get options () {
     return this._options;
+  }
+
+  /**
+   * @returns {number}
+   */
+  get timeScale () {
+    return this._timeScale;
   }
 
   /**

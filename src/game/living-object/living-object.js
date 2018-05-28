@@ -9,6 +9,7 @@ import { FireBallEffect } from "../effects/examples/fireball";
 import { FountainEffect } from "../effects/examples/fountain";
 import { TornadoEffect } from "../effects/examples/tornado";
 import { SmokeTailEffect } from "../effects/examples/smoke-tail";
+import { WhirlEffect } from "../effects/examples/whirl";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -161,20 +162,35 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    let effects = [ [FireBallEffect, SmokeTailEffect], FountainEffect, TornadoEffect ];
+    let effects = [
+      WhirlEffect,
+      [ FireBallEffect, SmokeTailEffect ],
+      FountainEffect,
+      TornadoEffect
+    ];
 
     this._effectIndex = this._effectIndex || 0;
 
     let selectedEffects = [].concat( effects[ this._effectIndex++ % effects.length ] );
+    let timeScale = 1;
+    if (selectedEffects[0] === FireBallEffect && selectedEffects[1] === SmokeTailEffect) {
+      timeScale = 1.5;
+    }
     for (let i = 0; i < selectedEffects.length; ++i) {
       const effect = new selectedEffects[ i ]();
       effect.setFrom( this );
       effect.setTo( livingObject );
 
+      effect.setTimeScale( timeScale );
+
       effect.init();
       effect.start();
 
       this._effects = (this._effects || []).concat( effect );
+    }
+
+    if (livingObject.id === Game.getInstance().world.me.id) {
+      livingObject.setTargetObject( this );
     }
 
     this._targetObject = livingObject;

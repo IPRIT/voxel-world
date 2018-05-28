@@ -15,6 +15,7 @@ export function optionsFactory () {
 
   return {
     duration: 1500,
+    timeScale: 1,
     attachToTarget: true,
     particleSystemOptions: {
       timeScale: .6,
