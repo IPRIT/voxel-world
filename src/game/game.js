@@ -2,6 +2,7 @@ import 'bluebird';
 import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./settings";
 import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
+import { UpdateWarper } from "./utils/update-warper";
 
 export class Game {
 
@@ -142,13 +143,18 @@ export class Game {
     this._addWorldLight();
 
     this._initWorld();
+
+    this._updateWarper = new UpdateWarper( 60, 1 );
+    this._updateWarper.onUpdate(deltaTime => {
+      this.world.update( deltaTime );
+    });
   }
 
   /**
    * Update cycle
    */
   update () {
-    this.world.update( this._clock.getDelta() );
+    this._updateWarper.update( this._clock.getDelta() );
   }
 
   /**

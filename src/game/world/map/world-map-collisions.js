@@ -22,8 +22,6 @@ export class WorldMapCollisions {
    * @returns {{shiftPosition: *, changed: boolean}}
    */
   clampNextPosition (position, shiftVector, options = {}) {
-    position = position.clone();
-
     let { objectBlocksRadius, objectBlocksHeight } = options;
 
     let shiftX = shiftVector.x;
@@ -275,8 +273,6 @@ export class WorldMapCollisions {
    * @returns {{shiftY: *, changed: boolean}}
    */
   clampVerticalPosition (currentPosition, shiftY, options = {}) {
-    currentPosition = currentPosition.clone();
-
     let { objectBlocksHeight, objectBlocksRadius } = options;
     const bs = WORLD_MAP_BLOCK_SIZE;
     const objectHeight = objectBlocksHeight * bs;

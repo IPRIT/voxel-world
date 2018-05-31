@@ -127,7 +127,7 @@ export class TransitionPlayback {
       && (this._toObject || this._toPosition)
       && !this.isRunning) {
 
-      console.log('[TransitionPlayback] starting...');
+      // console.log('[TransitionPlayback] starting...');
 
       this._startPosition = this.fromPosition.clone();
       if (this._fromObject) {
@@ -152,7 +152,7 @@ export class TransitionPlayback {
    * Finish the transition and dispatch `onFinished` event
    */
   finish () {
-    console.log('[TransitionPlayback] finishing...');
+    // console.log('[TransitionPlayback] finishing...');
 
     this._state = TransitionState.FINISHED;
 
@@ -207,7 +207,7 @@ export class TransitionPlayback {
     this._options = null;
     this._onFinishedFns = null;
 
-    console.log('[TransitionPlayback] disposing...');
+    // console.log('[TransitionPlayback] disposing...');
   }
 
   /**

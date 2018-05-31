@@ -4,14 +4,14 @@
 export function optionsFactory () {
 
   // HSL color ranges
-  const h1 = 73;
-  const h2 = h1 + 10;
+  const h1 = 181;
+  const h2 = 185;
 
-  const s1 = 26;
-  const s2 = 65;
+  const s1 = 65;
+  const s2 = 93;
 
-  const l1 = 55;
-  const l2 = 95;
+  const l1 = 90;
+  const l2 = 98;
 
   return {
     duration: 0,

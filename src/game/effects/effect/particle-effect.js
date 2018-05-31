@@ -80,7 +80,7 @@ export class ParticleEffect {
   _timeScale = 1;
 
   init () {
-    console.log('[ParticleEffect] initializing...');
+    // console.log('[ParticleEffect] initializing...');
     this._particleSystem = new ParticleSystem( this._particleSystemOptions );
 
     this.parentContainer.add( this._particleSystem );
@@ -101,7 +101,7 @@ export class ParticleEffect {
   }
 
   start () {
-    console.log('[ParticleEffect] starting...');
+    // console.log('[ParticleEffect] starting...');
     this._state = EffectState.RUNNING;
 
     if (this._particleSystem) {
@@ -116,7 +116,7 @@ export class ParticleEffect {
   }
 
   finish () {
-    console.log('[ParticleEffect] finishing...');
+    // console.log('[ParticleEffect] finishing...');
     this._state = EffectState.FINISHED;
 
     for (let i = 0, length = this._onFinishedFns.length; i < length; ++i) {
@@ -130,7 +130,7 @@ export class ParticleEffect {
    * Clear memory
    */
   dispose () {
-    console.log('[ParticleEffect] disposing...');
+    // console.log('[ParticleEffect] disposing...');
     this._particleSystem = null;
     this._to = null;
     this._from = null;

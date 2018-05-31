@@ -201,7 +201,7 @@ export class ParticleSystem extends THREE.Object3D {
    * Starts the system
    */
   start () {
-    console.log('[ParticleSystem] starting...');
+    // console.log('[ParticleSystem] starting...');
     this._bucket = this.pool.take( this._maxParticlesNumber );
     this._particleIsHSLRange
       ? this._bucket.setHSLRange( ...this._particleColorRange )
@@ -215,7 +215,7 @@ export class ParticleSystem extends THREE.Object3D {
   }
 
   stop () {
-    console.log('[ParticleSystem] stopping...');
+    // console.log('[ParticleSystem] stopping...');
     this._state = ParticleSystemState.NOT_RUNNING;
   }
 
@@ -223,7 +223,7 @@ export class ParticleSystem extends THREE.Object3D {
    * Release the particles
    */
   release () {
-    console.log('[ParticleSystem] releasing...');
+    // console.log('[ParticleSystem] releasing...');
     this._bucket && this._bucket.release();
   }
 
@@ -231,7 +231,7 @@ export class ParticleSystem extends THREE.Object3D {
    * Disposes the system
    */
   dispose () {
-    console.log('[ParticleSystem] disposing...');
+    // console.log('[ParticleSystem] disposing...');
     this._options = null;
     this._optionsCache = null;
     this._particleOptions = null;
@@ -361,7 +361,7 @@ export class ParticleSystem extends THREE.Object3D {
    * @private
    */
   _beforeBucketRelease (particles) {
-    console.log('[ParticleSystem] before release...');
+    // console.log('[ParticleSystem] before release...');
     if (this.isRunning) {
       this._state = ParticleSystemState.NOT_RUNNING;
     }
