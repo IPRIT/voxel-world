@@ -60,6 +60,18 @@ export class Particle extends THREE.Mesh {
   _acceleration = new THREE.Vector3();
 
   /**
+   * @type {number}
+   * @private
+   */
+  _opacity = 1;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _opacityVelocity = 0;
+
+  /**
    * @param {THREE.BufferGeometry|THREE.Geometry} geometry
    * @param {THREE.Material} material
    */
@@ -77,6 +89,8 @@ export class Particle extends THREE.Mesh {
       acceleration = new THREE.Vector3(),
       position = new THREE.Vector3(),
       scale = 1,
+      opacity = 1,
+      opacityVelocity = 0,
       lifetime = 10000,
       timeScale = 1,
     } = options;
@@ -84,11 +98,14 @@ export class Particle extends THREE.Mesh {
     this._velocity = velocity.clone();
     this._acceleration = acceleration.clone();
     this._rotationVelocity = rotationVelocity.clone();
+    this._opacity = opacity;
+    this._opacityVelocity = opacityVelocity;
     this._timeScale = timeScale;
     this._lifetimeMs = lifetime;
 
     this.scale.set( scale, scale, scale );
     this.position.copy( position );
+    this.material.opacity = opacity;
   }
 
   /**
@@ -103,6 +120,7 @@ export class Particle extends THREE.Mesh {
     this._updateVelocity( deltaTime );
     this._updatePosition( deltaTime );
     this._updateRotation( deltaTime );
+    this._updateOpacity( deltaTime );
 
     this._currentLifetimeMs += deltaTime * 1000;
     this._checkLifetime();
@@ -155,6 +173,34 @@ export class Particle extends THREE.Mesh {
   set shadows (value) {
     this.receiveShadow = value;
     this.castShadow = value;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get transparent () {
+    return this.material.transparent;
+  }
+
+  /**
+   * @param {boolean} value
+   */
+  set transparent (value) {
+    this.material.transparent = value;
+  }
+
+  /**
+   * @returns {number}
+   */
+  get opacity () {
+    return this.material.opacity || 1;
+  }
+
+  /**
+   * @param {number} opacity
+   */
+  set opacity (opacity) {
+    this.material.opacity = opacity;
   }
 
   /**
@@ -250,6 +296,18 @@ export class Particle extends THREE.Mesh {
     this.rotation.x += this._rotationVelocity.x * timeWarp;
     this.rotation.y += this._rotationVelocity.y * timeWarp;
     this.rotation.z += this._rotationVelocity.z * timeWarp;
+  }
+
+  /**
+   * @param {number} deltaTime
+   * @private
+   */
+  _updateOpacity (deltaTime) {
+    if (!this._opacityVelocity) {
+      return;
+    }
+    let timeWarp = warp( 1, deltaTime );
+    this.material.opacity = Math.min( 1, Math.max( 0, this.opacity + this._opacityVelocity * timeWarp ) );
   }
 
   /**

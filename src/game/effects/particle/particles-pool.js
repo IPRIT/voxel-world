@@ -56,7 +56,7 @@ export class ParticlesPool {
     sourceObject = sourceObject || this._createSourceObject();
 
     for (let i = 0; i < this._poolSize; ++i) {
-      this._cloneParticle( sourceObject );
+      this._pool.push( this._cloneParticle( sourceObject ) );
     }
 
     this._poolReady = true;
@@ -153,8 +153,7 @@ export class ParticlesPool {
    * @private
    */
   _cloneParticle (sourceObject) {
-    let particle = sourceObject.clone();
-    this._pool.push( particle );
+    return sourceObject.clone();
   }
 
   /**

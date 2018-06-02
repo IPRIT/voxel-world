@@ -149,6 +149,18 @@ export class ParticleSystem extends THREE.Object3D {
    * @type {number}
    * @private
    */
+  _particleOpacity = 1;
+
+  /**
+   * @type {number|Function}
+   * @private
+   */
+  _particleOpacityVelocity = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _state = ParticleSystemState.NOT_RUNNING;
 
   /**
@@ -248,6 +260,7 @@ export class ParticleSystem extends THREE.Object3D {
     this._particlePositionOffset = null;
     this._particleAcceleration = null;
     this._particleScale = null;
+    this._particleOpacityVelocity = null;
   }
 
   /**
@@ -341,7 +354,9 @@ export class ParticleSystem extends THREE.Object3D {
         rotationVelocity = new THREE.Vector3(1, 1, 1),
         positionOffset = new THREE.Vector3(1, 1, 1),
         acceleration = new THREE.Vector3(1, 1, 1),
-        scale = 1
+        scale = 1,
+        opacity = 1,
+        opacityVelocity = 0
       } = particleOptions;
 
       this._particleColorRange = colorRange;
@@ -352,6 +367,8 @@ export class ParticleSystem extends THREE.Object3D {
       this._particlePositionOffset = positionOffset;
       this._particleAcceleration = acceleration;
       this._particleScale = scale;
+      this._particleOpacity = opacity;
+      this._particleOpacityVelocity = opacityVelocity;
       this._particleGenerateContext = generateContext;
     }
   }
@@ -517,6 +534,8 @@ export class ParticleSystem extends THREE.Object3D {
       rotationVelocity: this._extractValue( this._particleRotationVelocity, context ),
       acceleration: this._extractValue( this._particleAcceleration, context ),
       scale: this._extractValue( this._particleScale, context ),
+      opacity: this._extractValue( this._particleOpacity, context ),
+      opacityVelocity: this._extractValue( this._particleOpacityVelocity, context ),
       lifetime: this._extractValue( this._particleLifetime, context ),
       timeScale: this._timeScale
     };

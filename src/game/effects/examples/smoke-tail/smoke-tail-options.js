@@ -50,8 +50,10 @@ export function optionsFactory () {
           return new THREE.Vector3( 0, 4 * Math.abs( context.y ) + 10, 0 )
         },
         scale: () => {
-          return Math.random() * 1.5 + .5;
-        }
+          return Math.random() * 1.5 + 1;
+        },
+        opacity: 1,
+        opacityVelocity: -.05
       }
     },
     transitionOptions: {
