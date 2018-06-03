@@ -163,3 +163,44 @@ for (let i = 0; i < 32; ++i) {
 }
 
 export const powers = { powersOfTwo, powersOfTwoInv };
+
+/**
+ * @param objects
+ * @returns {*}
+ */
+export function extendDeep (...objects) {
+  if (objects.length === 1) {
+    return objects[ 0 ];
+  }
+
+  let result = {};
+  for (let i = 0; i < objects.length; ++i) {
+    mergeDeep( result, objects[ i ] );
+  }
+
+  return result;
+}
+
+/**
+ * Custom deep objects merge for particle options
+ *
+ * @param {*} objectA
+ * @param {*} objectB
+ */
+export function mergeDeep(objectA, objectB) {
+  if (typeof objectB !== 'object' || Array.isArray(objectB)) {
+    return objectB;
+  }
+
+  Object.keys( objectB ).forEach(keyB => {
+    if (typeof objectB[ keyB ] === 'object'
+      && objectB[ keyB ] !== null
+      && !objectB[ keyB ].clone) {
+      objectA[ keyB ] = mergeDeep( objectA[ keyB ] || {}, objectB[ keyB ] );
+    } else {
+      objectA[ keyB ] = objectB[ keyB ];
+    }
+  });
+
+  return objectA;
+}

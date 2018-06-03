@@ -32,14 +32,13 @@ module.exports = merge(baseWebpackConfig, {
                 sass: extractPlugin
               }
             }
-          },
-          'eslint-loader'
+          }
         ],
         exclude: /node_modules\/(?!md-svg-vue)\/.*/
       },
       {
         test: /\.js$/,
-        loaders: ['babel-loader', 'eslint-loader'],
+        loaders: ['babel-loader'],
         exclude: /node_modules\/(?!md-svg-vue)\/.*/
       },
       {
@@ -56,8 +55,7 @@ module.exports = merge(baseWebpackConfig, {
             options: {
               inline: false
             }
-          },
-          'eslint-loader'
+          }
         ],
         exclude: /node_modules/
       }

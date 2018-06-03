@@ -182,6 +182,12 @@ export class ParticleSystem extends THREE.Object3D {
   _freeParticles = [];
 
   /**
+   * @type {Array<Function>}
+   * @private
+   */
+  _onStartFinishingFns = [];
+
+  /**
    * @param {*} options
    */
   constructor (options = {}) {
@@ -213,7 +219,6 @@ export class ParticleSystem extends THREE.Object3D {
    * Starts the system
    */
   start () {
-    // console.log('[ParticleSystem] starting...');
     this._bucket = this.pool.take( this._maxParticlesNumber );
     this._particleIsHSLRange
       ? this._bucket.setHSLRange( ...this._particleColorRange )
@@ -227,15 +232,15 @@ export class ParticleSystem extends THREE.Object3D {
   }
 
   stop () {
-    // console.log('[ParticleSystem] stopping...');
     this._state = ParticleSystemState.NOT_RUNNING;
+
+    this._onStartFinishing();
   }
 
   /**
    * Release the particles
    */
   release () {
-    // console.log('[ParticleSystem] releasing...');
     this._bucket && this._bucket.release();
   }
 
@@ -243,7 +248,6 @@ export class ParticleSystem extends THREE.Object3D {
    * Disposes the system
    */
   dispose () {
-    // console.log('[ParticleSystem] disposing...');
     this._options = null;
     this._optionsCache = null;
     this._particleOptions = null;
@@ -264,6 +268,13 @@ export class ParticleSystem extends THREE.Object3D {
   }
 
   /**
+   * @param {Function} callback
+   */
+  onStartFinishing (callback) {
+    this._onStartFinishingFns.push( callback );
+  }
+
+  /**
    * @returns {ParticlesPool}
    */
   get pool () {
@@ -278,19 +289,19 @@ export class ParticleSystem extends THREE.Object3D {
   }
 
   /**
-   * @returns {THREE.Scene|THREE.Object3D|LivingObject}
+   * @returns {THREE.Scene|LivingObject|THREE.Object3D}
    */
   get parentContainer () {
-    return !this._attachParticlesToLocal
-      ? (this._parentContainer || this.scene)
-      : this;
+    return this._attachParticlesToLocal
+      ? this : (this._parentContainer || this.scene);
   }
 
   /**
    * @returns {THREE.Vector3}
    */
   get originPosition () {
-    return this._attachParticlesToLocal ? zeroVector : this.position;
+    return this._attachParticlesToLocal
+      ? zeroVector : this.position;
   }
 
   /**
@@ -378,7 +389,6 @@ export class ParticleSystem extends THREE.Object3D {
    * @private
    */
   _beforeBucketRelease (particles) {
-    // console.log('[ParticleSystem] before release...');
     if (this.isRunning) {
       this._state = ParticleSystemState.NOT_RUNNING;
     }
@@ -475,11 +485,16 @@ export class ParticleSystem extends THREE.Object3D {
     }
     const particle = this._freeParticles.shift();
 
+    if (!this._attachParticlesToLocal) {
+      particle.position.copy( this.position );
+    }
+
     let particleOptions = this._createParticleOptions();
     particle.setOptions( particleOptions );
     particle.start();
 
     this.parentContainer.add( particle );
+
     this._particlesSpawned++;
 
     this._usingParticles.push( particle );
@@ -565,5 +580,14 @@ export class ParticleSystem extends THREE.Object3D {
       return fnOrValue( fnContext );
     }
     return fnOrValue;
+  }
+
+  /**
+   * @private
+   */
+  _onStartFinishing () {
+    for (let i = 0; i < this._onStartFinishingFns.length; ++i) {
+      this._onStartFinishingFns[ i ]();
+    }
   }
 }

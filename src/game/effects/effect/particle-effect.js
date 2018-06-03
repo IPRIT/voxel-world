@@ -2,6 +2,7 @@ import { EffectState } from "./effect-state";
 import { Game } from "../../game";
 import { LivingObject } from "../../living-object/index";
 import { ParticleSystem } from "../particle/index";
+import { extendDeep } from "../../utils";
 
 let EFFECT_ID = 1;
 
@@ -79,11 +80,21 @@ export class ParticleEffect {
    */
   _timeScale = 1;
 
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _isFlowing = false;
+
   init () {
-    // console.log('[ParticleEffect] initializing...');
     this._particleSystem = new ParticleSystem( this._particleSystemOptions );
 
     this.parentContainer.add( this._particleSystem );
+
+    if (!this._attachedToTarget
+      && !this._isFlowing && this.toPosition) {
+      this._particleSystem.position.copy( this.toPosition );
+    }
   }
 
   /**
@@ -101,7 +112,6 @@ export class ParticleEffect {
   }
 
   start () {
-    // console.log('[ParticleEffect] starting...');
     this._state = EffectState.RUNNING;
 
     if (this._particleSystem) {
@@ -116,13 +126,8 @@ export class ParticleEffect {
   }
 
   finish () {
-    // console.log('[ParticleEffect] finishing...');
     this._state = EffectState.FINISHED;
-
-    for (let i = 0, length = this._onFinishedFns.length; i < length; ++i) {
-      this._onFinishedFns[ i ]();
-    }
-
+    this._onFinished();
     this.dispose();
   }
 
@@ -130,7 +135,6 @@ export class ParticleEffect {
    * Clear memory
    */
   dispose () {
-    // console.log('[ParticleEffect] disposing...');
     this._particleSystem = null;
     this._to = null;
     this._from = null;
@@ -159,6 +163,15 @@ export class ParticleEffect {
   }
 
   /**
+   * @param {*} defaultOptions
+   * @param {*} options
+   * @returns {*}
+   */
+  mergeOptions (defaultOptions, options) {
+    return extendDeep( defaultOptions, options );
+  }
+
+  /**
    * @param {LivingObject|THREE.Vector3} from
    */
   setFrom (from) {
@@ -182,6 +195,13 @@ export class ParticleEffect {
   /**
    * @param {Function} callback
    */
+  onStartFinishing (callback) {
+    this._particleSystem.onStartFinishing( callback );
+  }
+
+  /**
+   * @param {Function} callback
+   */
   onFinished (callback) {
     this._onFinishedFns.push( callback );
   }
@@ -191,6 +211,20 @@ export class ParticleEffect {
    */
   get id () {
     return this._id;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isFlowing () {
+    return this._isFlowing;
+  }
+
+  /**
+   * @param {boolean} value
+   */
+  set isFlowing (value) {
+    this._isFlowing = value;
   }
 
   /**
@@ -210,8 +244,22 @@ export class ParticleEffect {
   /**
    * @returns {LivingObject|THREE.Vector3}
    */
+  get fromPosition () {
+    return this._from && this._from.position || this._from;
+  }
+
+  /**
+   * @returns {LivingObject|THREE.Vector3}
+   */
   get to () {
     return this._to;
+  }
+
+  /**
+   * @returns {LivingObject|THREE.Vector3}
+   */
+  get toPosition () {
+    return this._to && this._to.position || this._to;
   }
 
   /**
@@ -225,7 +273,13 @@ export class ParticleEffect {
    * @returns {THREE.Scene|THREE.Object3D|*}
    */
   get parentContainer () {
+    if (this._attachedToTarget && this._isFlowing) {
+      console.warn(`Effect shouldn't be attached to target and flowing at once`);
+    }
+
     return this._attachedToTarget
+      && !this._isFlowing
+      && this._to
       && this._to instanceof LivingObject
       ? this._to : this.scene;
   }
@@ -294,6 +348,15 @@ export class ParticleEffect {
     if (this._timeElapsed > this._duration
       && this._particleSystem.isRunning) {
       this._particleSystem.stop();
+    }
+  }
+
+  /**
+   * @private
+   */
+  _onFinished () {
+    for (let i = 0, length = this._onFinishedFns.length; i < length; ++i) {
+      this._onFinishedFns[ i ]();
     }
   }
 }

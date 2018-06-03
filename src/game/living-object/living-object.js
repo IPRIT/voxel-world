@@ -6,10 +6,9 @@ import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
 import { FireBallEffect } from "../effects/examples/fireball";
-import { FountainEffect } from "../effects/examples/fountain";
-import { TornadoEffect } from "../effects/examples/tornado";
 import { SmokeTailEffect } from "../effects/examples/smoke-tail";
-import { WhirlEffect } from "../effects/examples/whirl";
+import { ExplosionEffect } from "../effects/examples/explosion";
+import { EffectComposer } from "../effects/effect/effect-composer";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -123,20 +122,7 @@ export class LivingObject extends WorldObjectAnimated {
 
     this._updateLabel();
 
-    /**
-     * @type {ParticleEffect}
-     */
-    this._effects && this._effects.forEach((_, index) => {
-      /**
-       * @type {ParticleEffect}
-       */
-      let effect = _;
-      effect.update( deltaTime );
-
-      if (effect.isFinished) {
-        this._effects.splice( index, 1 );
-      }
-    });
+    this._effects && this._effects.forEach( effect => effect.update( deltaTime ) );
 
     super.update( deltaTime );
   }
@@ -162,36 +148,33 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    let effects = [
-      WhirlEffect,
-      [ FireBallEffect, SmokeTailEffect ],
-      FountainEffect,
-      TornadoEffect
-    ];
+    let effects = [{
+      effect: FireBallEffect,
+      children: [{
+        effect: ExplosionEffect,
+        effectOptions: {
+          particleSystemOptions: {
+            maxParticlesNumber: 20,
+            particleOptions: {
+              colorRange: [
+                new THREE.Vector3( 21 / 360, 100 / 100, 10 / 100 ),
+                new THREE.Vector3( 33 / 360, 100 / 100, 51 / 100 )
+              ]
+            }
+          }
+        }
+      }]
+    }, {
+      effect: SmokeTailEffect,
+      delayTimeout: 20
+    }];
 
-    this._effectIndex = this._effectIndex || 0;
+    const composer = new EffectComposer( effects );
+    composer.setFrom( this );
+    composer.setTo( livingObject );
+    composer.start();
 
-    let selectedEffects = [].concat( effects[ this._effectIndex++ % effects.length ] );
-    let timeScale = 1;
-    if (selectedEffects[0] === FireBallEffect && selectedEffects[1] === SmokeTailEffect) {
-      timeScale = 1.5;
-    }
-    for (let i = 0; i < selectedEffects.length; ++i) {
-      const effect = new selectedEffects[ i ]();
-      effect.setFrom( this );
-      effect.setTo( livingObject );
-
-      effect.setTimeScale( timeScale );
-
-      effect.init();
-      effect.start();
-
-      this._effects = (this._effects || []).concat( effect );
-    }
-
-    if (livingObject.id === Game.getInstance().world.me.id) {
-      livingObject.setTargetObject( this );
-    }
+    this._effects = (this._effects || []).concat( composer );
 
     this._targetObject = livingObject;
   }

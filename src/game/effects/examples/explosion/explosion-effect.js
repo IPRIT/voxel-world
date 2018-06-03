@@ -1,7 +1,8 @@
-import { optionsFactory } from "./tornado-options";
+import { optionsFactory } from "./explosion-options";
 import { ParticleEffect } from "../../effect";
+import { extendDeep } from "../../../utils";
 
-export class TornadoEffect extends ParticleEffect {
+export class ExplosionEffect extends ParticleEffect {
 
   /**
    * @param {*} options

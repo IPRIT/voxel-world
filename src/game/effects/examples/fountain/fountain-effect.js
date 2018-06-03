@@ -3,8 +3,11 @@ import { ParticleEffect } from "../../effect";
 
 export class FountainEffect extends ParticleEffect {
 
-  constructor () {
+  /**
+   * @param {*} options
+   */
+  constructor (options = {}) {
     super();
-    this.setOptions( optionsFactory() );
+    this.setOptions( this.mergeOptions( optionsFactory(), options ) );
   }
 }

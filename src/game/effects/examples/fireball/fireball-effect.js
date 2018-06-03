@@ -3,8 +3,11 @@ import { FlowingEffect } from "../../effect";
 
 export class FireBallEffect extends FlowingEffect {
 
-  constructor () {
+  /**
+   * @param {*} options
+   */
+  constructor (options = {}) {
     super();
-    this.setOptions( optionsFactory() );
+    this.setOptions( this.mergeOptions( optionsFactory(), options ) );
   }
 }

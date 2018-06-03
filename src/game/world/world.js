@@ -169,9 +169,11 @@ export class World {
     });
 
     this._players.forEach(player => {
-      setInterval(_ => {
+      let interval = setInterval(_ => {
         player.setTargetObject( this._me );
       }, Math.random() * 100000 + 5000);
+
+      // setTimeout(_ => clearInterval( interval ), 100 * 1000);
     });
   }
 

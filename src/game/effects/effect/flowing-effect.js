@@ -16,6 +16,8 @@ export class FlowingEffect extends ParticleEffect {
   _transitionOptions = {};
 
   init () {
+    this.isFlowing = true;
+
     super.init();
 
     this._transition = new TransitionPlayback( this.from, this.to, this._transitionOptions );

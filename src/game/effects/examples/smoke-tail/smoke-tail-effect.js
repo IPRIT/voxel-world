@@ -3,8 +3,11 @@ import { FlowingEffect } from "../../effect";
 
 export class SmokeTailEffect extends FlowingEffect {
 
-  constructor () {
+  /**
+   * @param {*} options
+   */
+  constructor (options = {}) {
     super();
-    this.setOptions( optionsFactory() );
+    this.setOptions( this.mergeOptions( optionsFactory(), options ) );
   }
 }

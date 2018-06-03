@@ -39,12 +39,12 @@ module.exports = {
               sass: extractPlugin
             }
           }
-        }, 'eslint-loader'],
+        }],
         exclude: /node_modules\/(?!md-svg-vue)\/.*/
       },
       {
         test: /\.js$/,
-        loaders: ['babel-loader', 'eslint-loader'],
+        loaders: ['babel-loader'],
         exclude: /node_modules\/(?!md-svg-vue)\/.*/
       },
       {
@@ -60,8 +60,7 @@ module.exports = {
             loader: 'worker-loader',
             options: {
             }
-          },
-          'eslint-loader'
+          }
         ]
       }
     ]

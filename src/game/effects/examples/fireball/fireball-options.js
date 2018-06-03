@@ -62,7 +62,7 @@ export function optionsFactory () {
     },
     transitionOptions: {
       timeScale: 1,
-      velocity: 80,
+      velocity: 120,
       acceleration: .5
     }
   };
