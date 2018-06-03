@@ -14,14 +14,14 @@ export function optionsFactory () {
   const l2 = 100;
 
   return {
-    duration: 750,
+    duration: 1500,
     timeScale: 1,
-    attachToTarget: false,
+    attachToTarget: true,
     particleSystemOptions: {
-      timeScale: 1.2,
-      spawnRate: .7,
-      maxParticlesNumber: 40,
-      attachParticlesToLocal: false,
+      timeScale: .5,
+      spawnRate: .15,
+      maxParticlesNumber: 50,
+      attachParticlesToLocal: true,
       particleOptions: {
         generateContext: () => {
           return {
@@ -35,24 +35,29 @@ export function optionsFactory () {
           new THREE.Vector3( h2 / 360, s2 / 100, l2 / 100 )
         ],
         isHSLRange: true,
-        lifetime: 1500,
+        lifetime: 150,
         velocity: (context) => {
           return new THREE.Vector3( context.x, 0, context.z )
             .normalize()
-            .multiplyScalar( 30 )
-            .setY( Math.abs( context.y ) * 50 + 25 )
+            .multiplyScalar( 100 )
+            .setY( 30 )
         },
         rotationVelocity: (context) => {
           return new THREE.Vector3( context.x, context.y, context.z )
-            .multiplyScalar( .3 )
         },
         positionOffset: (context) => {
-          return new THREE.Vector3( context.x, context.y, context.z )
-            .multiplyScalar( 2 )
+          return new THREE.Vector3( -context.x, 0, -context.z )
+            .normalize()
+            .multiplyScalar( 10 )
         },
-        acceleration: new THREE.Vector3( 0, -1.5, 0 ),
+        acceleration: (context) => {
+          return new THREE.Vector3( -context.x, 10, -context.z )
+            .normalize()
+            .multiplyScalar( 200 )
+            .setY( 20 )
+        },
         scale: () => {
-          return Math.random() * 2 + 1;
+          return Math.random() * 2 + .5;
         }
       }
     }

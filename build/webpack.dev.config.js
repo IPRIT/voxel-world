@@ -13,6 +13,7 @@ const extractPlugin = ExtractTextPlugin.extract({
 
 module.exports = {
   devtool: '#cheap-module-eval-source-map',
+  mode: 'development',
   entry: ['babel-polyfill', './dev/index.js'],
   output: {
     filename: '[name].js',

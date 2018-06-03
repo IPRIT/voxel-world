@@ -4,8 +4,8 @@
 export function optionsFactory () {
 
   // HSL color ranges
-  const h1 = 21;
-  const h2 = 33;
+  const h1 = 5;
+  const h2 = 15;
 
   const s1 = 100;
   const s2 = 100;
@@ -19,7 +19,7 @@ export function optionsFactory () {
     attachToTarget: false,
     particleSystemOptions: {
       timeScale: .5,
-      spawnRate: .1,
+      spawnRate: .2,
       maxParticlesNumber: 30,
       attachParticlesToLocal: true,
       rotationVelocity: new THREE.Vector3(0, 0, -.2),

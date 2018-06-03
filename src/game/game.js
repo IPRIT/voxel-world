@@ -148,6 +148,13 @@ export class Game {
     this._updateWarper.onUpdate(deltaTime => {
       this.world.update( deltaTime );
     });
+
+    let gui = new dat.GUI();
+    gui.add(this._updateWarper, 'timeScale', -.1, 5);
+
+    document.querySelector('.dg.ac').addEventListener('mousedown', ev => {
+      ev.stopPropagation();
+    });
   }
 
   /**

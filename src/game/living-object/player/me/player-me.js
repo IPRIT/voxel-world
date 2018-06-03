@@ -2,10 +2,10 @@ import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
 import { PlayerWorldLight } from "./player-world-light";
 import { PlayerControls } from "./player-controls";
-import { TransitionPlayback } from "../../../effects";
+import { TransitionPlayback } from "../../../visual-effects";
 import { Game } from "../../../game";
-import { ParticlesPool } from "../../../effects/particle/particles-pool";
-import { ParticleSystem } from "../../../effects/particle";
+import { ParticlesPool } from "../../../visual-effects/particle/particles-pool";
+import { ParticleSystem } from "../../../visual-effects/particle";
 
 export class PlayerMe extends Player {
 

@@ -5,10 +5,9 @@ import { Game } from "../game";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
-import { FireBallEffect } from "../effects/examples/fireball";
-import { SmokeTailEffect } from "../effects/examples/smoke-tail";
-import { ExplosionEffect } from "../effects/examples/explosion";
-import { EffectComposer } from "../effects/effect/effect-composer";
+import { LavaStrikeEffect } from "../visual-effects/skills/lava-strike";
+import { FountainEffect } from "../visual-effects/skills/components/gush/fountain";
+import { GushEffect } from "../visual-effects/skills/gush";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -148,33 +147,15 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    let effects = [{
-      effect: FireBallEffect,
-      children: [{
-        effect: ExplosionEffect,
-        effectOptions: {
-          particleSystemOptions: {
-            maxParticlesNumber: 20,
-            particleOptions: {
-              colorRange: [
-                new THREE.Vector3( 21 / 360, 100 / 100, 10 / 100 ),
-                new THREE.Vector3( 33 / 360, 100 / 100, 51 / 100 )
-              ]
-            }
-          }
-        }
-      }]
-    }, {
-      effect: SmokeTailEffect,
-      delayTimeout: 20
-    }];
+    let skills = [ LavaStrikeEffect, GushEffect ];
 
-    const composer = new EffectComposer( effects );
-    composer.setFrom( this );
-    composer.setTo( livingObject );
-    composer.start();
+    const effect = new skills[ Math.floor( Math.random() * skills.length ) % skills.length ]();
+    effect.setFrom( this );
+    effect.setTo( livingObject );
+    effect.init();
+    effect.start();
 
-    this._effects = (this._effects || []).concat( composer );
+    this._effects = (this._effects || []).concat( effect );
 
     this._targetObject = livingObject;
   }

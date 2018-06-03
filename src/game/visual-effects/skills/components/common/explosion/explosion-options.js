@@ -4,24 +4,24 @@
 export function optionsFactory () {
 
   // HSL color ranges
-  const h1 = 206;
-  const h2 = 206;
+  const h1 = 0;
+  const h2 = 0;
 
-  const s1 = 93;
-  const s2 = 93;
+  const s1 = 0;
+  const s2 = 0;
 
-  const l1 = 33;
-  const l2 = 66;
+  const l1 = 100;
+  const l2 = 100;
 
   return {
-    duration: 1500,
+    duration: 750,
     timeScale: 1,
-    attachToTarget: true,
+    attachToTarget: false,
     particleSystemOptions: {
-      timeScale: .5,
-      spawnRate: .15,
-      maxParticlesNumber: 50,
-      attachParticlesToLocal: true,
+      timeScale: 1.2,
+      spawnRate: .7,
+      maxParticlesNumber: 40,
+      attachParticlesToLocal: false,
       particleOptions: {
         generateContext: () => {
           return {
@@ -35,29 +35,24 @@ export function optionsFactory () {
           new THREE.Vector3( h2 / 360, s2 / 100, l2 / 100 )
         ],
         isHSLRange: true,
-        lifetime: 150,
+        lifetime: 1500,
         velocity: (context) => {
           return new THREE.Vector3( context.x, 0, context.z )
             .normalize()
-            .multiplyScalar( 100 )
-            .setY( 30 )
+            .multiplyScalar( 30 )
+            .setY( Math.abs( context.y ) * 50 + 25 )
         },
         rotationVelocity: (context) => {
           return new THREE.Vector3( context.x, context.y, context.z )
+            .multiplyScalar( .3 )
         },
         positionOffset: (context) => {
-          return new THREE.Vector3( -context.x, 0, -context.z )
-            .normalize()
-            .multiplyScalar( 10 )
+          return new THREE.Vector3( context.x, context.y + 1, context.z )
+            .multiplyScalar( 2 )
         },
-        acceleration: (context) => {
-          return new THREE.Vector3( -context.x, 10, -context.z )
-            .normalize()
-            .multiplyScalar( 200 )
-            .setY( 20 )
-        },
+        acceleration: new THREE.Vector3( 0, -1.5, 0 ),
         scale: () => {
-          return Math.random() * 2 + .5;
+          return Math.random() * 2 + 1;
         }
       }
     }

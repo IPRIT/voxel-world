@@ -1,6 +1,5 @@
 import { optionsFactory } from "./explosion-options";
-import { ParticleEffect } from "../../effect";
-import { extendDeep } from "../../../utils";
+import { ParticleEffect } from "../../../../effect";
 
 export class ExplosionEffect extends ParticleEffect {
 

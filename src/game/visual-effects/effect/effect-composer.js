@@ -55,11 +55,16 @@ export class EffectComposer {
    *  effect: ParticleEffect,
    *  effectOptions: {},
    *  delayTimeout: number,
+   *  nextImmediately: boolean,
    *  children: Array<*>
    * }>} effects
    */
   constructor (effects = []) {
     this._effects = effects;
+  }
+
+  init () {
+    this._traverse( this._effects );
   }
 
   /**
@@ -83,7 +88,6 @@ export class EffectComposer {
 
   start () {
     this._state = EffectState.RUNNING;
-    this._traverse( this._effects );
   }
 
   pause () {
@@ -192,11 +196,9 @@ export class EffectComposer {
 
       const next = () => this._traverse( children );
 
-      if (nextImmediately) {
-        effectInstance.onStartFinishing( next );
-      } else {
-        effectInstance.onFinished( next );
-      }
+      nextImmediately
+        ? effectInstance.onStartFinishing( next )
+        : effectInstance.onFinished( next );
 
       this._addToQueue( effectInstance, this._timeElapsed + delayTimeout );
     }

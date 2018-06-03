@@ -1,7 +1,7 @@
-import { optionsFactory } from "./whirl-options";
-import { FlowingEffect } from "../../effect";
+import { optionsFactory } from "./fireball-options";
+import { FlowingEffect } from "../../../../effect";
 
-export class WhirlEffect extends FlowingEffect {
+export class FireBallEffect extends FlowingEffect {
 
   /**
    * @param {*} options

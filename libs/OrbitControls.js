@@ -5,7 +5,7 @@
  * @author WestLangley / http://github.com/WestLangley
  * @author erich666 / http://erichaines.com
  * @author mrflix / http://felixniklas.de
- * 
+ *
  * released under MIT License (MIT)
  */
 /*global THREE, console */
@@ -18,7 +18,7 @@
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
 //    Pan - right mouse, or arrow keys / touch: three finter swipe
 //
-// This is a drop-in replacement for (most) TrackballControls used in examples.
+// This is a drop-in replacement for (most) TrackballControls used in components.
 // That is, include this js file and wherever you see:
 //    	controls = new THREE.TrackballControls( camera );
 //      controls.target.z = 150;
@@ -137,7 +137,7 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
 		// get X column of matrix
 		panOffset.set( te[0], te[1], te[2] );
 		panOffset.multiplyScalar(-distance);
-		
+
 		pan.add( panOffset );
 
 	};
@@ -150,10 +150,10 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
 		// get Y column of matrix
 		panOffset.set( te[4], te[5], te[6] );
 		panOffset.multiplyScalar(distance);
-		
+
 		pan.add( panOffset );
 	};
-	
+
 	// main entry point; pass in Vector2 of change desired in pixel space,
 	// right and down are positive
 	this.pan = function ( delta ) {
@@ -244,7 +244,7 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
 
 		// restrict radius to be between desired limits
 		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
-		
+
 		// move target to panned location
 		this.target.add( pan );
 
@@ -365,7 +365,7 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
 
 			panEnd.set( event.clientX, event.clientY );
 			panDelta.subVectors( panEnd, panStart );
-			
+
 			scope.pan( panDelta );
 
 			panStart.copy( panEnd );
@@ -426,7 +426,7 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
 		// pan a pixel - I guess for precise positioning?
 		// Greggman fix: https://github.com/greggman/three.js/commit/fde9f9917d6d8381f06bf22cdff766029d1761be
 		var needUpdate = false;
-		
+
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
@@ -455,7 +455,7 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
 		}
 
 	}
-	
+
 	function touchstart( event ) {
 
 		if ( scope.enabled === false ) { return; }
@@ -551,7 +551,7 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
 
 				panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 				panDelta.subVectors( panEnd, panStart );
-				
+
 				scope.pan( panDelta );
 
 				panStart.copy( panEnd );

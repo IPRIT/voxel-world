@@ -5,7 +5,7 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
 import { PlayerEnemy } from "../living-object/player/enemy";
 import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
-import { ParticlesPool } from "../effects/particle/particles-pool";
+import { ParticlesPool } from "../visual-effects/particle/particles-pool";
 
 export class World {
   /**
@@ -193,7 +193,7 @@ export class World {
 
     player.__interval = setInterval(_ => {
       if (!player.isComing) {
-        // player.setTargetLocation( points[ pointIndex ++ % points.length ] );
+        player.setTargetLocation( points[ pointIndex ++ % points.length ] );
       }
 
       if (Math.random() < .15) {

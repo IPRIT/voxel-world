@@ -10,6 +10,12 @@ export class UpdateWarper {
    * @type {number}
    * @private
    */
+  _timeScale = 1;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _updateInvokes = 0;
 
   /**
@@ -17,12 +23,6 @@ export class UpdateWarper {
    * @private
    */
   _updatesPerSecond = 60;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  _timeScale = 1;
 
   /**
    * @type {number}
@@ -100,6 +100,20 @@ export class UpdateWarper {
    */
   get isRunning () {
     return !this._paused;
+  }
+
+  /**
+   * @returns {number}
+   */
+  get timeScale () {
+    return this._timeScale;
+  }
+
+  /**
+   * @param {number} value
+   */
+  set timeScale (value) {
+    this._timeScale = value;
   }
 
   /**
