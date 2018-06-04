@@ -73,7 +73,7 @@ export class World {
     game.scene.add( me );
 
     setTimeout(_ => {
-      this._runDemo();
+      // this._runDemo();
     }, 100);
 
     SelectionOverlay.getOverlay(); // just init selection overlay once

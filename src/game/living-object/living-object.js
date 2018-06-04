@@ -8,6 +8,8 @@ import { SelectionOverlay } from "./utils";
 import { LavaStrikeEffect } from "../visual-effects/skills/lava-strike";
 import { FountainEffect } from "../visual-effects/skills/components/gush/fountain";
 import { GushEffect } from "../visual-effects/skills/gush";
+import { ParticlesPool } from "../visual-effects/particle";
+import { Tween } from "../utils/tween";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -147,7 +149,7 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    let skills = [ LavaStrikeEffect, GushEffect ];
+    /*let skills = [ LavaStrikeEffect, GushEffect ];
 
     const effect = new skills[ Math.floor( Math.random() * skills.length ) % skills.length ]();
     effect.setFrom( this );
@@ -155,7 +157,39 @@ export class LivingObject extends WorldObjectAnimated {
     effect.init();
     effect.start();
 
-    this._effects = (this._effects || []).concat( effect );
+    this._effects = (this._effects || []).concat( effect );*/
+
+    let bucket = ParticlesPool.getPool().take(1);
+    let particle = bucket.particles[ 0 ];
+
+    Game.getInstance().scene.add( particle );
+
+    particle.position.copy( this.position );
+
+    let tween1 = new Tween( particle.position, 'x', 20, {
+      duration: 1000,
+      timingFunction: 'linear'
+    });
+
+    let tween2 = new Tween( particle.position, 'y', 20, {
+      duration: 1000,
+      timingFunction: 'easeInOutQuint'
+    });
+
+    tween1.start();
+    tween2.start();
+
+    this._effects = (this._effects || []).concat( [ tween1, tween2 ] );
+
+    tween1.then(_ => {
+      let index = this._effects.findIndex(tween => tween.id === tween1.id);
+      this._effects.splice( index, 1 );
+    });
+
+    tween2.then(_ => {
+      let index = this._effects.findIndex(tween => tween.id === tween2.id);
+      this._effects.splice( index, 1 );
+    });
 
     this._targetObject = livingObject;
   }
