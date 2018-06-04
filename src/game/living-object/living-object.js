@@ -166,14 +166,14 @@ export class LivingObject extends WorldObjectAnimated {
 
     particle.position.copy( this.position );
 
-    let tween1 = new Tween( particle.position, 'x', 20, {
-      duration: 1000,
-      timingFunction: 'linear'
-    });
-
-    let tween2 = new Tween( particle.position, 'y', 20, {
+    let tween1 = new Tween( particle.position, ['x', 'y'], [ 20, 20 ], {
       duration: 1000,
       timingFunction: 'easeInOutQuint'
+    });
+
+    let tween2 = new Tween( particle.position, 'z', 20, {
+      duration: 1000,
+      timingFunction: 'easeInOutCubic'
     });
 
     tween1.start();

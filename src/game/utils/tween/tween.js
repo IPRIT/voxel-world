@@ -119,14 +119,17 @@ export class Tween {
    * @param {*} params
    */
   constructor (target, properties = [], deltaValues = [], params = {}) {
+    // we can't extends from Promise because Promise
+    // checks constructor internally to Promise function
+    // so should implement PromiseLike interface
     this._promise = new Promise((resolve, reject) => {
       this._resolve = resolve;
       this._reject = reject;
     });
 
     this._target = target;
-    this._properties = [].concat( properties );
-    this._deltaValues = [].concat( deltaValues );
+    this._properties = [].concat( properties ); // can be as single value
+    this._deltaValues = [].concat( deltaValues ); // --//--
     this._initParams( params );
   }
 
@@ -139,6 +142,9 @@ export class Tween {
     this._startValues = this._getPropertyValues( this._properties );
   }
 
+  /**
+   * Continue animation
+   */
   resume () {
     this._state = TweenState.RUNNING;
   }
