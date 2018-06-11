@@ -16,7 +16,7 @@ export class WorldMapLoader extends VoxModelLoader {
     if (this._instance) {
       return this._instance;
     }
-    return (this._instance = new WorldMapLoader( 500 ));
+    return (this._instance = new WorldMapLoader( 3000 ));
   }
 
   /**

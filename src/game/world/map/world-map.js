@@ -45,10 +45,13 @@ export class WorldMap extends THREE.Group {
    * @returns {*[]}
    * @private
    */
-  _dummyModelFunction = (x, z) => ([{ x, y: 0, z }, [255, 0, 0]]);
+  _dummyModelFunction = (x, z) => ([{ x, y: 0, z }, [255, 255, 255]]);
 
+  /**
+   * World preparing
+   */
   init () {
-    this.placeGroundPlate();
+    this._placeGroundPlate();
     this._initCollisions();
   }
 
@@ -60,6 +63,7 @@ export class WorldMap extends THREE.Group {
       return;
     }
     this._chunksLoading = true;
+
     let newVisibleChunks = this.getVisibleChunksAt( position, true );
     let chunksToLoad = newVisibleChunks.filter(chunkIndex => {
       return !this._map.has( chunkIndex );
@@ -68,77 +72,7 @@ export class WorldMap extends THREE.Group {
       return !newVisibleChunks.includes( chunkIndex );
     });
 
-    // loading chunks
-    return Promise.resolve(chunksToLoad).mapSeries(chunkToLoad => {
-      let [ x, z ] = this._parseChunkIndex( chunkToLoad );
-
-      return this.loadChunkModel( chunkToLoad ).then(data => {
-        let { cached, model = null, worldObject = null } = data || {};
-        if (cached && worldObject) {
-          // if cached attach object was created before
-          this.attach( worldObject );
-        } else if (model) {
-          // if not cached just create a chunk with a received model
-          worldObject = this.createWorldChunk( model, { x, y: 0, z } );
-        } else {
-          throw new Error('Can\'t load a model');
-        }
-        this.attach( worldObject );
-      }).catch(_ => {
-        console.log('Using fallback chunk because error:', _);
-        // using default function to render a chunk when we have an error
-        let newChunk = this.createWorldChunk(
-          this._dummyModelFunction,
-          { x, y: 0, z }
-        );
-        this.attach( newChunk );
-      }).finally(_ => {
-        // unload existing chunk
-        if (chunksToUnload.length) {
-          let chunkIndex = chunksToUnload.shift();
-          this.unloadChunk( chunkIndex );
-        }
-      });
-    }).then(_ => {
-      // unload the rest
-      this.unloadChunks( chunksToUnload );
-
-      this._chunksLoading = false;
-    });
-  }
-
-  /**
-   * @param {string} chunkIndex
-   * @returns {Promise<VoxModel>}
-   */
-  loadChunkModel (chunkIndex) {
-    let mapLoader = WorldMapLoader.getLoader();
-    try {
-      return mapLoader.load( chunkIndex );
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  /**
-   * @param {string[]} chunks
-   */
-  unloadChunks (chunks = []) {
-    for (let chunkIndex of chunks) {
-      this.unloadChunk( chunkIndex );
-    }
-  }
-
-  /**
-   * @param {string} chunkIndex
-   */
-  unloadChunk (chunkIndex) {
-    let mapLoader = WorldMapLoader.getLoader();
-    if (this._map.has( chunkIndex )) {
-      let chunk = this._map.get( chunkIndex );
-      mapLoader.addToCache( chunkIndex, chunk );
-      this.detach( chunk );
-    }
+    return this._loadChunks( chunksToLoad, chunksToUnload );
   }
 
   /**
@@ -279,10 +213,6 @@ export class WorldMap extends THREE.Group {
     const x = position.x - worldChunkObject.chunk._fromX;
     const y = position.y - worldChunkObject.chunk._fromY;
     const z = position.z - worldChunkObject.chunk._fromZ;
-    if (!window.test) {
-      window.test = 1;
-    }
-    window.test++;
     return worldChunkObject.getBlock( { x, y, z } );
   }
 
@@ -358,56 +288,6 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {VoxModel|function|null} model
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
-   * @returns {WorldObjectVox}
-   */
-  createWorldChunk (model, { x, y, z }) {
-    const mapChunkObject = new WorldObjectVox( WorldObjectType.MAP, ModelType.VOX );
-
-    mapChunkObject.setModel( model );
-    mapChunkObject.position.set(
-      x * WORLD_MAP_CHUNK_SIZE,
-      y + WORLD_MAP_BLOCK_SIZE / 2,
-      z * WORLD_MAP_CHUNK_SIZE
-    );
-    mapChunkObject.position.multiplyScalar( WORLD_MAP_BLOCK_SIZE );
-    mapChunkObject.init();
-
-    return mapChunkObject;
-  }
-
-  /**
-   * Places world plate on the ground
-   */
-  placeGroundPlate () {
-    let groundPlate = new THREE.Group();
-
-    let geo = new THREE.PlaneBufferGeometry(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE
-    );
-    let mat = new THREE.MeshPhongMaterial({ color: 0x444444, shininess: 100 });
-    let mesh = new THREE.Mesh(geo, mat);
-    mesh.rotation.x -= Math.PI / 2;
-    mesh.position.set(
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
-      0,
-      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
-    );
-    mesh.receiveShadow = true;
-    mesh.castShadow = true;
-
-    groundPlate.add( mesh );
-
-    this._groundPlate = groundPlate;
-
-    this.add( groundPlate );
-  }
-
-  /**
    * @param {WorldObjectVox} mapObject
    */
   attach (mapObject) {
@@ -427,7 +307,10 @@ export class WorldMap extends THREE.Group {
    * @param {WorldObjectVox} mapObject
    */
   register (mapObject) {
-    this._map.set(mapObject.chunk.mapChunkIndex, mapObject);
+    this._map.set(
+      mapObject.chunk.mapChunkIndex,
+      mapObject
+    );
   }
 
   /**
@@ -486,6 +369,142 @@ export class WorldMap extends THREE.Group {
    */
   _initCollisions () {
     this._collisions = new WorldMapCollisions( this );
+  }
+
+  /**
+   * @param {Array<string>} chunksToLoad
+   * @param {Array<string>} chunksToUnload
+   * @returns {Promise<any>}
+   * @private
+   */
+  _loadChunks (chunksToLoad = [], chunksToUnload = []) {
+    // loading chunks
+    return Promise.resolve( chunksToLoad ).map(chunkToLoad => {
+      return Promise.all([
+        chunkToLoad,
+        this._loadChunkModel( chunkToLoad )
+          .catch(error => this._onChunkLoadError( error, chunkToLoad ))
+      ]);
+    }, { concurrency: 10 }).mapSeries(async ([ chunkToLoad, data ]) => {
+      let [ x, z ] = this._parseChunkIndex( chunkToLoad );
+      let { cached, model = null, worldObject = null } = data || {};
+      if (!cached && model) {
+        // if not cached just create a chunk with a received model
+        worldObject = await this._createWorldChunk( model, { x, y: 0, z } );
+      } else if (!model && !worldObject) {
+        // when error occurred both objects are empty
+        return;
+      }
+
+      // adding chunk to the world
+      this.attach( worldObject );
+
+      // unload next chunk
+      if (chunksToUnload.length) {
+        let chunkIndex = chunksToUnload.shift();
+        this._unloadChunk( chunkIndex );
+      }
+    }).finally(_ => {
+      // unload the rest
+      this._unloadChunks( chunksToUnload );
+      this._chunksLoading = false;
+    });
+  }
+
+  /**
+   * @param {string} chunkIndex
+   * @returns {Promise<{cached: boolean, worldObject?: WorldObjectVox, model?: VoxModel}>}
+   */
+  async _loadChunkModel (chunkIndex) {
+    let mapLoader = WorldMapLoader.getLoader();
+    return mapLoader.load( chunkIndex );
+  }
+
+  /**
+   * @param {string[]} chunks
+   */
+  _unloadChunks (chunks = []) {
+    for (let chunkIndex of chunks) {
+      this._unloadChunk( chunkIndex );
+    }
+  }
+
+  /**
+   * @param {string} chunkIndex
+   */
+  _unloadChunk (chunkIndex) {
+    let mapLoader = WorldMapLoader.getLoader();
+    if (this._map.has( chunkIndex )) {
+      let chunk = this._map.get( chunkIndex );
+      mapLoader.addToCache( chunkIndex, chunk );
+      this.detach( chunk );
+    }
+  }
+
+  /**
+   * @param {*} error
+   * @param {string} targetChunk
+   * @private
+   */
+  _onChunkLoadError (error, targetChunk) {
+    console.log('Using fallback chunk due to error:', error);
+
+    let [ x, z ] = this._parseChunkIndex( targetChunk );
+    // using a function to generate plane
+    let fallback = this._createWorldChunk(
+      this._dummyModelFunction,
+      { x, y: 0, z }
+    );
+    this.attach( fallback );
+  }
+
+  /**
+   * @param {VoxModel|function|null} model
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {WorldObjectVox}
+   */
+  _createWorldChunk (model, { x, y, z }) {
+    const mapChunkObject = new WorldObjectVox( WorldObjectType.MAP, ModelType.VOX );
+
+    mapChunkObject.setModel( model );
+    mapChunkObject.position.set(
+      x * WORLD_MAP_CHUNK_SIZE,
+      y + WORLD_MAP_BLOCK_SIZE / 2,
+      z * WORLD_MAP_CHUNK_SIZE
+    );
+    mapChunkObject.position.multiplyScalar( WORLD_MAP_BLOCK_SIZE );
+
+    return mapChunkObject.init();
+  }
+
+  /**
+   * Places world plate on the ground
+   */
+  _placeGroundPlate () {
+    let groundPlate = new THREE.Group();
+
+    let geo = new THREE.PlaneBufferGeometry(
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE,
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE
+    );
+    let mat = new THREE.MeshPhongMaterial({ color: 0x444444, shininess: 100 });
+    let mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.x -= Math.PI / 2;
+    mesh.position.set(
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2,
+      0,
+      WORLD_MAP_BLOCK_SIZE * WORLD_MAP_SIZE / 2
+    );
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
+
+    groundPlate.add( mesh );
+
+    this._groundPlate = groundPlate;
+
+    this.add( groundPlate );
   }
 
   /**

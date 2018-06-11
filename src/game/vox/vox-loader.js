@@ -38,7 +38,7 @@ export class VoxLoader {
    */
   async load (url) {
     let voxelData = await this._loadRequest(url);
-    return new VoxModel(voxelData);
+    return new VoxModel( voxelData );
   }
 
   /**

@@ -50,16 +50,19 @@ export class WorldObjectVox extends WorldObjectBase {
 
   /**
    * @param {*} options
+   * @returns {Promise<WorldObjectVox>}
    */
   init (options = {}) {
     super.init( options );
 
     this._createChunk();
-    this._createMesh().then(_ => {
-      if (this.objectType === WorldObjectType.OBJECT && this.model) {
+    return this._createMesh().then(_ => {
+      if (this.model && this.objectType === WorldObjectType.OBJECT) {
         this._centerMesh();
       }
       this.attachMesh();
+
+      return this;
     });
   }
 

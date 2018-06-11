@@ -36,19 +36,19 @@ export class WorldObjectVoxMesher {
     const worldObject = this._worldObject;
 
     this.resetFaces();
-    const { vertices, colors } = await this.computeVertices(bs);
-    const geometry = this.createOrUpdateGeometry(vertices, colors);
+    const { vertices, colors } = await this.computeVertices( bs );
+    const geometry = this.createOrUpdateGeometry( vertices, colors );
 
     let mesh = worldObject.mesh;
     if (!mesh) {
-      mesh = new THREE.Mesh(geometry, worldObject.material);
+      mesh = new THREE.Mesh( geometry, worldObject.material );
       mesh.castShadow = true;
       mesh.receiveShadow = true;
     } else {
       mesh.geometry = geometry;
     }
 
-    return (this._worldObject.mesh = mesh);
+    return ( this._worldObject.mesh = mesh );
   }
 
   /**
