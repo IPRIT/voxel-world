@@ -44,7 +44,7 @@ export class VoxModelLoader extends AbstractModelLoader {
    */
   async tryLoad (fileUrl, attemptsNumber) {
     return this.tryUntil(async attemptNumber => {
-      console.log(`Trying to load vox model [attempt: ${attemptNumber}]: ${fileUrl}`);
+      // console.log(`Trying to load vox model [attempt: ${attemptNumber}]: ${fileUrl}`);
       // return commonModel;
       let vox = new Vox();
       let model;
