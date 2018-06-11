@@ -25,7 +25,7 @@ export class Vox {
    * @returns {Promise<VoxModel>}
    */
   async load (url) {
-    this._model = await VoxLoader.getLoader().load(url);
+    this._model = await VoxLoader.getLoader().load( url );
     this._url = url;
     this._loaded = true;
 

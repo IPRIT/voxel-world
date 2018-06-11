@@ -19,6 +19,8 @@ export class VoxModel {
   constructor (voxelData, rotated = false) {
     this._voxelData = voxelData;
     !rotated && this._rotate();
+
+    console.log( voxelData );
   }
 
   /**
@@ -39,7 +41,7 @@ export class VoxModel {
   getBlock (index) {
     const xyzi = this.xyzi[ index ];
     return {
-      color: this.getColorArrayByIndex(xyzi.c),
+      color: this.getColorArrayByIndex( xyzi.c ),
       ...xyzi
     };
   }
