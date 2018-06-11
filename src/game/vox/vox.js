@@ -24,12 +24,14 @@ export class Vox {
    * @param url
    * @returns {Promise<VoxModel>}
    */
-  async load (url) {
-    this._model = await VoxLoader.getLoader().load( url );
-    this._url = url;
-    this._loaded = true;
-
-    return this._model;
+  load (url) {
+    return VoxLoader.getLoader().load( url ).then(model => {
+      this._model = model;
+      this._url = url;
+      this._loaded = true;
+      
+      return model;
+    });
   }
 
   /**
