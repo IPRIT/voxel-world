@@ -89,7 +89,7 @@ export class World {
       this._map.updateAtPosition(
         this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE )
       );
-      this._map.updateAppearAnimations( deltaTime );
+      this._map.updateShowingAnimations( deltaTime );
     }
 
     if (this._players.length) {

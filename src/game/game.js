@@ -276,7 +276,7 @@ export class Game {
    * @private
    */
   _initFog () {
-    this._scene.fog = new THREE.Fog(0xffa1c1, 50 * WORLD_MAP_BLOCK_SIZE, 700 * WORLD_MAP_BLOCK_SIZE);
+    this._scene.fog = new THREE.Fog(0xffa1c1, 50 * WORLD_MAP_BLOCK_SIZE, 600 * WORLD_MAP_BLOCK_SIZE);
   }
 
   /**

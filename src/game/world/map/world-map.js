@@ -65,14 +65,19 @@ export class WorldMap extends THREE.Group {
   /**
    * @param {number} deltaTime
    */
-  updateAppearAnimations (deltaTime) {
-    this._showingAnimations && this._showingAnimations.forEach((animation, index) => {
+  updateShowingAnimations (deltaTime) {
+    if (!this._showingAnimations
+      || !this._showingAnimations.length) {
+      return;
+    }
+    for (let i = 0; i < this._showingAnimations.length; ++i) {
+      let animation = this._showingAnimations[ i ];
       if (animation.isStopped) {
-        this._showingAnimations.splice( index, 1 );
+        this._showingAnimations.splice( i--, 1 );
       } else {
         animation.update( deltaTime );
       }
-    });
+    }
   }
 
   /**
