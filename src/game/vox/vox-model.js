@@ -19,8 +19,6 @@ export class VoxModel {
   constructor (voxelData, rotated = false) {
     this._voxelData = voxelData;
     !rotated && this._rotate();
-
-    console.log( voxelData );
   }
 
   /**
