@@ -12,6 +12,7 @@ import {
 } from "../../settings";
 import { ModelType } from "../../model";
 import { WorldMapCollisions } from "./world-map-collisions";
+import { Tween } from "../../utils/tween";
 
 export class WorldMap extends THREE.Group {
 
@@ -40,6 +41,12 @@ export class WorldMap extends THREE.Group {
   _chunksLoading = false;
 
   /**
+   * @type {Array<Tween>}
+   * @private
+   */
+  _showingAnimations = [];
+
+  /**
    * @param {number} x
    * @param {number} z
    * @returns {*[]}
@@ -53,6 +60,19 @@ export class WorldMap extends THREE.Group {
   init () {
     this._placeGroundPlate();
     this._initCollisions();
+  }
+
+  /**
+   * @param {number} deltaTime
+   */
+  updateAppearAnimations (deltaTime) {
+    this._showingAnimations && this._showingAnimations.forEach((animation, index) => {
+      if (animation.isStopped) {
+        this._showingAnimations.splice( index, 1 );
+      } else {
+        animation.update( deltaTime );
+      }
+    });
   }
 
   /**
@@ -291,6 +311,16 @@ export class WorldMap extends THREE.Group {
    * @param {WorldObjectVox} mapObject
    */
   attach (mapObject) {
+    mapObject.material.transparent = true;
+    mapObject.material.opacity = 0;
+
+    const tween = new Tween( mapObject.material, 'opacity', 1, {
+      duration: 400,
+      timingFunction: 'easeInQuad'
+    });
+    tween.start();
+    this._showingAnimations.push( tween );
+
     this.add( mapObject );
     this.register( mapObject );
   }

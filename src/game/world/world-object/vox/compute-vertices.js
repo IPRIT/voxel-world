@@ -93,7 +93,16 @@ export function computeVertices (context) {
 
         // Only check / draw bottom if we are an object!
         if (!isMapChunk || renderNegY) {
-          if (y > 0) {
+          if (isMapChunk) {
+            if (y > 1) {
+              if (chunkBlocks[ chunkBlockIndex(x, y - 1, z) ] !== 0) {
+                below = 1;
+                chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x20; // bit 6
+              }
+            } else {
+              below = 1;
+            }
+          } else if (y > 0) {
             if (chunkBlocks[ chunkBlockIndex(x, y - 1, z) ] !== 0) {
               below = 1;
               chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x20; // bit 6
