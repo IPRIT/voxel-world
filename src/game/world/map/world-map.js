@@ -385,7 +385,7 @@ export class WorldMap extends THREE.Group {
         this._loadChunkModel( chunkToLoad )
           .catch(error => this._onChunkLoadError( error, chunkToLoad ))
       ]);
-    }, { concurrency: 10 }).mapSeries(async ([ chunkToLoad, data ]) => {
+    }, { concurrency: 30 }).mapSeries(async ([ chunkToLoad, data ]) => {
       let [ x, z ] = this._parseChunkIndex( chunkToLoad );
       let { cached, model = null, worldObject = null } = data || {};
       if (!cached && model) {
