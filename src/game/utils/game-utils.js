@@ -204,3 +204,31 @@ export function mergeDeep(objectA, objectB) {
 
   return objectA;
 }
+
+/**
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+export function valueBetween (value, min = -Infinity, max = Infinity) {
+  if (min > max) {
+    [ min, max ] = [ max, min ];
+  }
+  return Math.min(
+    Math.max( ensureNumber(value), min ),
+    max
+  );
+}
+
+/**
+ * @param {number|*} value
+ * @returns {number}
+ */
+export function ensureNumber (value) {
+  value = Number(value);
+  if (Number.isNaN(value)) {
+    return 0;
+  }
+  return value;
+}

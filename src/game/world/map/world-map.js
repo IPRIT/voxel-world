@@ -324,6 +324,11 @@ export class WorldMap extends THREE.Group {
       timingFunction: 'easeInQuad'
     });
     tween.start();
+    tween.then(_ => {
+      // webgl doesn't sort transparent objects properly by z depth
+      // so we need turn off this to get rid of unexpected results
+      mapObject.material.transparent = false;
+    });
     this._showingAnimations.push( tween );
 
     this.add( mapObject );

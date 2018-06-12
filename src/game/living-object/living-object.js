@@ -10,6 +10,9 @@ import { FountainEffect } from "../visual-effects/skills/components/gush/fountai
 import { GushEffect } from "../visual-effects/skills/gush";
 import { ParticlesPool } from "../visual-effects/particle";
 import { Tween } from "../utils/tween";
+import { TornadoEffect } from "../visual-effects/skills/components/common/tornado";
+import { WhirlEffect } from "../visual-effects/skills/components/unsorted/whirl";
+import { DamageText } from "./utils/damage-text";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -121,8 +124,6 @@ export class LivingObject extends WorldObjectAnimated {
       this._updateVerticalPosition( deltaTime );
     }
 
-    this._updateLabel();
-
     this._effects && this._effects.forEach( effect => effect.update( deltaTime ) );
 
     super.update( deltaTime );
@@ -149,7 +150,7 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    /*let skills = [ LavaStrikeEffect, GushEffect ];
+    let skills = [ LavaStrikeEffect, GushEffect, TornadoEffect, WhirlEffect ];
 
     const effect = new skills[ Math.floor( Math.random() * skills.length ) % skills.length ]();
     effect.setFrom( this );
@@ -157,9 +158,9 @@ export class LivingObject extends WorldObjectAnimated {
     effect.init();
     effect.start();
 
-    this._effects = (this._effects || []).concat( effect );*/
+    this._effects = (this._effects || []).concat( effect );
 
-    let bucket = ParticlesPool.getPool().take(1);
+    /*let bucket = ParticlesPool.getPool().take(1);
     let particle = bucket.particles[ 0 ];
 
     Game.getInstance().scene.add( particle );
@@ -189,7 +190,7 @@ export class LivingObject extends WorldObjectAnimated {
     tween2.then(_ => {
       let index = this._effects.findIndex(tween => tween.id === tween2.id);
       this._effects.splice( index, 1 );
-    });
+    });*/
 
     this._targetObject = livingObject;
   }
@@ -286,7 +287,10 @@ export class LivingObject extends WorldObjectAnimated {
       textSize: 3,
       textureOptions: {
         fontWeight: 'bold',
-        fontFamily: 'Arial, Helvetica, sans-serif'
+        fontFamily: 'Arial, Helvetica, sans-serif',
+        fontColor: 'rgba(255, 255, 255, .85)',
+        strokeColor: 'rgba(0, 0, 0, .3)',
+        strokeWidth: 2
       },
       materialOptions: {
         color: 0xffffff,
@@ -296,9 +300,21 @@ export class LivingObject extends WorldObjectAnimated {
     options = Object.assign( {}, defaultOptions, options );
 
     this._label = new TextLabel( text, options, this );
-    this._label.setOffsetPosition( new THREE.Vector3(0, this.labelVerticalOffset, 0) );
+    this._label.setOffsetPosition( new THREE.Vector3(0, this.objectHeight * 1.5, 0) );
+    this._label.setVerticalOffset( this.objectHeight * 1.5, this.objectHeight / 2 + 1 );
+    this._label.attachToObject();
 
-    this.add( this._label );
+    // damage text
+    let damageText = new DamageText({
+      damage: Math.floor( Math.random() * 30000 ),
+      isForeign: Math.random() > .5,
+      isCritical: Math.random() > .5,
+      isMiss: Math.random() > .5,
+      isImmunity: Math.random() > .5
+    }, this);
+    damageText.setOffsetPosition( new THREE.Vector3(0, this.objectHeight * 2, 0) );
+    damageText.setVerticalOffset( this.objectHeight * 2, this.objectHeight / 2 + 1 );
+    damageText.attachToObject();
   }
 
   /**
@@ -418,13 +434,6 @@ export class LivingObject extends WorldObjectAnimated {
    */
   get label () {
     return this._label;
-  }
-
-  /**
-   * @returns {number}
-   */
-  get labelVerticalOffset () {
-    return this.objectHeight * 1.5;
   }
 
   /**
@@ -557,36 +566,5 @@ export class LivingObject extends WorldObjectAnimated {
     rotationMatrix.makeRotationAxis( axis, angleSign * angle );
 
     this._rotationMatrix = rotationMatrix;
-  }
-
-  /**
-   * @private
-   */
-  _updateLabel () {
-    let { distanceToCamera } = this._label;
-    if (!distanceToCamera) {
-      return;
-    }
-
-    const minDistance = 50;
-    const maxDistance = 150;
-    const minScale = .01;
-    const maxScale = 8;
-
-    let scaleModifier = 1, verticalOffset = 0;
-    if (distanceToCamera < minDistance) {
-      const maxVerticalOffset = this.objectHeight / 2 + 1;
-      scaleModifier = Math.max(minScale, distanceToCamera / minDistance);
-      verticalOffset = (1 - scaleModifier) * maxVerticalOffset;
-    } else if (distanceToCamera > maxDistance) {
-      scaleModifier = Math.min(maxScale, distanceToCamera / maxDistance);
-    }
-
-    this._label.scaleModifier = scaleModifier;
-    if (verticalOffset) {
-      this._label.setOffsetPosition(
-        new THREE.Vector3( 0, this.labelVerticalOffset - verticalOffset, 0 )
-      );
-    }
   }
 }

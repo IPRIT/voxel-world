@@ -77,9 +77,11 @@ export class TextTexture extends THREE.Texture {
   constructor (options = {}) {
     let {
       autoRedraw = true, text = '',
-      fontStyle = 'normal', fontVariant = 'normal',
-      fontWeight = 'normal', fontSize = 16,
-      fontFamily = 'sans-serif', textAlign = 'center',
+      strokeColor = 'black', strokeWidth = 1,
+      fontStyle = 'normal', fontColor = 'white',
+      fontVariant = 'normal', fontWeight = 'bold',
+      fontSize = 16, fontFamily = 'sans-serif',
+      textAlign = 'center',
       lineHeight = 1.15, padding = 0.25,
       magFilter = THREE.LinearFilter, minFilter = THREE.LinearFilter,
       mapping, wrapS, wrapT, format, type, anisotropy
@@ -93,6 +95,9 @@ export class TextTexture extends THREE.Texture {
     );
     this._text = text;
     this._fontStyle = fontStyle;
+    this._fontColor = fontColor;
+    this._strokeColor = strokeColor;
+    this._strokeWidth = strokeWidth;
     this._fontVariant = fontVariant;
     this._fontWeight = fontWeight;
     this._fontSize = fontSize;
@@ -119,7 +124,9 @@ export class TextTexture extends THREE.Texture {
       context.canvas.height = this.paddingBoxHeightInPixels;
       context.font = this.font;
       context.textBaseline = 'middle';
-      context.fillStyle = 'white';
+      context.fillStyle = this._fontColor;
+      context.lineWidth = this._strokeWidth;
+      context.strokeStyle = this._strokeColor;
 
       let left;
       switch (this.textAlign) {
