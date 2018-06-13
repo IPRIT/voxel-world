@@ -166,7 +166,7 @@ export class World {
    */
   _runDemo () {
     this._players.forEach(player => {
-      this._runDemoForPlayer( player );
+      // this._runDemoForPlayer( player );
     });
 
     this._players.forEach(player => {
