@@ -2,10 +2,7 @@ import { Player } from "../player";
 import { PlayerCamera } from "./player-camera";
 import { PlayerWorldLight } from "./player-world-light";
 import { PlayerControls } from "./player-controls";
-import { TransitionPlayback } from "../../../visual-effects";
-import { Game } from "../../../game";
-import { ParticlesPool } from "../../../visual-effects/particle/particles-pool";
-import { ParticleSystem } from "../../../visual-effects/particle";
+import { DamageQueue } from "../../utils/damage";
 
 export class PlayerMe extends Player {
 
@@ -55,6 +52,9 @@ export class PlayerMe extends Player {
     if (this._light) {
       this._light.update();
     }
+
+    let damageQueue = DamageQueue.getQueue();
+    damageQueue.update( deltaTime );
   }
 
   /**

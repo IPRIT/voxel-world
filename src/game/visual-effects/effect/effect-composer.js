@@ -154,7 +154,9 @@ export class EffectComposer {
    * @returns {boolean}
    */
   get isDone () {
-    return !this._activeEffects.length && !this._queue.length;
+    return !this._activeEffects
+      || !this._queue
+      || !this._activeEffects.length && !this._queue.length;
   }
 
   /**

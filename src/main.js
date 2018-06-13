@@ -7,6 +7,8 @@ export function run () {
   });*/
 
   window.game = Game.getInstance();
-  window.game.init();
-  window.game.start();
+  document.addEventListener('DOMContentLoaded', _ => {
+    window.game.init();
+    window.game.start();
+  });
 }

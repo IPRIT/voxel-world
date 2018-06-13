@@ -1,6 +1,5 @@
-import { TextLabel } from "../../utils/label/text-label";
-import { extendDeep } from "../../utils";
-import { translate } from "../../utils/i18n/translate";
+import { TextLabel } from "../../../utils/label/text-label/index";
+import { translate } from "../../../utils/i18n/translate";
 
 export class DamageText extends TextLabel {
 
@@ -47,15 +46,16 @@ export class DamageText extends TextLabel {
       isImmunity = false
     } = options;
 
-    const fontColor = isForeign ? '#eab929' : '#f90000';
+    const fontColor = isForeign ? '#ffca2d' : '#f90000';
+    const strokeColor = isForeign ? 'rgba(0, 0, 0, .5)' : 'rgba(0, 0, 0, .3)';
 
     let textOptions = {
-      textSize: 3,
+      textSize: 5,
       textureOptions: {
         fontWeight: 'bold',
-        fontFamily: 'Arial, Helvetica, sans-serif',
+        fontFamily: '"Yanone Kaffeesatz", Arial, Helvetica, sans-serif',
         fontColor,
-        strokeColor: 'rgba(0, 0, 0, .6)',
+        strokeColor,
         strokeWidth: 1
       }
     };
@@ -69,12 +69,6 @@ export class DamageText extends TextLabel {
       text = `${translate( 'critical_hit' )} ${damage}`;
     } else {
       text = (Number( damage ) || 0).toFixed(0).toString();
-      extendDeep(textOptions, {
-        textSize: 4,
-        textureOptions: {
-          strokeWidth: 2
-        }
-      });
     }
 
     super( text, textOptions, object3D );

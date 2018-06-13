@@ -6,13 +6,11 @@ import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
 import { LavaStrikeEffect } from "../visual-effects/skills/lava-strike";
-import { FountainEffect } from "../visual-effects/skills/components/gush/fountain";
 import { GushEffect } from "../visual-effects/skills/gush";
-import { ParticlesPool } from "../visual-effects/particle";
-import { Tween } from "../utils/tween";
 import { TornadoEffect } from "../visual-effects/skills/components/common/tornado";
 import { WhirlEffect } from "../visual-effects/skills/components/unsorted/whirl";
-import { DamageText } from "./utils/damage-text";
+import { DamageText } from "./utils/damage/damage-text";
+import { DamageQueue } from "./utils/damage";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -124,7 +122,13 @@ export class LivingObject extends WorldObjectAnimated {
       this._updateVerticalPosition( deltaTime );
     }
 
-    this._effects && this._effects.forEach( effect => effect.update( deltaTime ) );
+    this._effects && this._effects.forEach((effect, index) => {
+      effect.update( deltaTime );
+
+      if (effect.isDone) {
+        this._effects.splice( index, 1 );
+      }
+    });
 
     super.update( deltaTime );
   }
@@ -152,45 +156,31 @@ export class LivingObject extends WorldObjectAnimated {
 
     let skills = [ LavaStrikeEffect, GushEffect, TornadoEffect, WhirlEffect ];
 
+    /**
+     * @type {EffectComposer}
+     */
     const effect = new skills[ Math.floor( Math.random() * skills.length ) % skills.length ]();
     effect.setFrom( this );
     effect.setTo( livingObject );
     effect.init();
     effect.start();
 
+    let damageQueue = DamageQueue.getQueue();
+
+    setTimeout(_ => {
+      damageQueue.add({
+        damage: Math.floor( Math.random() * 100000 ),
+        isForeign: Game.getInstance().world.me.id === livingObject.id,
+        isCritical: Math.random() > .7,
+        isMiss: Math.random() > .8,
+        isImmunity: Math.random() > .9
+      }, livingObject, {
+        verticalOffset: livingObject.objectHeight * 2,
+        maxVerticalOffset: livingObject.objectHeight / 2 + 1,
+      });
+    }, 300);
+
     this._effects = (this._effects || []).concat( effect );
-
-    /*let bucket = ParticlesPool.getPool().take(1);
-    let particle = bucket.particles[ 0 ];
-
-    Game.getInstance().scene.add( particle );
-
-    particle.position.copy( this.position );
-
-    let tween1 = new Tween( particle.position, ['x', 'y'], [ 20, 20 ], {
-      duration: 1000,
-      timingFunction: 'easeInOutQuint'
-    });
-
-    let tween2 = new Tween( particle.position, 'z', 20, {
-      duration: 1000,
-      timingFunction: 'easeInOutCubic'
-    });
-
-    tween1.start();
-    tween2.start();
-
-    this._effects = (this._effects || []).concat( [ tween1, tween2 ] );
-
-    tween1.then(_ => {
-      let index = this._effects.findIndex(tween => tween.id === tween1.id);
-      this._effects.splice( index, 1 );
-    });
-
-    tween2.then(_ => {
-      let index = this._effects.findIndex(tween => tween.id === tween2.id);
-      this._effects.splice( index, 1 );
-    });*/
 
     this._targetObject = livingObject;
   }
@@ -287,7 +277,7 @@ export class LivingObject extends WorldObjectAnimated {
       textSize: 3,
       textureOptions: {
         fontWeight: 'bold',
-        fontFamily: 'Arial, Helvetica, sans-serif',
+        fontFamily: '"Yanone Kaffeesatz", Arial, Helvetica, sans-serif',
         fontColor: 'rgba(255, 255, 255, .85)',
         strokeColor: 'rgba(0, 0, 0, .3)',
         strokeWidth: 2
@@ -303,18 +293,6 @@ export class LivingObject extends WorldObjectAnimated {
     this._label.setOffsetPosition( new THREE.Vector3(0, this.objectHeight * 1.5, 0) );
     this._label.setVerticalOffset( this.objectHeight * 1.5, this.objectHeight / 2 + 1 );
     this._label.attachToObject();
-
-    // damage text
-    let damageText = new DamageText({
-      damage: Math.floor( Math.random() * 30000 ),
-      isForeign: Math.random() > .5,
-      isCritical: Math.random() > .5,
-      isMiss: Math.random() > .5,
-      isImmunity: Math.random() > .5
-    }, this);
-    damageText.setOffsetPosition( new THREE.Vector3(0, this.objectHeight * 2, 0) );
-    damageText.setVerticalOffset( this.objectHeight * 2, this.objectHeight / 2 + 1 );
-    damageText.attachToObject();
   }
 
   /**
