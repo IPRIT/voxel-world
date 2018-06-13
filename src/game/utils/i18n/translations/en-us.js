@@ -1,7 +1,7 @@
 export default {
   'test': 'Hello world',
 
-  'critical_hit': 'CRITICAL',
-  'immunity': 'RESIST',
-  'miss': 'MISS'
+  'critical_hit': 'Critical',
+  'immunity': 'Resist',
+  'miss': 'Miss'
 }
