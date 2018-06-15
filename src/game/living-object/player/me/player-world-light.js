@@ -53,10 +53,10 @@ export class PlayerWorldLight extends THREE.DirectionalLight {
     this.shadow.mapSize.height = 1 << 10;
     */
 
-    this.shadow.mapSize.width = 1 << 12;
-    this.shadow.mapSize.height = 1 << 12;
+    this.shadow.mapSize.width = 1 << 11;
+    this.shadow.mapSize.height = 1 << 11;
 
-    const offset = 300;
+    const offset = 150;
 
     this.shadow.camera.top = offset;
     this.shadow.camera.right = offset;

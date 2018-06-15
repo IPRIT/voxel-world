@@ -179,7 +179,7 @@ export class Tween {
     }
     !error && this._resolve();
     error && this._reject( error );
-    this.dispose();
+    // this.dispose();
   }
 
   /**

@@ -655,6 +655,10 @@ babel-plugin-module-resolver@3.0.0:
     reselect "^3.0.1"
     resolve "^1.4.0"
 
+babel-plugin-rewire@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-rewire/-/babel-plugin-rewire-1.1.0.tgz#a6b966d9d8c06c03d95dcda2eec4e2521519549b"
+
 babel-plugin-syntax-async-functions@^6.8.0:
   version "6.13.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-syntax-async-functions/-/babel-plugin-syntax-async-functions-6.13.0.tgz#cad9cad1191b5ad634bf30ae0872391e0647be95"
@@ -4399,9 +4403,9 @@ parse-json@^2.2.0:
   dependencies:
     error-ex "^1.2.0"
 
-parse-magica-voxel@^1.0.3:
+"parse-magica-voxel@https://github.com/IPRIT/parse-magica-voxel.git":
   version "1.0.3"
-  resolved "https://registry.yarnpkg.com/parse-magica-voxel/-/parse-magica-voxel-1.0.3.tgz#579c2f9d8e61f8008742d0fd1133111b5a242fad"
+  resolved "https://github.com/IPRIT/parse-magica-voxel.git#e004ee068811ebb9647031c637c2120129975df3"
   dependencies:
     buffer "^5.0.2"
     is-buffer "^1.1.4"
@@ -6197,6 +6201,12 @@ vm-browserify@0.0.4:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-0.0.4.tgz#5d7ea45bbef9e4a6ff65f95438e0a87c357d5a73"
   dependencies:
     indexof "0.0.1"
+
+vox-parser@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/vox-parser/-/vox-parser-0.2.2.tgz#f9f75b14ea8585175717e7e99629e8633ed63388"
+  dependencies:
+    babel-plugin-rewire "1.1.0"
 
 vue-hot-reload-api@^2.2.0:
   version "2.3.0"

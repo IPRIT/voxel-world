@@ -1,4 +1,3 @@
-import Promise from 'bluebird';
 import parseMagicaVoxel from "parse-magica-voxel";
 
 /**
@@ -18,20 +17,9 @@ import parseMagicaVoxel from "parse-magica-voxel";
  * @param {string} url
  */
 export function voxLoadAndParse (url) {
-  const req = new XMLHttpRequest();
-  req.open("GET", url, true);
-  req.responseType = 'arraybuffer';
-
-  req.send(null);
-
-  return new Promise((resolve, reject) => {
-    req.onreadystatechange = () => {
-      if (req.readyState === 4 && (req.status === 200 || req.status === 0)) {
-        if (req.response) {
-          resolve( parseMagicaVoxel( req.response ) );
-        }
-      }
-    };
-    req.onerror = event => reject(new Error('Can\'t load vox model'));
-  });
+  return fetch( url )
+    .then(response => response.arrayBuffer())
+    .then(arrayBuffer => {
+      return parseMagicaVoxel( arrayBuffer );
+    });
 }

@@ -1,5 +1,6 @@
 import { TextLabel } from "../../../utils/label/text-label/index";
 import { translate } from "../../../utils/i18n/translate";
+import { ensureNumber } from "../../../utils";
 
 export class DamageText extends TextLabel {
 
@@ -37,7 +38,7 @@ export class DamageText extends TextLabel {
    * @param {*} options
    * @param {THREE.Object3D} object3D
    */
-  constructor (options = {}, object3D = {}) {
+  constructor (options = {}, object3D = null) {
     let {
       damage = 1,
       isForeign = false,
@@ -45,6 +46,8 @@ export class DamageText extends TextLabel {
       isMiss = false,
       isImmunity = false
     } = options;
+
+    damage = ensureNumber( damage ) | 0;
 
     const fontColor = isForeign ? '#ffca2d' : '#f90000';
     const strokeColor = isForeign ? 'rgba(0, 0, 0, .5)' : 'rgba(0, 0, 0, .3)';
@@ -68,7 +71,7 @@ export class DamageText extends TextLabel {
     } else if (isCritical && damage > 0) {
       text = `${translate( 'critical_hit' )} ${damage}`;
     } else {
-      text = (Number( damage ) || 0).toFixed(0).toString();
+      text = damage.toFixed(0);
     }
 
     super( text, textOptions, object3D );

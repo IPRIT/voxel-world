@@ -47,9 +47,9 @@ export class TextLabel extends TextSprite {
   /**
    * @param {string} text
    * @param {*} options
-   * @param {THREE.Object3D} object3D
+   * @param {THREE.Object3D|null} object3D
    */
-  constructor (text = '', options, object3D) {
+  constructor (text = '', options = {}, object3D = null) {
     options.textureOptions.text = text;
     super( options );
     this._object3D = object3D;

@@ -25,11 +25,12 @@ export class Vox {
    * @returns {Promise<VoxModel>}
    */
   load (url) {
-    return VoxLoader.getLoader().load( url ).then(model => {
+    const loader = VoxLoader.getLoader();
+    return loader.load( url ).then(model => {
       this._model = model;
       this._url = url;
       this._loaded = true;
-      
+
       return model;
     });
   }

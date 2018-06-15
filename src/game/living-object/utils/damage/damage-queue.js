@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import { DamageText } from "./damage-text";
 import { Game } from "../../../game";
 import { Tween } from "../../../utils/tween";
@@ -93,7 +94,7 @@ export class DamageQueue {
     const nextElements = ( this._queueProgress | 0 ) - this._queueDoneElements;
     const needToSpawn = Math.min( nextElements, this._queue.length );
     for (let i = 0; i < needToSpawn; ++i) {
-      let animations = this._createAnimation( ...this._queue.shift() );
+      let animations = this._createAnimations( ...this._queue.shift() );
       this._activeAnimations.push( ...[].concat( animations ) );
       animations.forEach( animation => animation.start() );
     }
@@ -104,12 +105,12 @@ export class DamageQueue {
   /**
    * @param {*} damageOptions
    * @param {THREE.Object3D} target
-   * @param {THREE.Vector3} targetPosition
+   * @param {THREE.Vector3} targetPosition - saved position
    * @param {*} options
    * @returns {Tween[]}
    * @private
    */
-  _createAnimation (damageOptions, target, targetPosition, options) {
+  _createAnimations (damageOptions, target, targetPosition, options) {
     let {
       verticalOffset = 0,
       maxVerticalOffset = 0
@@ -134,10 +135,10 @@ export class DamageQueue {
       target.add( fakeTarget );
     }
 
-    let damageText = new DamageText( damageOptions, fakeTarget );
+    let damageText = new DamageText( damageOptions );
     damageText.setOffsetPosition( new THREE.Vector3(0, verticalOffset, 0) );
     damageText.setVerticalOffset( verticalOffset, maxVerticalOffset );
-    damageText.attachToObject();
+    fakeTarget.add( damageText );
 
     damageText.material.transparent = true;
     damageText.material.opacity = .2;
@@ -152,10 +153,14 @@ export class DamageQueue {
       timingFunction: 'linear'
     });
 
-    Promise.all([ opacityAnimation, verticalAnimation ]).then(_ => {
-      setTimeout(_ => {
-        damageText.dispose();
-      }, 300);
+    Promise.all([ opacityAnimation, verticalAnimation ]).delay( 300 ).then(_ => {
+      damageText.dispose();
+      opacityAnimation.dispose();
+      verticalAnimation.dispose();
+
+      if (fakeTarget && fakeTarget.parent) {
+        fakeTarget.parent.remove( fakeTarget );
+      }
     });
 
     return [ verticalAnimation, opacityAnimation ];
