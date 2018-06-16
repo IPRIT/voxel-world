@@ -146,7 +146,8 @@ export class WorldObjectVoxMesher {
       chunkSize: chunk.size,
       bs,
       WorldChunkType: WorldChunkType.getPlainObject(),
-      renderNegY: true
+      renderNegY: true,
+      heightMap: chunk.heightMap.map
     };
 
     if (!workerPool) {

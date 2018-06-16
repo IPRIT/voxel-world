@@ -218,7 +218,6 @@ export class WorldObjectVox extends WorldObjectBase {
    * @private
    */
   _rebuildMaterial () {
-    // this._material = shaderMaterial;
     this._material = new THREE.MeshLambertMaterial({
       vertexColors: THREE.VertexColors,
       wireframe: this.wireframe

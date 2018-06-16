@@ -25,11 +25,12 @@ export class WorldChunkHeightMap {
 
   /**
    * @param {THREE.Vector3} objectSize
+   * @param {Uint32Array} heightMap
    */
-  constructor (objectSize) {
+  constructor (objectSize, heightMap) {
     this._bufferSize = objectSize.x * objectSize.z;
     this._objectSize = objectSize;
-    this._init();
+    this._init( heightMap );
   }
 
   /**
@@ -150,10 +151,15 @@ export class WorldChunkHeightMap {
   }
 
   /**
+   * @param {Uint32Array|null} heightMap
    * @private
    */
-  _init () {
-    this._map = new Uint32Array( this._bufferSize );
+  _init (heightMap = null) {
+    if (heightMap) {
+      this._map = heightMap;
+    } else {
+      this._map = new Uint32Array( this._bufferSize );
+    }
   }
 
   /**

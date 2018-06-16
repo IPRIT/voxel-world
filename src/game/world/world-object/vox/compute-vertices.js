@@ -1,8 +1,11 @@
 import { WorldChunkType } from '../../chunks/world-chunk-type';
+import { WORLD_MAP_CHUNK_HEIGHT, WORLD_MAP_CHUNK_SIZE_POWER } from "../../../settings";
+import { hasBit } from "../../../utils";
 
 export function computeVertices (context) {
   let {
     chunkBlocks,
+    heightMap,
     chunkType,
     chunkSize,
     bs,
@@ -94,13 +97,14 @@ export function computeVertices (context) {
         // Only check / draw bottom if we are an object!
         if (!isMapChunk || renderNegY) {
           if (isMapChunk) {
-            if (y > 1) {
+            let minMaxY = getMinMaxBlock( heightMap, x, z );
+            if (y - 2 < minMaxY) {
+              below = 1;
+            } else {
               if (chunkBlocks[ chunkBlockIndex(x, y - 1, z) ] !== 0) {
                 below = 1;
                 chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x20; // bit 6
               }
-            } else {
-              below = 1;
             }
           } else if (y > 0) {
             if (chunkBlocks[ chunkBlockIndex(x, y - 1, z) ] !== 0) {
@@ -497,4 +501,36 @@ export function computeVertices (context) {
     vertices,
     colors
   };
+}
+
+/**
+ * @param {Uint32Array} map
+ * @param {number} x
+ * @param {number} z
+ * @return {number}
+ */
+function getColumn (map, x, z) {
+  return map[ (x << WORLD_MAP_CHUNK_SIZE_POWER) + z ];
+}
+
+/**
+ * @param {Uint32Array} map
+ * @param {number} x
+ * @param {number} z
+ * @return {number}
+ */
+function getMinMaxBlock (map, x, z) {
+  let column = getColumn( map, x, z );
+  let minMaxY = 0, minY = -1;
+  for (let y = 0; y < WORLD_MAP_CHUNK_HEIGHT; ++y) {
+    if (hasBit( column, y )) {
+      minMaxY = y;
+      if (minY === -1) {
+        minY = y;
+      }
+    } else if (minY >= 0) {
+      break;
+    }
+  }
+  return minMaxY;
 }

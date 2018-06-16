@@ -102,7 +102,7 @@ export class Game {
    * @type {number}
    * @private
    */
-  _far = 400 * WORLD_MAP_BLOCK_SIZE;
+  _far = 500 * WORLD_MAP_BLOCK_SIZE;
 
   /**
    * @type {THREE.Clock}

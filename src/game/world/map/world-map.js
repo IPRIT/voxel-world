@@ -112,7 +112,7 @@ export class WorldMap extends THREE.Group {
       new THREE.Vector3(WORLD_MAP_SIZE - 1, WORLD_MAP_CHUNK_HEIGHT - 1, WORLD_MAP_SIZE - 1)
     ];
 
-    let chunkSize = WORLD_MAP_CHUNK_SIZE_VECTOR.clone();
+    let chunkSize = new THREE.Vector3( ...WORLD_MAP_CHUNK_SIZE_VECTOR );
 
     let viewAreaBox = new THREE.Vector3(
       WORLD_MAP_CHUNK_SIZE * WORLD_MAP_CHUNK_VIEW_DISTANCE,
@@ -157,7 +157,7 @@ export class WorldMap extends THREE.Group {
   getVisibleChunksBoxAt (position) {
     position = new THREE.Vector3(position.x, position.y, position.z);
     let visibleBox = this.getVisibleBoxAt( position );
-    let chunkSize = WORLD_MAP_CHUNK_SIZE_VECTOR.clone();
+    let chunkSize = new THREE.Vector3( ...WORLD_MAP_CHUNK_SIZE_VECTOR );
 
     return {
       from: resetDecimal( visibleBox.from.clone().divide( chunkSize ).setY(0) ),
@@ -181,7 +181,7 @@ export class WorldMap extends THREE.Group {
     }
 
     if (sort) {
-      let chunkSize = WORLD_MAP_CHUNK_SIZE_VECTOR.clone();
+      let chunkSize = new THREE.Vector3( ...WORLD_MAP_CHUNK_SIZE_VECTOR );
       let curChunk = resetDecimal(
         position.clone()
           .divide( chunkSize )

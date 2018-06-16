@@ -295,6 +295,13 @@ export class WorldChunkBase {
   }
 
   /**
+   * @return {WorldChunkHeightMap}
+   */
+  get heightMap () {
+    return this._heightMap;
+  }
+
+  /**
    * @returns {Uint32Array}
    * @private
    */
