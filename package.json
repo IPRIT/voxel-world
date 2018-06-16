@@ -14,6 +14,7 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.dev.config.js --open",
     "dev-external": "cross-env NODE_ENV=development HOST=0.0.0.0 webpack-dev-server --config build/webpack.dev.config.js --open --hot",
     "start": "npm run dev",
+    "rename-chunks": "node ./scripts/chunk-names.js",
     "build": "npm run build:dist && npm run build:es5",
     "build:dev": "cross-env NODE_ENV=production node build/webpack.dev.config.js",
     "build:dist": "rimraf dist && cross-env NODE_ENV=production webpack --config build/config.js --progress --hide-modules",
@@ -86,6 +87,7 @@
     "write-file-webpack-plugin": "^4.3.2"
   },
   "dependencies": {
+    "@xailabs/three-renderer-stats": "^1.0.4",
     "bluebird": "^3.5.1",
     "dat.gui": "^0.7.1",
     "md-svg-vue": "^1.0.6",

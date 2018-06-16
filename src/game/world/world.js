@@ -37,7 +37,7 @@ export class World {
 
     for (let i = 0; i < 10; ++i) {
       let enemy = new PlayerEnemy();
-      let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 300, z: Math.random() * 1000 - 500 });
+      let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 1000, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
       this._players.push( enemy );
 

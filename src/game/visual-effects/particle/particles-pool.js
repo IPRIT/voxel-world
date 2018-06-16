@@ -53,10 +53,11 @@ export class ParticlesPool {
       console.warn('[Warn] Particles Pool already initialized');
     }
     this._pool = [];
-    sourceObject = sourceObject || this._createSourceObject();
 
     for (let i = 0; i < this._poolSize; ++i) {
-      this._pool.push( this._cloneParticle( sourceObject ) );
+      this._pool.push(
+        sourceObject && sourceObject.clone() || this._createSourceObject()
+      );
     }
 
     this._poolReady = true;

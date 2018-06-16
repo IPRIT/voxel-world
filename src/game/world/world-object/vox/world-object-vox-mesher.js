@@ -37,7 +37,7 @@ export class WorldObjectVoxMesher {
 
     this.resetFaces();
     const { vertices, colors } = await this.computeVertices( bs );
-    const geometry = this.createOrUpdateGeometry( vertices, colors );
+    let geometry = this.createOrUpdateGeometry( vertices, colors );
 
     let mesh = worldObject.mesh;
     if (!mesh) {

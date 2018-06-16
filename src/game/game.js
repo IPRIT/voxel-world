@@ -1,4 +1,5 @@
 import 'bluebird';
+import RendererStats from '@xailabs/three-renderer-stats';
 import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./settings";
 import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
@@ -101,7 +102,7 @@ export class Game {
    * @type {number}
    * @private
    */
-  _far = 3000 * WORLD_MAP_BLOCK_SIZE;
+  _far = 400 * WORLD_MAP_BLOCK_SIZE;
 
   /**
    * @type {THREE.Clock}
@@ -162,6 +163,9 @@ export class Game {
    */
   update () {
     this._updateWarper.update( this._clock.getDelta() );
+
+    // update renderer stats
+    this._renderStats.update( this._renderer );
   }
 
   /**
@@ -329,6 +333,12 @@ export class Game {
       stats.end();
       requestAnimationFrame( animate );
     }
+
+    this._renderStats = new RendererStats();
+    this._renderStats.domElement.style.position = 'absolute';
+    this._renderStats.domElement.style.left = '0px';
+    this._renderStats.domElement.style.bottom = '0px';
+    document.body.appendChild( this._renderStats.domElement );
 
     return stats;
   }
