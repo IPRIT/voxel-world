@@ -3,5 +3,7 @@ export default {
 
   'critical_hit': 'Critical',
   'immunity': 'Resist',
-  'miss': 'Miss'
-}
+  'miss': 'Miss',
+
+  'mystic': 'Mystic'
+};

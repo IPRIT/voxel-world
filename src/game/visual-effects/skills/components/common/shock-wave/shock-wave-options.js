@@ -1,6 +1,3 @@
-/**
- * @returns {{particleSystemOptions: {timeScale: number, spawnRate: number, maxParticlesNumber: number, particleOptions: {generateContext: (function(): {x: number, y: number, z: number}), colorRange: *[], isHSLRange: boolean, lifetime: number, velocity: (function(*): *), rotationVelocity: (function(*): THREE.Vector3), positionOffset: (function(*): *), acceleration: (function(*): *), scale: (function(): number)}}}}
- */
 export function optionsFactory () {
 
   // HSL color ranges
@@ -39,20 +36,20 @@ export function optionsFactory () {
         velocity: (context) => {
           return new THREE.Vector3( context.x, 0, context.z )
             .normalize()
-            .multiplyScalar( 100 )
+            .multiplyScalar( 100 );
         },
         rotationVelocity: (context) => {
           return new THREE.Vector3( context.x, context.y, context.z )
-            .multiplyScalar( .2 )
+            .multiplyScalar( .2 );
         },
         positionOffset: (context) => {
           return new THREE.Vector3( context.x, .5, context.z )
-            .multiplyScalar( 1 )
+            .multiplyScalar( 1 );
         },
         acceleration: (context) => {
           return new THREE.Vector3( context.x, 0, context.z )
             .normalize()
-            .multiplyScalar( -1.5 )
+            .multiplyScalar( -1.5 );
         },
         scale: () => {
           return Math.random() * 1.5 + .5;

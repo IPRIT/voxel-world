@@ -8,7 +8,9 @@ function getY(x, z) {
   z -= WORLD_MAP_SIZE / 2;
   x /= WORLD_MAP_SIZE / 5;
   z /= WORLD_MAP_SIZE / 5;
-  return Math.sin(x ** 2 + 0.1 * z ** 2) / (0.1 + Math.sqrt(x ** 2 + 2 * z ** 2) ** 2) + (x ** 2 + 1.9 * z ** 2) * Math.exp(1 - Math.sqrt(x ** 2 + 2 * z ** 2) ** 2) / 4.0 * 80 + 3;
+  return Math.sin( x ** 2 + 0.1 * z ** 2 )
+    / ( 0.1 + Math.sqrt(x ** 2 + 2 * z ** 2) ** 2 )
+    + ( x ** 2 + 1.9 * z ** 2 ) * Math.exp( 1 - Math.sqrt( x ** 2 + 2 * z ** 2 ) ** 2 ) / 4.0 * 80 + 3;
 }
 
 function model(x, z) {
@@ -32,7 +34,7 @@ export class VoxModelLoader extends AbstractModelLoader {
       return {
         cached: true,
         worldObject: object.model
-      }
+      };
     }
     return object;
   }

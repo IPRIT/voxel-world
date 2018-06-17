@@ -114,7 +114,7 @@ export class ParticlesBucket {
       if (particle) {
         particle.material.color.setHex(
           Math.abs( colorTo - colorFrom ) * Math.random() + Math.min( colorFrom, colorTo )
-        )
+        );
       }
     }
   }

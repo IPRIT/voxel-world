@@ -1,0 +1,34 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('loading', 'component') {
+  @extend %layer-flex-row;
+  white-space: nowrap;
+
+  @include element('line') {
+    height: 100%;
+    width: 0;
+    transition: $primary-transition;
+    will-change: width;
+
+    @include theme-property(background-color color, false, false);
+  }
+
+  @include modifier('line') {
+    height: 3px;
+  }
+
+  @include modifier('round-line') {
+    border-radius: $radius-large;
+
+    @include modifies-element('line') {
+      border-radius: $radius-large;
+    }
+  }
+
+  @include modifier('shadow-line') {
+    @include modifies-element('line') {
+      box-shadow: 0 0 7px 0 currentColor;
+    }
+  }
+}

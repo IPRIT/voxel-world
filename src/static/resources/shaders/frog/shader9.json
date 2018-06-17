@@ -1,0 +1,37 @@
+{
+  "id": 2382,
+  "name": "New Composed Shader",
+  "fragment": "#extension GL_OES_standard_derivatives : enable\n\nprecision highp float;\nuniform vec3 color;\nuniform float start;\nuniform float end;\nuniform float alpha;\nvarying vec3 fPosition;\nvarying vec3 fNormal;\nvec4 Glow_Effect1529181521073_1066_main() \n{\n    vec4 Glow_Effect1529181521073_1066_gl_FragColor = vec4(0.0);\n    vec3 normal = normalize(fNormal);\n    vec3 eye = normalize(-fPosition.xyz);\n    float rim = smoothstep(start, end, 1.0 - dot(normal, eye));\n    Glow_Effect1529181521073_1066_gl_FragColor = vec4(clamp(rim, 0.0, 1.0) * alpha * color, 1.0);\n    return Glow_Effect1529181521073_1066_gl_FragColor *= 1.0;\n}\nvoid main() \n{\n    gl_FragColor = Glow_Effect1529181521073_1066_main();}\n",
+  "vertex": "precision highp float;\nuniform mat3 normalMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nattribute vec3 position;\nattribute vec3 normal;\nvarying vec3 fNormal;\nvarying vec3 fPosition;\nvec4 Glow_Effect1529181521073_1066_main() \n{\n    vec4 Glow_Effect1529181521073_1066_gl_Position = vec4(0.0);\n    fNormal = normalize(normalMatrix * normal);\n    vec4 pos = modelViewMatrix * vec4(position, 1.0);\n    fPosition = pos.xyz;\n    Glow_Effect1529181521073_1066_gl_Position = projectionMatrix * pos;\n    return Glow_Effect1529181521073_1066_gl_Position *= 1.0;\n}\nvoid main() \n{\n    gl_Position = Glow_Effect1529181521073_1066_main();}\n",
+  "uniforms": {
+    "color": {
+      "value": {
+        "r": 0.4235294117647059,
+        "g": 0.4745098039215686,
+        "b": 0.7568627450980392
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "start": {
+      "value": "0",
+      "type": "f",
+      "glslType": "float"
+    },
+    "end": {
+      "value": "1",
+      "type": "f",
+      "glslType": "float"
+    },
+    "alpha": {
+      "value": "1",
+      "type": "f",
+      "glslType": "float"
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/2382",
+  "user": {
+    "username": "IPRIT",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}

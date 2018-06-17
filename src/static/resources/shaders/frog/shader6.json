@@ -1,0 +1,46 @@
+{
+  "id": 1345,
+  "name": "interdimensional rift",
+  "fragment": "#define iterations 17\n#define volsteps 3\n#define sparsity 0.5\n#define stepsize 0.2\n#define frequencyVariation 1.3\n#define PI 3.141592653589793238462643383279\n\n#extension GL_OES_standard_derivatives : enable\n\nprecision highp float;\nprecision highp int;\nuniform vec3 color;\nuniform float time;\nuniform float twinkleSpeed;\nuniform float speed;\nuniform float brightness;\nuniform float distfading;\nvarying vec2 vUv;\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvec4 Universe_Nursery1488474583783_31_main(void) \n{\n    vec4 Universe_Nursery1488474583783_31_gl_FragColor = vec4(0.0);\n    vec2 uv = vUv.xy + 0.5;\n    uv.x += time * speed * 0.1;\n    vec3 dir = vec3(uv * 2.0, 1.0);\n    float s = 0.1, fade = 0.01;\n    vec3 starColor = vec3(0.0);\n    for (int r = 0;\n r < volsteps; ++r) \n    {\n        vec3 p = (time * speed * twinkleSpeed) + dir * (s * 0.5);\n        p = abs(vec3(frequencyVariation) - mod(p, vec3(frequencyVariation * 2.0)));\n        float prevlen = 0.0, a = 0.0;\n        for (int i = 0;\n i < iterations; ++i) \n        {\n            p = abs(p);\n            p = p * (1.0 / dot(p, p)) + (-sparsity);\n            float len = length(p);\n            a += abs(len - prevlen);\n            prevlen = len;\n        }\n        a *= a * a;\n        starColor += (vec3(s, s * s, s * s * s) * a * brightness + 1.0) * fade;\n        fade *= distfading;\n        s += stepsize;\n    }\n    starColor = min(starColor, vec3(1.2));\n    float intensity = min(starColor.r + starColor.g + starColor.b, 0.7);\n    vec2 sgn = vec2(vUv.xy) * 2.0 - 1.0;\n    vec2 gradient = vec2(dFdx(intensity) * sgn.x, dFdy(intensity) * sgn.y);\n    float cutoff = max(max(gradient.x, gradient.y) - 0.1, 0.0);\n    starColor *= max(1.0 - cutoff * 6.0, 0.3);\n    Universe_Nursery1488474583783_31_gl_FragColor = vec4(starColor * color, 1.0);\n    return Universe_Nursery1488474583783_31_gl_FragColor *= 1.0;\n}\nvoid main() \n{\n    gl_FragColor = Universe_Nursery1488474583783_31_main();}\n",
+  "vertex": "precision highp float;\nprecision highp int;\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\nvarying vec2 vUv;\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvec4 Universe_Nursery1488474583783_31_main() \n{\n    vec4 Universe_Nursery1488474583783_31_gl_Position = vec4(0.0);\n    vUv = uv;\n    vPosition = position;\n    vNormal = normal;\n    Universe_Nursery1488474583783_31_gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n    return Universe_Nursery1488474583783_31_gl_Position *= 1.0;\n}\nvoid main() \n{\n    gl_Position = Universe_Nursery1488474583783_31_main();}\n",
+  "uniforms": {
+    "time": {
+      "type": "f",
+      "glslType": "float"
+    },
+    "brightness": {
+      "value": "0.018",
+      "type": "f",
+      "glslType": "float"
+    },
+    "distfading": {
+      "value": "0.6",
+      "type": "f",
+      "glslType": "float"
+    },
+    "twinkleSpeed": {
+      "value": "200",
+      "type": "f",
+      "glslType": "float"
+    },
+    "color": {
+      "value": {
+        "r": 0,
+        "g": 0,
+        "b": 1
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "speed": {
+      "value": "0.00021",
+      "type": "f",
+      "glslType": "float"
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/1345",
+  "user": {
+    "username": "Mopnex",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}

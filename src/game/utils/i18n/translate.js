@@ -12,7 +12,7 @@ let targetLanguage = null;
  * @returns {string}
  */
 export function translate (appTextId) {
-  if (!targetLanguage) {
+  if (!targetLanguage && typeof window !== 'undefined') {
     targetLanguage = extractSetupLanguage() || detectLanguage();
     console.log( `[Language Detector] Target language is "${targetLanguage}".` );
   }

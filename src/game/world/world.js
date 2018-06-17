@@ -6,6 +6,7 @@ import { PlayerEnemy } from "../living-object/player/enemy";
 import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
 import { ParticlesPool } from "../visual-effects/particle/particles-pool";
+import { RuntimeShaders } from "../utils/shaders/RuntimeShaders";
 
 export class World {
   /**
@@ -81,6 +82,17 @@ export class World {
     particlesPool.createPool();
 
     console.log(particlesPool);
+
+    const cylGeometry = new THREE.CylinderGeometry( 1600, 1600, 1000, 100, 2, true );
+    const material = new THREE.MeshNormalMaterial({ color: 0x0f00df });
+    material.transparent = true;
+    material.opacity = .5;
+    material.side = THREE.DoubleSide;
+    material.depthWrite = false;
+    const cylinder = new THREE.Mesh( cylGeometry, material );
+    cylinder.position.copy( me.position );
+
+    game.scene.add( cylinder );
   }
 
   update (deltaTime) {

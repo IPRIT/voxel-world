@@ -1,0 +1,31 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('class-name', 'component') {
+  @extend %layer-flex-row;
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+  user-select: none;
+
+  @include element('icon') {
+    width: 20px;
+    height: 20px;
+    background: no-repeat center center/contain;
+
+    .mystic & {
+      background-image: url("/resources/ui/classes/icons/mystic.svg");
+    }
+  }
+
+  @include element('text') {
+    text-transform: capitalize;
+    position: relative;
+    top: 2px;
+    margin-left: 2px;
+
+    .mystic & {
+      color: #9b113d;
+    }
+  }
+}

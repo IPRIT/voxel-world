@@ -10,6 +10,6 @@ export class WorldChunkType {
     return {
       MAP_CHUNK: 0x1,
       OBJECT_CHUNK: 0x2
-    }
+    };
   }
 }

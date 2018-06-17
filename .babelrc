@@ -7,46 +7,38 @@
       ],
       "plugins": [
         "transform-runtime",
-        ["transform-define", "./build/babel-transform-define.js"],
         ["module-resolver", {
           "root": ["./src"],
           "alias": {
             "~components": "components",
-            "~directives": "directives",
-            "~mixins": "mixins",
-            "~styles": "styles",
-            "~util": "util"
+            "~styles": "styles"
           }
         }]
       ]
     },
     "es5": {
       "presets": [
-        ["es2015"],
+        ["es2015",  {"modules": false}],
         ["stage-2"]
       ],
-      "plugins": [
-        "./build/babel-transform-styles-paths.js",
-        ["transform-define", "./build/babel-transform-define.js"]
-      ]
+      "plugins": ["./build/babel-transform-styles-paths.js"]
     },
     "development": {
       "presets": [
-        ["es2015", { "modules": false }],
+        ["es2015",  {"modules": false}],
         ["stage-2"]
       ],
       "plugins": [
-        "add-filehash",
-        ["transform-define", "./build/babel-transform-define.js"]
+        ["transform-class-properties", { "spec": true }]
       ]
     },
     "production": {
       "presets": [
-        ["es2015", { "modules": false }],
+        ["es2015",  {"modules": false}],
         ["stage-2"]
       ],
       "plugins": [
-        ["transform-define", "./build/babel-transform-define.js"]
+        ["transform-class-properties", { "spec": true }]
       ]
     }
   }

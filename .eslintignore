@@ -1,7 +1,4 @@
-﻿﻿build/*.js
-es5/*
-dist/*
-.gitlab/*
-dev/*
-src/styles/*.scss
-src/**/*.js
+﻿.nuxt/*
+*.spec.js
+*.test.js
+node_modules/*

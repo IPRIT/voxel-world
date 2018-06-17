@@ -114,7 +114,7 @@ export class WorldChunkMap extends WorldChunkBase {
       x: WORLD_MAP_CHUNK_SIZE,
       y: WORLD_MAP_CHUNK_HEIGHT,
       z: WORLD_MAP_CHUNK_SIZE
-    }
+    };
   }
 
   /**

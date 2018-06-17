@@ -1,0 +1,70 @@
+{
+  "id": 2113,
+  "name": "Ocean",
+  "fragment": "precision highp float;\nprecision highp int;\nuniform vec3 baseColor;\nuniform float brightness;\nuniform float scale;\nuniform float time;\nuniform mat3 normalMatrix;\nuniform sampler2D image;\nuniform float speed;\nuniform float contrast;\nuniform vec3 color;\nvarying vec2 Star_Swamp_3D_version_1518181399092_348_vUv;\nvarying vec3 Star_Swamp_3D_version_1518181399092_348_vPosition;\nvarying vec3 Star_Swamp_3D_version_1518181399092_348_vNormal;\nfloat field(in vec3 p) \n{\n    float strength = 7. + .03 * log(1.e-6 + fract(sin(time) * 4373.11));\n    float accum = 0.;\n    float prev = 0.;\n    float tw = 0.;\n    for (int i = 0;\n i < 32; ++i) \n    {\n        float mag = dot(p, p);\n        p = abs(p) / mag + vec3(-.51, -.4, -1.3);\n        float w = exp(-float(i) / 7.);\n        accum += w * exp(-strength * pow(abs(mag - prev), 2.3));\n        tw += w;\n        prev = mag;\n    }\n    return max(0., 5. * accum / tw - .2);\n}\nvec3 nrand3(vec2 co) \n{\n    vec3 a = fract(cos(co.x * 8.3e-3 + co.y) * vec3(1.3e5, 4.7e5, 2.9e5));\n    vec3 b = fract(sin(co.x * 0.3e-3 + co.y) * vec3(8.1e5, 1.0e5, 0.1e5));\n    vec3 c = mix(a, b, 0.5);\n    return c;\n}\nvarying float vHeight;\nvarying vec2 Simple_ocean1519313433049_66_vUv;\nvarying vec3 Simple_ocean1519313433049_66_vNormal;\nvec4 Star_Swamp_3D_version_1518181399092_348_main() \n{\n    vec4 Star_Swamp_3D_version_1518181399092_348_gl_FragColor = vec4(0.0);\n    vec3 pos = Star_Swamp_3D_version_1518181399092_348_vPosition / scale;\n    vec3 p = vec3(pos / 4.) + vec3(2., -1.3, -1.);\n    p += 0.18 * vec3(sin(time / 16.), sin(time / 12.), sin(time / 128.));\n    vec3 p2 = vec3(pos / (4. + sin(time * 0.11) * 0.2 + 0.2 + sin(time * 0.15) * 0.3 + 0.4)) + vec3(2., -1.3, -1.);\n    p2 += 0.2 * vec3(sin(time / 16.), sin(time / 12.), sin(time / 128.));\n    vec3 p3 = vec3(pos / (4. + sin(time * 0.14) * 0.23 + 0.23 + sin(time * 0.19) * 0.31 + 0.31)) + vec3(2., -1.3, -1.);\n    p3 += 0.25 * vec3(sin(time / 16.), sin(time / 12.), sin(time / 128.));\n    float t = field(p);\n    float t2 = field(p2);\n    float t3 = field(p3);\n    float v = (1. - exp((abs(pos.x) - 1.) * 6.)) * (1. - exp((abs(pos.y) - 1.) * 6.)) * (1. - exp((abs(pos.z) - 1.) * 6.));\n    vec3 c1 = mix(.9, 1., v) * vec3(1.8 * t * t * t, 1.4 * t * t, t);\n    vec3 c2 = mix(.8, 1., v) * vec3(1.9 * t2 * t2 * t2, 1.8 * t2 * t2, t2);\n    vec3 c3 = mix(.8, 1., v) * vec3(1.4 * t3 * t3 * t3, 1.8 * t3 * t3, t3);\n    c1 *= baseColor;\n    c2 *= baseColor;\n    c3 *= baseColor;\n    Star_Swamp_3D_version_1518181399092_348_gl_FragColor = vec4(brightness * vec3(c1 * 0.7 + c2 * 0.9 + c3 * 0.1), 1.0);\n    return Star_Swamp_3D_version_1518181399092_348_gl_FragColor *= 1.0;\n}\nvec4 Simple_ocean1519313433049_66_main() \n{\n    vec4 Simple_ocean1519313433049_66_gl_FragColor = vec4(0.0);\n    float t = time * speed * 0.01;\n    vec3 color = texture2D(image, Simple_ocean1519313433049_66_vUv + vec2(sin(t), cos(t))).rgb + vHeight * contrast * color;\n    Simple_ocean1519313433049_66_gl_FragColor = vec4(color, 1.0);\n    return Simple_ocean1519313433049_66_gl_FragColor *= 0.0;\n}\nvoid main() \n{\n    gl_FragColor = (Star_Swamp_3D_version_1518181399092_348_main() + Simple_ocean1519313433049_66_main());}\n",
+  "vertex": "precision highp float;\nprecision highp int;\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nuniform float waveWidth;\nuniform float waveHeight;\nuniform float speed;\nuniform float time;\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\nvarying vec2 Star_Swamp_3D_version_1518181399092_348_vUv;\nvarying vec3 Star_Swamp_3D_version_1518181399092_348_vPosition;\nvarying vec3 Star_Swamp_3D_version_1518181399092_348_vNormal;\nvarying vec3 Simple_ocean1519313433049_66_vPosition;\nvarying vec3 Simple_ocean1519313433049_66_vNormal;\nvarying vec2 Simple_ocean1519313433049_66_vUv;\nvarying vec2 vUv2;\nvarying float vHeight;\nvec4 Star_Swamp_3D_version_1518181399092_348_main() \n{\n    vec4 Star_Swamp_3D_version_1518181399092_348_gl_Position = vec4(0.0);\n    Star_Swamp_3D_version_1518181399092_348_vUv = uv;\n    Star_Swamp_3D_version_1518181399092_348_vPosition = position;\n    Star_Swamp_3D_version_1518181399092_348_vNormal = normal;\n    Star_Swamp_3D_version_1518181399092_348_gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n    return Star_Swamp_3D_version_1518181399092_348_gl_Position *= 1.0;\n}\nvec4 Simple_ocean1519313433049_66_main() \n{\n    vec4 Simple_ocean1519313433049_66_gl_Position = vec4(0.0);\n    Simple_ocean1519313433049_66_vNormal = normal;\n    Simple_ocean1519313433049_66_vUv = uv;\n    vec4 v = vec4(position, 1.0);\n    float t = time * speed;\n    v.z += (sin(waveWidth * position.x + t * 1.3) * cos(waveWidth * position.y + t * 0.9) * waveHeight) + (cos(waveWidth * 2.0 * position.x + t * -.3) * sin(waveWidth * 4.0 * position.y + t * 3.9) * (waveHeight / 2.0));\n    vHeight = v.z;\n    Simple_ocean1519313433049_66_gl_Position = projectionMatrix * modelViewMatrix * v;\n    return Simple_ocean1519313433049_66_gl_Position *= 0.0;\n}\nvoid main() \n{\n    gl_Position = Star_Swamp_3D_version_1518181399092_348_main() + Simple_ocean1519313433049_66_main();}\n",
+  "uniforms": {
+    "time": {
+      "type": "f",
+      "glslType": "float"
+    },
+    "baseColor": {
+      "value": {
+        "r": 0,
+        "g": 0.25882352941176473,
+        "b": 0.6901960784313725
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "brightness": {
+      "value": "1.2",
+      "type": "f",
+      "glslType": "float"
+    },
+    "scale": {
+      "value": "3.96323295",
+      "type": "f",
+      "glslType": "float"
+    },
+    "waveWidth": {
+      "value": "4",
+      "type": "f",
+      "glslType": "float"
+    },
+    "waveHeight": {
+      "value": "0.05",
+      "type": "f",
+      "glslType": "float"
+    },
+    "image": {
+      "value": null,
+      "type": "t",
+      "glslType": "sampler2D"
+    },
+    "speed": {
+      "value": "1",
+      "type": "f",
+      "glslType": "float"
+    },
+    "contrast": {
+      "value": "0",
+      "type": "f",
+      "glslType": "float"
+    },
+    "color": {
+      "value": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "type": "c",
+      "glslType": "vec3"
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/2113",
+  "user": {
+    "username": "jwtulp",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}

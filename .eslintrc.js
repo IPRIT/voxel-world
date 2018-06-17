@@ -1,12 +1,11 @@
 module.exports = {
   root: true,
+  parser: 'babel-eslint',
   parserOptions: {
-    parser: 'babel-eslint',
-    ecmaVersion: 2017,
     sourceType: 'module'
   },
   // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
-  extends: 'vue',
+  // extends: 'vue',
   // required to lint *.vue files
   plugins: [
     'vue',
@@ -37,8 +36,7 @@ module.exports = {
     // ensure consistent 2 space indentation and indent cases under switch
     'indent': [2, 2, {'SwitchCase': 1}],
     'object-curly-spacing': [2, 'always'],
-    'max-statements': [2, 24],
-    "semi": [2, "always"],
-    'prefer-promise-reject-errors': 0
+    'max-statements': [2, 300],
+    "semi": [2, "always"]
   }
 };

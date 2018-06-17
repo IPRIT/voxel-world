@@ -105,9 +105,9 @@ function resolvePath (pathTo) {
 async function run () {
   let [
     globalSize = 8,
-    inputPath = '../resources/models/qubicle/input',
-    outputPath = '../resources/models/qubicle/output',
-    finalPath = '../resources/models/chunks'
+    inputPath = '../src/static/resources/models/qubicle/input',
+    outputPath = '../src/static/resources/models/qubicle/output',
+    finalPath = '../src/static/resources/models/chunks'
   ] = process.argv.slice( 2 );
 
   createDirSafely(

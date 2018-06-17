@@ -4,6 +4,7 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./settings";
 import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
 import { UpdateWarper } from "./utils/update-warper";
+import { RuntimeShaders } from "./utils/shaders/RuntimeShaders";
 
 export class Game {
 
@@ -102,7 +103,7 @@ export class Game {
    * @type {number}
    * @private
    */
-  _far = 500 * WORLD_MAP_BLOCK_SIZE;
+  _far = 1000 * WORLD_MAP_BLOCK_SIZE;
 
   /**
    * @type {THREE.Clock}
@@ -129,20 +130,26 @@ export class Game {
   _pauseToken = false;
 
   /**
+   * @type {RuntimeShaders}
+   * @private
+   */
+  _runtimeShaders = null;
+
+  /**
    * Initializing application
    */
   init () {
     this._clock = new THREE.Clock( true );
     this._stats = this._initStats();
 
+    this._runtimeShaders = RuntimeShaders.getManager();
+
     this._initRenderer();
     this._attachToDom();
     this._initScene();
     this._initFog();
     this._attachEventListeners();
-
     this._addWorldLight();
-
     this._initWorld();
 
     this._updateWarper = new UpdateWarper( 60, 1 );
@@ -151,7 +158,7 @@ export class Game {
     });
 
     let gui = new dat.GUI();
-    gui.add(this._updateWarper, 'timeScale', -.1, 5);
+    gui.add(this._updateWarper, 'timeScale', -.5, 5);
 
     document.querySelector('.dg.ac').addEventListener('mousedown', ev => {
       ev.stopPropagation();
@@ -162,7 +169,9 @@ export class Game {
    * Update cycle
    */
   update () {
-    this._updateWarper.update( this._clock.getDelta() );
+    const deltaTime = this._clock.getDelta();
+    this._updateWarper.update( deltaTime );
+    this._runtimeShaders.update( deltaTime );
 
     // update renderer stats
     this._renderStats.update( this._renderer );
@@ -172,7 +181,7 @@ export class Game {
    * Render cycle
    */
   render () {
-    this._renderer.render( this._scene, this._activeCamera );
+    this._renderer.render( this._scene, this.activeCamera );
   }
 
   /**
@@ -223,7 +232,15 @@ export class Game {
    * @param {PerspectiveCamera} camera
    */
   set activeCamera (camera) {
+    this._runtimeShaders.registerCamera( camera );
     this._activeCamera = camera;
+  }
+
+  /**
+   * @return {RuntimeShaders}
+   */
+  get runtimeShaders () {
+    return this._runtimeShaders;
   }
 
   /**
@@ -270,8 +287,10 @@ export class Game {
   _initScene () {
     this._scene = new THREE.Scene();
 
-    this._activeCamera = this._worldCamera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
-    this._worldCamera.position.set( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 50 * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE);
+    this.activeCamera = this._worldCamera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
+    this._worldCamera.position.set(
+      WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 50 * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE
+    );
 
     this._scene.add( this._worldCamera );
   }

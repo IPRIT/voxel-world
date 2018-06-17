@@ -3,5 +3,7 @@ export default {
 
   'critical_hit': 'Крит. уд.',
   'immunity': 'Иммун.',
-  'miss': 'Промах'
-}
+  'miss': 'Промах',
+
+  'mystic': 'Мистик'
+};

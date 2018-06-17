@@ -52,11 +52,11 @@ export const structure = [{
           return new THREE.Vector3( context.x, 0, context.z )
             .normalize()
             .multiplyScalar( 10 )
-            .setY( Math.abs( context.y * 15 ) )
+            .setY( Math.abs( context.y * 15 ) );
         },
         rotationVelocity: (context) => {
           return new THREE.Vector3( context.x, context.y, context.z )
-            .multiplyScalar( .5 )
+            .multiplyScalar( .5 );
         },
       }
     }

@@ -1,3 +1,6 @@
+@import "../settings/index";
+@import "../tools/index";
+
 @import "../settings/variables";
 @import "../settings/colors";
 @import "../tools/classes";
@@ -8,6 +11,9 @@ html {
   -webkit-text-size-adjust: 100%; /* iOS 8+ */
   height: 100%;
   box-sizing: border-box;
+  /* All browsers without overlaying scrollbars */
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 body {
@@ -16,13 +22,14 @@ body {
   min-height: 100%;
   margin: 0;
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto;
   font-style: normal;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -moz-font-feature-settings: "liga" on;
   letter-spacing: 0;
+  min-width: 320px;
 }
 
 html, body {
@@ -60,6 +67,7 @@ a, button, input {
 a {
   color: $link-text;
   text-decoration: none;
+  cursor: pointer;
 
   &:hover {
     text-decoration: underline;

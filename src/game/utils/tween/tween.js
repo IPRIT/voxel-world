@@ -363,6 +363,6 @@ export class Tween {
    */
   _getTimingFunction (functionName) {
     const defaultFunctionName = Tween.DEFAULT_PARAMS.timingFunction;
-    return timingFunctions[ functionName ] || timingFunctions[ defaultFunctionName ]
+    return timingFunctions[ functionName ] || timingFunctions[ defaultFunctionName ];
   }
 }

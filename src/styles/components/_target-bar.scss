@@ -1,0 +1,106 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('target-bar', 'component') {
+  @extend %layer-fixed;
+
+  width: $target-bar-width;
+  height: $target-bar-height;
+  left: 40%;
+  left: calc(50% - #{$target-bar-width / 2});
+  border-top-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  border-top-right-radius: 100px;
+  border-bottom-left-radius: 100px;
+  background-color: white;
+  transform: translate3d(0, -$target-bar-height - 10, 0);
+  transition: transform .2s cubic-bezier(0.4, 0, 0.34, 1.44);
+  will-change: transform;
+
+  @include shadow(5);
+
+  @include modifier('opened') {
+    transform: translate3d(0, 20px, 0);
+    border-top-right-radius: 100px;
+  }
+
+  @include element('inner') {
+    @extend %layer-flex-row;
+  }
+
+  @include element('image-wrap') {
+    width: $target-bar-height;
+    height: $target-bar-height;
+  }
+
+  @include element('image') {
+    $image-margin: 10px;
+    background: no-repeat center center/cover;
+    width: $target-bar-height - $image-margin;
+    height: $target-bar-height - $image-margin;
+    margin: 7px;
+    position: relative;
+    left: -$image-margin;
+    border-radius: 60px;
+    box-shadow: 0 0 0 2px white,
+      0 2px 2px 1px transparentize(black, .7);
+
+    .mystic & {
+      background-image: url("/resources/ui/classes/images/char-test-sq-1.png");
+    }
+  }
+
+  @include element('target-info') {
+    width: 65%;
+    width: calc(100% - 115px);
+    padding: 15px 0;
+  }
+
+  @include element('target-name-row') {
+    @extend %layer-flex-row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @include element('target-name') {
+    font-size: $font-size-headline;
+    font-weight: bold;
+    position: relative;
+    top: 1px;
+  }
+
+  @include element('indicators') {
+    margin-top: 5px;
+  }
+
+  @include element('indicator-bar') {
+    height: 10px;
+    border-radius: 20px;
+    background-color: #ccc;
+
+    &:not(:first-of-type) {
+      margin-top: 6px;
+    }
+
+    @include modifier('health') {
+      background-color: $health-bar-background;
+
+      @include modifies-element('indicator-value') {
+        background-color: $health-bar-foreground;
+      }
+    }
+
+    @include modifier('energy') {
+      background-color: $energy-bar-background;
+
+      @include modifies-element('indicator-value') {
+        background-color: $energy-bar-foreground;
+      }
+    }
+  }
+
+  @include element('indicator-value') {
+    border-radius: 20px;
+    height: 100%;
+  }
+}

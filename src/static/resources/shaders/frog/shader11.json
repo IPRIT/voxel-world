@@ -1,0 +1,63 @@
+{
+  "id": 2383,
+  "name": "New Composed Shader",
+  "fragment": "precision highp float;\nprecision highp int;\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nuniform vec3 cameraPosition;\nuniform float time;\nuniform vec3 color;\nuniform vec2 lpxy;\nuniform float lpz;\nuniform float tmp;\nuniform float sc;\nuniform sampler2D iChannel0;\nuniform samplerCube iChannel1;\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvarying vec2 vUv;\nvarying vec2 vUv2;\nvec2 enlight(vec3 p, vec3 n, vec3 lp) \n{\n    vec3 toLight = normalize(lp - p);\n    float lamb = clamp(dot(n, toLight), 0.0, 1.0);\n    vec3 rd = normalize(p - cameraPosition);\n    vec3 nr = n * dot(n, -rd);\n    vec3 refl = normalize(-rd + (nr + rd) * 2.0);\n    float fresnel = 1.0 - clamp(dot(n, -rd), 0.0, 1.0);\n    float phong = pow(clamp(dot(refl, toLight), 0.0, 1.0), 120.0);\n    phong *= (1.0 + fresnel) * lamb;\n    return vec2(lamb, phong);\n}\nvec4 triplanar1529181652054_1106_main() \n{\n    vec4 triplanar1529181652054_1106_gl_FragColor = vec4(0.0);\n    vec3 lp = vec3(lpxy.x, lpz, lpxy.y);\n    vec3 p = (modelMatrix * vec4(vPosition, 1.0)).xyz;\n    vec3 n = normalize(vec3(modelMatrix * vec4(vNormal, 0.0)));\n    float ns = 1.0;\n    vec3 t = p * sc;\n    vec3 ts = p * 100.0;\n    vec2 tx = vec2(sin(ts.y), sin(ts.z));\n    vec2 ty = vec2(sin(ts.x), sin(ts.z));\n    vec2 tz = vec2(sin(ts.x), sin(ts.y));\n    tx = texture2D(iChannel0, t.yz).rg - 0.5;\n    ty = texture2D(iChannel0, t.xz).rg - 0.5;\n    tz = texture2D(iChannel0, t.xy).rg - 0.5;\n    if (n.x > 0.0) tx = -tx;\n     if (n.y < 0.0) ty = -ty;\n     if (n.z > 0.0) tz = -tz;\n     vec3 nx = normalize(n * ns + tx.x * cross(n, vec3(0, 0, 1)) + tx.y * cross(n, vec3(0, 1, 0)));\n    vec3 ny = normalize(n * ns + ty.x * cross(n, vec3(0, 0, 1)) + ty.y * cross(n, vec3(0, 1, 0)));\n    vec3 nz = normalize(n * ns + tz.x * cross(n, vec3(0, 1, 0)) + tz.y * cross(n, vec3(1, 0, 0)));\n    vec3 w = abs(n);\n    w = vec3(pow(w.x, tmp), pow(w.y, tmp), pow(w.z, tmp));\n    w /= dot(w, vec3(1, 1, 1));\n    n = normalize(nx * w.x + ny * w.y + nz * w.z);\n    vec2 l1 = enlight(p, n, lp) * 0.8;\n    vec2 l2 = enlight(p, n, vec3(lp.z, lp.y, -lp.x)) * 0.6;\n    vec2 l3 = enlight(p, n, -lp) * 0.4;\n    float lamb = l2.x + l1.x + l3.x;\n    float phong = l2.y + l1.y + l3.y;\n    vec3 rd = normalize(p - cameraPosition);\n    vec3 nr = n * dot(n, -rd);\n    vec3 refl = normalize(-rd + (nr + rd) * 2.0);\n    float fresnel = 1.0 - clamp(dot(n, -rd), 0.0, 1.0);\n    vec4 rc = textureCube(iChannel1, refl);\n    triplanar1529181652054_1106_gl_FragColor = vec4(lamb * color + (0.3 + fresnel * 0.5) * rc.rgb * (0.6 + color * 0.3) + phong, 1.0);\n    return triplanar1529181652054_1106_gl_FragColor *= 1.0;\n}\nvoid main() \n{\n    gl_FragColor = triplanar1529181652054_1106_main();}\n",
+  "vertex": "precision highp float;\nprecision highp int;\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nuniform vec3 cameraPosition;\nuniform float time;\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvarying vec2 vUv;\nvarying vec2 vUv2;\nvec4 triplanar1529181652054_1106_main() \n{\n    vec4 triplanar1529181652054_1106_gl_Position = vec4(0.0);\n    vNormal = normal;\n    vUv = uv;\n    vUv2 = uv2;\n    vPosition = position;\n    triplanar1529181652054_1106_gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n    return triplanar1529181652054_1106_gl_Position *= 1.0;\n}\nvoid main() \n{\n    gl_Position = triplanar1529181652054_1106_main();}\n",
+  "uniforms": {
+    "cameraPosition": {
+      "type": "v3",
+      "glslType": "vec3"
+    },
+    "time": {
+      "type": "f",
+      "glslType": "float"
+    },
+    "color": {
+      "value": {
+        "r": 1,
+        "g": 0.1607843137254902,
+        "b": 0.17254901960784313
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "iChannel0": {
+      "value": null,
+      "type": "t",
+      "glslType": "sampler2D"
+    },
+    "lpxy": {
+      "value": {
+        "x": -2.076923076923077,
+        "y": 0.384615384615385
+      },
+      "type": "v2",
+      "glslType": "vec2"
+    },
+    "lpz": {
+      "value": "5",
+      "type": "f",
+      "glslType": "float"
+    },
+    "tmp": {
+      "value": "10.87728957",
+      "type": "f",
+      "glslType": "float"
+    },
+    "sc": {
+      "value": "0.66058232",
+      "type": "f",
+      "glslType": "float"
+    },
+    "iChannel1": {
+      "value": null,
+      "type": "t",
+      "glslType": "samplerCube"
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/2383",
+  "user": {
+    "username": "IPRIT",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}

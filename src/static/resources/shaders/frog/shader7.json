@@ -1,0 +1,64 @@
+{
+  "id": 675,
+  "name": "Universe In A Menu",
+  "fragment": "#extension GL_OES_standard_derivatives : enable\n\nprecision highp float;\nprecision highp int;\nuniform vec3 color1;\nuniform vec3 color2;\nuniform vec3 Inner_Glow1457144739343_76_color;\nuniform float start;\nuniform float end;\nuniform float alpha;\nuniform vec3 Soild_Color1457144789262_118_color;\nvarying vec2 Vertical_2_Color_Graident1457144092727_92_vUv;\nvarying vec3 fPosition;\nvarying vec3 fNormal;\nvarying vec2 Soild_Color1457144789262_118_vUv;\nvec4 Vertical_2_Color_Graident1457144092727_92_main(void) \n{\n    vec4 Vertical_2_Color_Graident1457144092727_92_gl_FragColor = vec4(0.0);\n    vec3 mixCol = mix(color2, color1, Vertical_2_Color_Graident1457144092727_92_vUv.y);\n    Vertical_2_Color_Graident1457144092727_92_gl_FragColor = vec4(mixCol, 1.);\n    return Vertical_2_Color_Graident1457144092727_92_gl_FragColor *= 1.0;\n}\nvec4 Inner_Glow1457144739343_76_main() \n{\n    vec4 Inner_Glow1457144739343_76_gl_FragColor = vec4(0.0);\n    vec3 normal = normalize(fNormal);\n    vec3 eye = normalize(-fPosition.xyz);\n    float rim = 1.0 - smoothstep(start, end, 1.0 - dot(normal, eye));\n    Inner_Glow1457144739343_76_gl_FragColor = vec4(clamp(rim, 0.0, 1.0) * alpha * Inner_Glow1457144739343_76_color, 1.0);\n    return Inner_Glow1457144739343_76_gl_FragColor *= 1.0;\n}\nvec4 Soild_Color1457144789262_118_main(void) \n{\n    vec4 Soild_Color1457144789262_118_gl_FragColor = vec4(0.0);\n    Soild_Color1457144789262_118_gl_FragColor = vec4(Soild_Color1457144789262_118_color, 1.);\n    return Soild_Color1457144789262_118_gl_FragColor *= 0.5;\n}\nvoid main() \n{\n    gl_FragColor = (((Vertical_2_Color_Graident1457144092727_92_main()) * Inner_Glow1457144739343_76_main()) + (Soild_Color1457144789262_118_main() * ( 1.0 - Inner_Glow1457144739343_76_main() )));}\n",
+  "vertex": "precision highp float;\nprecision highp int;\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\nvarying vec2 Vertical_2_Color_Graident1457144092727_92_vUv;\nvarying vec3 fNormal;\nvarying vec3 fPosition;\nvec4 Vertical_2_Color_Graident1457144092727_92_main() \n{\n    vec4 Vertical_2_Color_Graident1457144092727_92_gl_Position = vec4(0.0);\n    Vertical_2_Color_Graident1457144092727_92_vUv = uv;\n    Vertical_2_Color_Graident1457144092727_92_gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n    return Vertical_2_Color_Graident1457144092727_92_gl_Position *= 1.0;\n}\nvec4 Inner_Glow1457144739343_76_main() \n{\n    vec4 Inner_Glow1457144739343_76_gl_Position = vec4(0.0);\n    fNormal = normalize(normalMatrix * normal);\n    vec4 pos = modelViewMatrix * vec4(position, 1.0);\n    fPosition = pos.xyz;\n    Inner_Glow1457144739343_76_gl_Position = projectionMatrix * pos;\n    return Inner_Glow1457144739343_76_gl_Position *= 1.0;\n}\nvec4 Soild_Color1457144789262_118_main() \n{\n    vec4 Soild_Color1457144789262_118_gl_Position = vec4(0.0);\n    Soild_Color1457144789262_118_gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n    return Soild_Color1457144789262_118_gl_Position *= 0.5;\n}\nvoid main() \n{\n    gl_Position = Vertical_2_Color_Graident1457144092727_92_main() + Inner_Glow1457144739343_76_main() + Soild_Color1457144789262_118_main();}\n",
+  "uniforms": {
+    "color1": {
+      "value": {
+        "r": 1,
+        "g": 0.803921568627451,
+        "b": 0.6352941176470588
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "color2": {
+      "value": {
+        "r": 0.7764705882352941,
+        "g": 0.10588235294117647,
+        "b": 0.054901960784313725
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "start": {
+      "value": "0",
+      "type": "f",
+      "glslType": "float"
+    },
+    "end": {
+      "value": "0.94319433",
+      "type": "f",
+      "glslType": "float"
+    },
+    "alpha": {
+      "value": "1",
+      "type": "f",
+      "glslType": "float"
+    },
+    "Inner_Glow1457144739343_76_color": {
+      "value": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "Soild_Color1457144789262_118_color": {
+      "value": {
+        "r": 0.4392156862745098,
+        "g": 0.34509803921568627,
+        "b": 1
+      },
+      "type": "c",
+      "glslType": "vec3"
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/675",
+  "user": {
+    "username": "andrewray",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}

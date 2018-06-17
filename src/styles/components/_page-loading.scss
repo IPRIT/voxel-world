@@ -1,0 +1,23 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('page-loading', 'component') {
+  @extend %layer-absolute-fill;
+  position: fixed;
+  background: transparent;
+  pointer-events: none;
+  text-align: center;
+  z-index: 10000;
+  top: 0;
+
+  .loading {
+    width: 100%;
+    top: 0;
+  }
+
+  @include modifier('reset-line-animation') {
+    .loading__line {
+      transition-duration: 0s !important;
+    }
+  }
+}

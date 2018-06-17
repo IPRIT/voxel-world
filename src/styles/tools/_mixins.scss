@@ -60,8 +60,6 @@
   @include font-style($font-size-display-2, $line-height-display-2, $font-weight-black);
 }
 
-
-
 /**
  * Add custom style to different states of input's placeholder (like :hover or :active etc).
  *
@@ -75,8 +73,8 @@
  */
 @mixin input-placeholder-color($color, $target-pseudo-colors: (), $addStyleContent: true) {
   $pseudos: '::-webkit-input-placeholder', '::input-placeholder',
-    '::placeholder', ':-moz-placeholder', '::-moz-placeholder',
-    ':-ms-input-placeholder', '::-webkit-input-placeholder';
+  '::placeholder', ':-moz-placeholder', '::-moz-placeholder',
+  ':-ms-input-placeholder', '::-webkit-input-placeholder';
 
   @each $pseudo in $pseudos {
     &#{$pseudo} {
@@ -243,8 +241,8 @@
   $shadow-key-umbra-opacity, $shadow-key-penumbra-opacity, $shadow-key-ambient-opacity
 )) {
   $shadow-params: nth($shadow-key-umbra, $z + 1),
-    nth($shadow-key-penumbra, $z + 1),
-    nth($shadow-key-ambient, $z + 1);
+  nth($shadow-key-penumbra, $z + 1),
+  nth($shadow-key-ambient, $z + 1);
   $shadow-colors: ();
   @each $opacity in $shadows-opacity {
     $shadow-colors: append($shadow-colors, transparentize($shadow-color, 1 - $opacity));
@@ -381,4 +379,13 @@
   padding: 0 $indent-medium;
   flex: 0 0 100% * $size / 12;
   max-width: 100% * $size / 12;
+}
+
+@mixin clearfix {
+  &:after {
+    content: '';
+    display: block;
+    width: 100%;
+    clear: both;
+  }
 }

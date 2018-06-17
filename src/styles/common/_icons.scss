@@ -1,0 +1,10 @@
+@import '../tools/mixins';
+@import "../settings/colors";
+
+@include block('icon', 'utility') {
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
+
+  @include theme-property(color fill, false, false);
+}
