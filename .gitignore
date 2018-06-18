@@ -6,3 +6,5 @@ npm-debug.log
 # Nuxt generate
 dist
 .nuxt
+sources/qubicle/output
+src/static/resources/models/chunks

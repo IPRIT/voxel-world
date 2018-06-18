@@ -105,8 +105,8 @@ function resolvePath (pathTo) {
 async function run () {
   let [
     globalSize = 8,
-    inputPath = '../src/static/resources/models/qubicle/input',
-    outputPath = '../src/static/resources/models/qubicle/output',
+    inputPath = '../sources/qubicle/input',
+    outputPath = '../sources/qubicle/output',
     finalPath = '../src/static/resources/models/chunks'
   ] = process.argv.slice( 2 );
 
