@@ -7,6 +7,7 @@ import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
 import { ParticlesPool } from "../visual-effects/particle/particles-pool";
 import { RuntimeShaders } from "../utils/shaders/RuntimeShaders";
+import { LivingObjectType } from "../living-object/info";
 
 export class World {
   /**
@@ -43,13 +44,17 @@ export class World {
       this._players.push( enemy );
 
       enemy.init({
-        classType: PlayerClassType.MYSTIC
+        classType: PlayerClassType.MYSTIC,
+        objectInfo: {
+          id: enemy.id,
+          type: LivingObjectType.PLAYER,
+          name: 'Enemy player ' + enemy.id,
+          maxHealth: 2000 + Math.floor( Math.random() * 1000 ),
+          health: 2000,
+          maxEnergy: 1500 + Math.floor( Math.random() * 1000 ),
+          energy: 1500
+        }
       });
-      enemy.setPlayerData({
-        playerId: enemy.id,
-        playerName: 'Enemy player ' + enemy.id
-      });
-      enemy.createLabel( enemy.playerName );
 
       game.scene.add( enemy );
     }
@@ -60,13 +65,17 @@ export class World {
     me.position.set(coords.x, coords.y, coords.z);
 
     me.init({
-      classType: PlayerClassType.MYSTIC
+      classType: PlayerClassType.MYSTIC,
+      objectInfo: {
+        id: me.id,
+        type: LivingObjectType.PLAYER,
+        name: 'Lorem ipsum\ndolor sit amet',
+        maxHealth: 20000,
+        health: 12245,
+        maxEnergy: 17000,
+        energy: 13003
+      }
     });
-    me.setPlayerData({
-      playerId: me.id,
-      playerName: 'Lorem ipsum\ndolor sit amet' // 'Лисёнок'
-    });
-    me.createLabel( me.playerName );
 
     game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
     game._transformControl.attach( me );
@@ -84,7 +93,7 @@ export class World {
     console.log(particlesPool);
 
     const cylGeometry = new THREE.CylinderGeometry( 1600, 1600, 1000, 100, 2, true );
-    const material = new THREE.MeshNormalMaterial({ color: 0x0f00df });
+    const material = new THREE.MeshNormalMaterial();
     material.transparent = true;
     material.opacity = .5;
     material.side = THREE.DoubleSide;

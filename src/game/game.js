@@ -5,6 +5,7 @@ import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
 import { UpdateWarper } from "./utils/update-warper";
 import { RuntimeShaders } from "./utils/shaders/RuntimeShaders";
+import { AppStore } from "./utils/store/app-store";
 
 export class Game {
 
@@ -137,8 +138,14 @@ export class Game {
 
   /**
    * Initializing application
+   * @param {*} vuexStore
    */
-  init () {
+  init (vuexStore) {
+    const store = AppStore.getStore();
+    store.initStore( vuexStore );
+
+    console.log( store );
+
     this._clock = new THREE.Clock( true );
     this._stats = this._initStats();
 

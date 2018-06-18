@@ -9,7 +9,7 @@
       window.dat = require('dat.gui');
 
       const game = require('../main');
-      game.run();
+      game.run( this.$store );
     }
   };
 </script>

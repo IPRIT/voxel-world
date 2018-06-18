@@ -1,4 +1,5 @@
 <script>
+  import { PlayerClassType } from "../game/living-object/player/player-class-type";
   import { translate } from "../game/utils/i18n";
 
   export default {
@@ -16,7 +17,10 @@
       },
 
       className () {
-        return translate( 'mystic' );
+        let classTypeName = PlayerClassType
+          .resolveClassName( this.classType )
+          .toLowerCase();
+        return translate( classTypeName );
       }
     }
   };

@@ -13,21 +13,13 @@
       RoyalTargetBar: () => import(/* webpackChunkName: "pages/game-page" */ '../components/RoyalTargetBar')
     },
 
-    data: () => ({
-      open: false
-    }),
-
-    mounted () {
-      setTimeout(_ => {
-        this.open = true;
-      }, 5000);
-    }
+    data: () => ({}),
   };
 </script>
 
 <template>
   <div class="game-ui">
-    <royal-target-bar :open="open"></royal-target-bar>
+    <royal-target-bar></royal-target-bar>
   </div>
 </template>
 

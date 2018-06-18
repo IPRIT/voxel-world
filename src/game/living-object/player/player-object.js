@@ -7,6 +7,7 @@ import {
   PLAYER_VELOCITY_SCALAR,
   PLAYER_WORLD_SCALE
 } from "./player-defaults";
+import { LivingObjectType } from "../info";
 
 export class PlayerObject extends LivingObject {
 
@@ -29,7 +30,7 @@ export class PlayerObject extends LivingObject {
   init (options = {}) {
     this._options = options;
 
-    let { classType } = options;
+    let { classType = PlayerClassType.MYSTIC } = options;
     this._classType = classType;
 
     Object.assign(options, {
@@ -39,7 +40,7 @@ export class PlayerObject extends LivingObject {
       objectBlocksHeight: PLAYER_BLOCKS_HEIGHT,
       objectJumpVelocity: PLAYER_JUMP_VELOCITY,
       velocityScalar: PLAYER_VELOCITY_SCALAR,
-      gravity: PLAYER_GRAVITY,
+      gravity: PLAYER_GRAVITY
     });
 
     return super.init( options );

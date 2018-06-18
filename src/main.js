@@ -1,7 +1,7 @@
 import { Game } from "./game";
 
-export function run () {
+export function run (vuexStore) {
   window.game = Game.getInstance();
-  window.game.init();
+  window.game.init( vuexStore );
   window.game.start();
 }

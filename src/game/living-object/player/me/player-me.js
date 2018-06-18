@@ -3,6 +3,7 @@ import { PlayerCamera } from "./player-camera";
 import { PlayerWorldLight } from "./player-world-light";
 import { PlayerControls } from "./player-controls";
 import { DamageQueue } from "../../utils/damage";
+import { AppStore } from "../../../utils/store/app-store";
 
 export class PlayerMe extends Player {
 
@@ -65,7 +66,11 @@ export class PlayerMe extends Player {
       if (this.targetObject && livingObject.id !== this.targetObject.id) {
         this.resetTargetObject();
       }
-      livingObject.select();
+      
+      if (!this.targetObject) {
+        livingObject.select();
+        this.store.dispatch( 'setTarget', livingObject.objectInfo );
+      }
     }
     super.setTargetObject( livingObject );
   }
@@ -73,6 +78,7 @@ export class PlayerMe extends Player {
   resetTargetObject () {
     if (this.targetObject) {
       this.targetObject.deselect();
+      this.store.dispatch( 'resetTarget' );
     }
     super.resetTargetObject();
   }
@@ -88,6 +94,13 @@ export class PlayerMe extends Player {
    */
   get camera () {
     return this._camera;
+  }
+
+  /**
+   * @return {AppStore}
+   */
+  get store () {
+    return AppStore.getStore();
   }
 
   /**

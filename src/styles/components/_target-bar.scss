@@ -67,6 +67,9 @@
     font-weight: bold;
     position: relative;
     top: 1px;
+    max-width: 130px;
+
+    @include overflow-ellipsis;
   }
 
   @include element('indicators') {

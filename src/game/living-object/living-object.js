@@ -11,6 +11,7 @@ import { TornadoEffect } from "../visual-effects/skills/components/common/tornad
 import { WhirlEffect } from "../visual-effects/skills/components/unsorted/whirl";
 import { DamageText } from "./utils/damage/damage-text";
 import { DamageQueue } from "./utils/damage";
+import { LivingObjectInfo } from "./info";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -19,6 +20,12 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _label = null;
+
+  /**
+   * @type {LivingObjectInfo}
+   * @private
+   */
+  _objectInfo = null;
 
   /**
    * @type {THREE.Vector3}
@@ -40,7 +47,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {THREE.Vector3}
    * @private
    */
-  _velocityDirection = new THREE.Vector3(0, 0, 0);
+  _velocityDirection = new THREE.Vector3( 0, 0, 0 );
 
   /**
    * @type {number}
@@ -103,6 +110,7 @@ export class LivingObject extends WorldObjectAnimated {
    */
   init (options = {}) {
     this._initOptions( options );
+    this._createLabel( this._objectInfo.name );
     return super.init( options );
   }
 
@@ -138,12 +146,13 @@ export class LivingObject extends WorldObjectAnimated {
    * @param {boolean} infinite
    */
   setTargetLocation (location, infinite = false) {
-    if (location) {
-      this._targetLocation = new THREE.Vector3( location.x, location.y, location.z );
-      this._targetLocationInfinite = infinite;
-      this._updateVelocityDirection();
-      this.setComingState();
+    if (!location) {
+      return;
     }
+    this._targetLocation = new THREE.Vector3( location.x, location.y, location.z );
+    this._targetLocationInfinite = infinite;
+    this._updateVelocityDirection();
+    this.setComingState();
   }
 
   /**
@@ -269,51 +278,11 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
-   * @param {string} text
-   * @param {*} options
+   * Disposes the object
    */
-  createLabel (text, options = {}) {
-    const defaultOptions = {
-      textSize: 3,
-      textureOptions: {
-        fontWeight: 'bold',
-        fontFamily: '"Yanone Kaffeesatz", Arial, Helvetica, sans-serif',
-        fontColor: 'rgba(255, 255, 255, .85)',
-        strokeColor: 'rgba(0, 0, 0, .3)',
-        strokeWidth: 2
-      },
-      materialOptions: {
-        color: 0xffffff,
-        fog: true
-      },
-    };
-    options = Object.assign( {}, defaultOptions, options );
-
-    this._label = new TextLabel( text, options, this );
-    this._label.setOffsetPosition( new THREE.Vector3(0, this.objectHeight * 1.5, 0) );
-    this._label.setVerticalOffset( this.objectHeight * 1.5, this.objectHeight / 2 + 1 );
-    this._label.attachToObject();
-  }
-
-  /**
-   * Attaches label to object
-   */
-  attachLabel () {
-    this._label && this._label.attachToObject();
-  }
-
-  /**
-   * Detaches label from object
-   */
-  detachLabel () {
-    this._label && this._label.detachFromObject();
-  }
-
-  /**
-   * Destroys label for object
-   */
-  destroyLabel () {
-    this._label && this._label.dispose();
+  dispose () {
+    this._destroyLabel();
+    // todo: add more
   }
 
   /**
@@ -415,6 +384,13 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
+   * @return {LivingObjectInfo}
+   */
+  get objectInfo () {
+    return this._objectInfo;
+  }
+
+  /**
    * @param {object} options
    * @private
    */
@@ -424,7 +400,8 @@ export class LivingObject extends WorldObjectAnimated {
       gravity,
       objectBlocksHeight,
       objectBlocksRadius,
-      objectJumpVelocity
+      objectJumpVelocity,
+      objectInfo
     } = options;
 
     this._velocityScalar = velocityScalar;
@@ -433,6 +410,57 @@ export class LivingObject extends WorldObjectAnimated {
     this._objectJumpVelocity = objectJumpVelocity;
 
     this._gravity.setAcceleration( gravity );
+
+    this._objectInfo = new LivingObjectInfo( objectInfo );
+  }
+
+  /**
+   * @param {string} text
+   * @param {*} options
+   * @private
+   */
+  _createLabel (text, options = {}) {
+    const defaultOptions = {
+      textSize: 3,
+      textureOptions: {
+        fontWeight: 'bold',
+        fontFamily: '"Yanone Kaffeesatz", Arial, Helvetica, sans-serif',
+        fontColor: 'rgba(255, 255, 255, .85)',
+        strokeColor: 'rgba(0, 0, 0, .3)',
+        strokeWidth: 2
+      },
+      materialOptions: {
+        color: 0xffffff,
+        fog: true
+      },
+    };
+    options = Object.assign( {}, defaultOptions, options );
+
+    this._label = new TextLabel( text, options, this );
+    this._label.setOffsetPosition( new THREE.Vector3(0, this.objectHeight * 1.5, 0) );
+    this._label.setVerticalOffset( this.objectHeight * 1.5, this.objectHeight / 2 + 1 );
+    this._label.attachToObject();
+  }
+
+  /**
+   * Attaches label to object
+   */
+  _attachLabel () {
+    this._label && this._label.attachToObject();
+  }
+
+  /**
+   * Detaches label from object
+   */
+  _detachLabel () {
+    this._label && this._label.detachFromObject();
+  }
+
+  /**
+   * Destroys label for object
+   */
+  _destroyLabel () {
+    this._label && this._label.dispose();
   }
 
   /**
