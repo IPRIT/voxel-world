@@ -1,6 +1,6 @@
 {
   "name": "voxel-royal-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Voxel Royal Game Client",
   "author": "Alexander Belov <ipritoflex@yandex.ru>",
   "private": true,
