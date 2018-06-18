@@ -7,4 +7,5 @@ npm-debug.log
 dist
 .nuxt
 sources/qubicle/output
+src/static/sw.js
 src/static/resources/models/chunks
