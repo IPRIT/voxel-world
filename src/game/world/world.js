@@ -2,12 +2,11 @@ import { WorldMap } from "./map/world-map";
 import { PlayerMe } from "../living-object/player/me/player-me";
 import { PlayerClassType } from "../living-object/player/player-class-type";
 import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
-import { PlayerEnemy } from "../living-object/player/enemy";
 import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
 import { ParticlesPool } from "../visual-effects/particle/particles-pool";
-import { RuntimeShaders } from "../utils/shaders/RuntimeShaders";
-import { LivingObjectType } from "../living-object/info";
+import { DeerAnimal } from "../living-object/animal";
+import { PlayerEnemy } from "../living-object/player/enemy";
 
 export class World {
   /**
@@ -23,7 +22,7 @@ export class World {
   _me = null;
 
   /**
-   * @type {Array<Player>}
+   * @type {Array<LivingObject>}
    * @private
    */
   _players = [];
@@ -37,7 +36,26 @@ export class World {
 
     let coords = new THREE.Vector3( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 10, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE );
 
-    for (let i = 0; i < 10; ++i) {
+    for (let i = 0; i < 150; ++i) {
+      let enemy = new DeerAnimal();
+      let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 1000, z: Math.random() * 1000 - 500 });
+      enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
+      this._players.push( enemy );
+
+      enemy.init({
+        objectInfo: {
+          id: enemy.id,
+          maxHealth: 2000 + Math.floor( Math.random() * 1000 ),
+          health: 2000,
+          maxEnergy: 1500 + Math.floor( Math.random() * 1000 ),
+          energy: 1500
+        }
+      });
+
+      game.scene.add( enemy );
+    }
+
+    for (let i = 0; i < 20; ++i) {
       let enemy = new PlayerEnemy();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 1000, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
@@ -47,8 +65,7 @@ export class World {
         classType: PlayerClassType.MYSTIC,
         objectInfo: {
           id: enemy.id,
-          type: LivingObjectType.PLAYER,
-          name: 'Enemy player ' + enemy.id,
+          name: 'Enemy ' + enemy.id,
           maxHealth: 2000 + Math.floor( Math.random() * 1000 ),
           health: 2000,
           maxEnergy: 1500 + Math.floor( Math.random() * 1000 ),
@@ -62,14 +79,13 @@ export class World {
     let me = new PlayerMe();
     this._me = me;
 
-    me.position.set(coords.x, coords.y, coords.z);
+    me.position.set( coords.x, coords.y, coords.z );
 
     me.init({
-      classType: PlayerClassType.MYSTIC,
+      classType: PlayerClassType.DEER,
       objectInfo: {
         id: me.id,
-        type: LivingObjectType.PLAYER,
-        name: 'Lorem ipsum\ndolor sit amet',
+        name: 'Оленина', // 'Lorem ipsum\ndolor sit amet',
         maxHealth: 20000,
         health: 12245,
         maxEnergy: 17000,
@@ -187,7 +203,7 @@ export class World {
    */
   _runDemo () {
     this._players.forEach(player => {
-      // this._runDemoForPlayer( player );
+      this._runDemoForPlayer( player );
     });
 
     this._players.forEach(player => {

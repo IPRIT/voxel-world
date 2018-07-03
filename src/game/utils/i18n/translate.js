@@ -25,6 +25,7 @@ export function translate (appTextId) {
  * @returns {*}
  */
 export function getTranslation (language) {
+  // storage.setItem( STORAGE_KEY, 'ru' );
   const translations = { en, ru };
   return translations[ language ] || en;
 }

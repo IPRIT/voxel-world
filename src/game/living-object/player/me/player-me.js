@@ -33,7 +33,8 @@ export class PlayerMe extends Player {
     this._initCamera();
     this._initLights();
     this._initControls();
-    return super.init(options).then(_ => {
+
+    return super.init( options ).then(_ => {
       this._camera.targetCenter();
     });
   }
@@ -66,7 +67,7 @@ export class PlayerMe extends Player {
       if (this.targetObject && livingObject.id !== this.targetObject.id) {
         this.resetTargetObject();
       }
-      
+
       if (!this.targetObject) {
         livingObject.select();
         this.store.dispatch( 'setTarget', livingObject.objectInfo );
@@ -101,6 +102,13 @@ export class PlayerMe extends Player {
    */
   get store () {
     return AppStore.getStore();
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isMe () {
+    return true;
   }
 
   /**

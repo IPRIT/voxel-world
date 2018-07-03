@@ -46,7 +46,11 @@
       0 2px 2px 1px transparentize(black, .7);
 
     .mystic & {
-      background-image: url("/resources/ui/classes/images/char-test-sq-1.png");
+      background-image: url("/resources/ui/living-objects/thumbnails/player/mystic.png");
+    }
+
+    .deer & {
+      background-image: url("/resources/ui/living-objects/thumbnails/animal/deer.png");
     }
   }
 

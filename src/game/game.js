@@ -1,5 +1,5 @@
 import 'bluebird';
-import RendererStats from '@xailabs/three-renderer-stats';
+import RendererStats from 'three-webgl-stats';
 import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./settings";
 import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
@@ -161,7 +161,7 @@ export class Game {
 
     this._updateWarper = new UpdateWarper( 60, 1 );
     this._updateWarper.onUpdate(deltaTime => {
-      this.world.update( deltaTime );
+      // this.world.update( deltaTime );
     });
 
     let gui = new dat.GUI();
@@ -177,7 +177,8 @@ export class Game {
    */
   update () {
     const deltaTime = this._clock.getDelta();
-    this._updateWarper.update( deltaTime );
+    // this._updateWarper.update( deltaTime );
+    this.world.update( deltaTime );
     this._runtimeShaders.update( deltaTime );
 
     // update renderer stats
@@ -296,7 +297,10 @@ export class Game {
 
     this.activeCamera = this._worldCamera = new THREE.PerspectiveCamera(this._fov, this._aspect, this._near, this._far);
     this._worldCamera.position.set(
-      WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 50 * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE
+      WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 250 * WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE
+    );
+    this._worldCamera.lookAt(
+      WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 0, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE
     );
 
     this._scene.add( this._worldCamera );

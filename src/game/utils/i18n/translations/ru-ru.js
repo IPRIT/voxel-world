@@ -5,5 +5,9 @@ export default {
   'immunity': 'Иммун.',
   'miss': 'Промах',
 
-  'mystic': 'Мистик'
+  'mystic': 'Мистик',
+
+  'player': 'Игроки',
+  'animal': 'Мирные животные',
+  'animal_deer': 'Олень'
 };

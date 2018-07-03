@@ -13,8 +13,18 @@
     height: 20px;
     background: no-repeat center center/contain;
 
+    $icon-path: '/resources/ui/living-objects/icons';
+
     .mystic & {
-      background-image: url("/resources/ui/classes/icons/mystic.svg");
+      background-image: url("#{$icon-path}/mystic.svg");
+    }
+
+    .animal & {
+      background-image: url("#{$icon-path}/animal.png");
+    }
+
+    .offensive_animal & {
+      background-image: url("#{$icon-path}/offensive_animal.svg");
     }
   }
 
@@ -23,9 +33,16 @@
     position: relative;
     top: 2px;
     margin-left: 2px;
+    max-width: 65px;
+
+    @include overflow-ellipsis;
 
     .mystic & {
       color: #9b113d;
+    }
+
+    .animal & {
+      color: #209839;
     }
   }
 }

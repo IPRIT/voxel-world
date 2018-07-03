@@ -1,26 +1,35 @@
 <script>
-  import { PlayerClassType } from "../game/living-object/player/player-class-type";
   import { translate } from "../game/utils/i18n";
 
   export default {
     name: 'royal-class-name',
 
     props: {
-      classType: Number
+      livingObject: Object
     },
 
     computed: {
       classes () {
         return {
-          'class-name': true
+          'class-name': true,
+          [this.displayTypeName]: true
         };
       },
 
-      className () {
-        let classTypeName = PlayerClassType
-          .resolveClassName( this.classType )
-          .toLowerCase();
-        return translate( classTypeName );
+      displayTypeName () {
+        if (!this.livingObject) {
+          return '';
+        }
+
+        if (this.livingObject.isPlayer) {
+          return this.livingObject.className;
+        }
+
+        return this.livingObject.livingObjectTypeName;
+      },
+
+      displayName () {
+        return translate( this.displayTypeName );
       }
     }
   };
@@ -29,7 +38,7 @@
 <template>
   <div :class="classes">
     <div class="class-name__icon"></div>
-    <div class="class-name__text">{{ className }}</div>
+    <div class="class-name__text" :title="displayName">{{ displayName }}</div>
   </div>
 </template>
 

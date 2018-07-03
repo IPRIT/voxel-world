@@ -83,10 +83,6 @@
   version "0.25.5"
   resolved "https://registry.yarnpkg.com/@std/esm/-/esm-0.25.5.tgz#6fc3f7309574bbff7b2593351c44c9848297721c"
 
-"@xailabs/three-renderer-stats@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@xailabs/three-renderer-stats/-/three-renderer-stats-1.0.4.tgz#d5b27bb13e96b99313d936584677a60a9470f783"
-
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -7790,6 +7786,10 @@ text-table@~0.2.0:
 three-orbit-controls@^82.1.0:
   version "82.1.0"
   resolved "https://registry.yarnpkg.com/three-orbit-controls/-/three-orbit-controls-82.1.0.tgz#11a7f33d0a20ecec98f098b37780f6537374fab4"
+
+three-webgl-stats@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/three-webgl-stats/-/three-webgl-stats-1.0.5.tgz#9b4852b9fd9319e9b605d71e9e58cace9618d9b6"
 
 three@^0.91.0:
   version "0.91.0"

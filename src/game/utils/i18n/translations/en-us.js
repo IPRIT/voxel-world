@@ -5,5 +5,7 @@ export default {
   'immunity': 'Resist',
   'miss': 'Miss',
 
-  'mystic': 'Mystic'
+  'mystic': 'Mystic',
+
+  'animal_deer': 'Deer'
 };

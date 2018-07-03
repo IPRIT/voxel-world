@@ -78,6 +78,10 @@ export class WorldObjectSkinned extends WorldObjectBase {
     return [ model ];
   }
 
+  /**
+   * @return {Promise<{cached: boolean, skinnedMesh?: THREE.SkinnedMesh, model?: {geometry: *, material: *}}>}
+   * @private
+   */
   async _loadObjectModel () {
     const { modelName } = this.options;
 

@@ -1,4 +1,4 @@
-import { LivingObjectType } from "./living-object-type";
+import { LivingObjectType } from "../living-object-type";
 
 export class LivingObjectInfo {
 
@@ -12,7 +12,25 @@ export class LivingObjectInfo {
    * @type {number}
    * @private
    */
-  _type = 0;
+  _livingObjectType = 0;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  _livingObjectTypeName;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _classType = 0;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  _className;
 
   /**
    * @type {string}
@@ -50,7 +68,10 @@ export class LivingObjectInfo {
   constructor (objectInfo = {}) {
     let {
       id,
-      type = LivingObjectType.OFFENSIVE_ANIMAL,
+      livingObjectType = LivingObjectType.OFFENSIVE_ANIMAL,
+      livingObjectTypeName,
+      classType = 0,
+      className = '',
       name = 'Unknown name',
       maxHealth = 1,
       health = 1,
@@ -59,7 +80,10 @@ export class LivingObjectInfo {
     } = objectInfo;
 
     this._id = id;
-    this._type = type;
+    this._livingObjectType = livingObjectType;
+    this._livingObjectTypeName = livingObjectTypeName;
+    this._classType = classType;
+    this._className = className;
     this._name = name;
     this._maxHealth = maxHealth;
     this._health = health;
@@ -77,8 +101,50 @@ export class LivingObjectInfo {
   /**
    * @return {number}
    */
-  get type () {
-    return this._type;
+  get livingObjectType () {
+    return this._livingObjectType;
+  }
+
+  /**
+   * @return {string}
+   */
+  get livingObjectTypeName () {
+    return this._livingObjectTypeName;
+  }
+
+  /**
+   * @return {number}
+   */
+  get classType () {
+    return this._classType;
+  }
+
+  /**
+   * @return {string}
+   */
+  get className () {
+    return this._className;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isPlayer () {
+    return this._livingObjectType === LivingObjectType.PLAYER;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isAnimal () {
+    return this._livingObjectType === LivingObjectType.ANIMAL;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isOffensiveAnimal () {
+    return this._livingObjectType === LivingObjectType.OFFENSIVE_ANIMAL;
   }
 
   /**

@@ -25,7 +25,7 @@ export class SkinnedObjectLoader extends SkinnedModelLoader {
    */
   async load (modelName) {
     let fileName = `${modelName}.json`;
-    let pathToFile = `/resources/models/skinned/`;
+    let pathToFile = `/resources/models/skinned/${modelName}/default/`;
     let modelUrl = `${pathToFile}${fileName}`;
 
     return super.load( fileName, modelUrl, 15 );

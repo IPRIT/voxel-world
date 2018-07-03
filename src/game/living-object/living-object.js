@@ -9,9 +9,11 @@ import { LavaStrikeEffect } from "../visual-effects/skills/lava-strike";
 import { GushEffect } from "../visual-effects/skills/gush";
 import { TornadoEffect } from "../visual-effects/skills/components/common/tornado";
 import { WhirlEffect } from "../visual-effects/skills/components/unsorted/whirl";
-import { DamageText } from "./utils/damage/damage-text";
 import { DamageQueue } from "./utils/damage";
+import { LivingObjectType } from "./living-object-type";
 import { LivingObjectInfo } from "./info";
+import { PlayerClassType } from "./player/player-class-type";
+import { AnimalType } from "./animal/animal-type";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -20,12 +22,6 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _label = null;
-
-  /**
-   * @type {LivingObjectInfo}
-   * @private
-   */
-  _objectInfo = null;
 
   /**
    * @type {THREE.Vector3}
@@ -54,6 +50,24 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _velocityScalar = .2;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _livingObjectType;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _classType;
+
+  /**
+   * @type {LivingObjectInfo}
+   * @private
+   */
+  _objectInfo = null;
 
   /**
    * @type {number}
@@ -384,6 +398,70 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
+   * @return {number}
+   */
+  get livingObjectType () {
+    return this._livingObjectType;
+  }
+
+  /**
+   * @return {string}
+   */
+  get livingObjectTypeName () {
+    if (this.isPlayer) {
+      return 'player';
+    } else if (this.isAnimal) {
+      return 'animal';
+    } else if (this.isOffensiveAnimal) {
+      return 'offensive_animal';
+    }
+    return 'unknown';
+  }
+
+  /**
+   * @return {number}
+   */
+  get classType () {
+    return this._classType;
+  }
+
+  /**
+   * @return {string}
+   */
+  get className () {
+    if (this.isPlayer) {
+      return PlayerClassType.resolveClassName( this._classType )
+        .toLowerCase();
+    } else if (this.isAnimal) {
+      return AnimalType.resolveClassName( this._classType )
+        .toLowerCase();
+    } else {
+      return 'unknown_class_type';
+    }
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isPlayer () {
+    return this._livingObjectType === LivingObjectType.PLAYER;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isAnimal () {
+    return this._livingObjectType === LivingObjectType.ANIMAL;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isOffensiveAnimal () {
+    return this._livingObjectType === LivingObjectType.OFFENSIVE_ANIMAL;
+  }
+
+  /**
    * @return {LivingObjectInfo}
    */
   get objectInfo () {
@@ -396,22 +474,36 @@ export class LivingObject extends WorldObjectAnimated {
    */
   _initOptions (options) {
     let {
-      velocityScalar,
-      gravity,
+      classType,
+      livingObjectType,
       objectBlocksHeight,
       objectBlocksRadius,
       objectJumpVelocity,
-      objectInfo
+      objectInfo,
+      velocityScalar,
+      gravity
     } = options;
 
-    this._velocityScalar = velocityScalar;
+    this._classType = classType;
+    this._livingObjectType = livingObjectType;
     this._objectBlocksHeight = objectBlocksHeight;
     this._objectBlocksRadius = objectBlocksRadius;
     this._objectJumpVelocity = objectJumpVelocity;
+    this._velocityScalar = velocityScalar;
+
+    Object.assign(options, {
+      modelName: this.className
+    });
 
     this._gravity.setAcceleration( gravity );
 
-    this._objectInfo = new LivingObjectInfo( objectInfo );
+    this._objectInfo = new LivingObjectInfo({
+      livingObjectType,
+      livingObjectTypeName: this.livingObjectTypeName,
+      classType,
+      className: this.className,
+      ...objectInfo
+    });
   }
 
   /**

@@ -14,11 +14,15 @@
         target: state => state.target
       }),
 
+      className () {
+        return this.target && this.target.className || '';
+      },
+
       classes () {
         return {
           'target-bar': true,
           'target-bar_opened': !!this.target,
-          'mystic': true
+          [this.className]: true
         };
       },
 
@@ -44,14 +48,14 @@
 <template>
   <div :class="classes">
     <div class="target-bar__inner">
-      <div class="target-bar__image-wrap">
+      <div class="target-bar__image-wrap" v-if="target">
         <div class="target-bar__image"></div>
       </div>
-      <div class="target-bar__target-info">
-        <div class="target-bar__target-name-row" v-if="target">
-          <div class="target-bar__target-name">{{ target.name }}</div>
+      <div class="target-bar__target-info" v-if="target">
+        <div class="target-bar__target-name-row">
+          <div class="target-bar__target-name" :title="target.name">{{ target.name }}</div>
           <div class="target-bar__target-class">
-            <royal-class-name :classType="target.type"></royal-class-name>
+            <royal-class-name :livingObject="target"></royal-class-name>
           </div>
         </div>
 

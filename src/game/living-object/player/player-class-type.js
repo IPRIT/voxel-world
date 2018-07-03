@@ -9,14 +9,14 @@ export class PlayerClassType {
   static MYSTIC = 0x1;
   static MYSTIC_NAME = 'MYSTIC';
 
-  static WARRIOR = 0x2;
-  static WARRIOR_NAME = 'WARRIOR';
+  static DEER = 0x2;
+  static DEER_NAME = 'DEER';
 
   static mapping = {
     [PlayerClassType.DEBUG]: PlayerClassType.DEBUG_NAME,
     [PlayerClassType.UNSUPPORTED]: PlayerClassType.UNSUPPORTED_NAME,
     [PlayerClassType.MYSTIC]: PlayerClassType.MYSTIC_NAME,
-    [PlayerClassType.WARRIOR]: PlayerClassType.WARRIOR_NAME,
+    [PlayerClassType.DEER]: PlayerClassType.DEER_NAME,
   };
 
   /**
