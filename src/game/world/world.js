@@ -193,8 +193,8 @@ export class World {
    * @returns {THREE.Mesh[]}
    */
   get playersMeshes () {
-    return (this._players || []).filter(_ => !!_.mesh).map(player => {
-      return player.mesh;
+    return (this._players || []).filter(_ => !!_.captureArea || !!_.mesh).map(player => {
+      return player.captureArea || player.mesh;
     });
   }
 
@@ -203,7 +203,7 @@ export class World {
    */
   _runDemo () {
     this._players.forEach(player => {
-      this._runDemoForPlayer( player );
+      // this._runDemoForPlayer( player );
     });
 
     this._players.forEach(player => {

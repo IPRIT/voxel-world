@@ -3,9 +3,9 @@ import en from './translations/en-us';
 import ru from './translations/ru-ru';
 import { storage } from "../storage";
 
-const availableTranslations = { en, ru };
-
 const STORAGE_KEY = 'settings:language';
+
+const availableTranslations = { en, ru };
 
 let targetLanguage = null;
 
@@ -26,7 +26,7 @@ export function translate (appTextId, params = null) {
     targetLanguage = extractSetupLanguage() || detectLanguage();
     console.log( `[Language Detector] Target language is "${targetLanguage}".` );
   }
-  const dictionary = getTranslation( targetLanguage );
+  const dictionary = getLanguageDictionary( targetLanguage );
   const translation = dictionary[ appTextId ] || appTextId;
 
   if (typeof translation === 'function') {
@@ -40,7 +40,7 @@ export function translate (appTextId, params = null) {
  * @param {string} language
  * @returns {*}
  */
-export function getTranslation (language) {
+export function getLanguageDictionary (language) {
   return availableTranslations[ language ] || en;
 }
 

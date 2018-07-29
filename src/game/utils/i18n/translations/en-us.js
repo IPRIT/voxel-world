@@ -20,6 +20,6 @@ export default {
     return `Reconnecting... (${attempts} attempt${attempts > 1 ? 's' : ''})`;
   },
   'network_latency': ms => {
-    return `Ping: ${ms} ms`;
+    return `Latency: ${ms} ms`;
   },
 };

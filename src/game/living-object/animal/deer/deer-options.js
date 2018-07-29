@@ -3,7 +3,7 @@ import { translate } from "../../../utils/i18n";
 export const options = {
   worldScale: .8,
   objectBlocksRadius: 1,
-  objectBlocksHeight: 7,
+  objectBlocksHeight: 8,
   objectJumpVelocity: 60,
   velocityScalar: .8,
 

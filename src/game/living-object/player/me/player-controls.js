@@ -221,7 +221,7 @@ export class PlayerControls {
     const game = Game.getInstance();
     const map = game.world.map;
 
-    this._clickedAt = this._normalizedCursorPoint( event );
+    this._clickedAt = this._normalizeCursorPoint( event );
 
     // update the picking ray with the camera and mouse position
     this._mapRaycaster.setFromCamera( this._clickedAt, this._me.camera );
@@ -288,7 +288,7 @@ export class PlayerControls {
   _handleHighlight (event) {
     const game = Game.getInstance();
     const map = game.world.map;
-    const mousePoint = this._normalizedCursorPoint( event );
+    const mousePoint = this._normalizeCursorPoint( event );
 
     // update the picking ray with the camera and mouse position
     this._mapRaycaster.setFromCamera( mousePoint, this._me.camera );
@@ -379,7 +379,7 @@ export class PlayerControls {
    * @returns {{x: number, y: number}}
    * @private
    */
-  _normalizedCursorPoint (event) {
+  _normalizeCursorPoint (event) {
     return this._normalizeScreenPoint(
       this._cursorPoint( event )
     );

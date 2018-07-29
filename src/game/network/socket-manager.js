@@ -56,7 +56,7 @@ export class SocketManager extends EventEmitter {
 
     this._attachEventListeners();
 
-    window.manager = this;
+    console.log( this );
 
     return new Promise((resolve, reject) => {
       this._socket.once( 'connect', resolve );

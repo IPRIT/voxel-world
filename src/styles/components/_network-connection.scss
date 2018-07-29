@@ -9,7 +9,7 @@
   z-index: 200;
 
   @include element('inner') {
-    padding: $indent-medium;
+    transform: translate3d(-$indent-medium, -$indent-medium, 0);
     transition: $primary-transition;
   }
 
@@ -18,12 +18,12 @@
     background-color: rgba(255, 161, 193, 0.15);
     border-radius: $radius-medium;
     transition: $primary-transition;
+    max-width: 200px;
   }
 
   @include element('state') {
     @extend %layer-flex-row;
     align-items: center;
-    max-width: 200px;
     font-size: $font-size-caption;
     color: white;
     line-height: 1;
@@ -49,7 +49,7 @@
   @include element('text') {
     font-weight: $font-weight-medium;
     text-transform: uppercase;
-    letter-spacing: .4px;
+    letter-spacing: .5px;
   }
 
   @include modifier('ping') {
@@ -65,7 +65,7 @@
     }
 
     @include modifies-element('inner') {
-      padding: 0;
+      transform: translate3d(0, 0, 0);
     }
 
     @include modifies-element('states') {

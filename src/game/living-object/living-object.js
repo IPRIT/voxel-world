@@ -24,6 +24,12 @@ export class LivingObject extends WorldObjectAnimated {
   _label = null;
 
   /**
+   * @type {THREE.Mesh}
+   * @private
+   */
+  _captureArea = null;
+
+  /**
    * @type {THREE.Vector3}
    */
   _targetLocation = null;
@@ -125,6 +131,7 @@ export class LivingObject extends WorldObjectAnimated {
   init (options = {}) {
     this._initOptions( options );
     this._createLabel( this._objectInfo.name );
+    this._createCaptureArea();
     return super.init( options );
   }
 
@@ -398,6 +405,13 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
+   * @return {THREE.Mesh}
+   */
+  get captureArea () {
+    return this._captureArea;
+  }
+
+  /**
    * @return {number}
    */
   get livingObjectType () {
@@ -536,6 +550,8 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * Attaches label to object
+   *
+   * @private
    */
   _attachLabel () {
     this._label && this._label.attachToObject();
@@ -543,6 +559,8 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * Detaches label from object
+   *
+   * @private
    */
   _detachLabel () {
     this._label && this._label.detachFromObject();
@@ -550,9 +568,25 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * Destroys label for object
+   *
+   * @private
    */
   _destroyLabel () {
     this._label && this._label.dispose();
+  }
+
+  /**
+   * @private
+   */
+  _createCaptureArea () {
+    let geometry = new THREE.BoxBufferGeometry( this.objectHeight / 2, this.objectHeight, this.objectHeight / 2 );
+    let material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+    material.depthWrite = false;
+    let mesh = new THREE.Mesh( geometry, material );
+    mesh.position.y += this.objectHeight / 2;
+    this.add( mesh );
+
+    this._captureArea = mesh;
   }
 
   /**
