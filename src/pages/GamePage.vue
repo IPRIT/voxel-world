@@ -1,4 +1,5 @@
 <script>
+  import RoyalNetworkConnection from "../components/utils/RoyalNetworkConnection";
   export default {
     name: 'game-page',
 
@@ -10,7 +11,8 @@
     components: {
       MdFavoriteBorder: () => import(/* webpackChunkName: "pages/game-page" */ 'md-svg-vue/dist/action/MdFavoriteBorder.vue'),
 
-      RoyalTargetBar: () => import(/* webpackChunkName: "pages/game-page" */ '../components/RoyalTargetBar')
+      RoyalTargetBar: () => import(/* webpackChunkName: "pages/game-page" */ '../components/RoyalTargetBar'),
+      RoyalNetworkConnection: () => import(/* webpackChunkName: "pages/game-page" */ '../components/utils/RoyalNetworkConnection')
     },
 
     data: () => ({}),
@@ -20,6 +22,8 @@
 <template>
   <div class="game-ui">
     <royal-target-bar></royal-target-bar>
+
+    <royal-network-connection></royal-network-connection>
   </div>
 </template>
 

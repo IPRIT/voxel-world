@@ -7,4 +7,14 @@
   background-color: transparent;
 
   @include theme-property(color fill, false, false);
+
+  @include modifier('small') {
+    width: 20px;
+    height: 20px;
+  }
+
+  @include modifier('large') {
+    width: 28px;
+    height: 28px;
+  }
 }

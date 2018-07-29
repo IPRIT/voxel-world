@@ -1,0 +1,84 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('network-connection', 'component') {
+  display: inline-block;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 200;
+
+  @include element('inner') {
+    padding: $indent-medium;
+    transition: $primary-transition;
+  }
+
+  @include element('states') {
+    padding: $indent-small $indent-medium;
+    background-color: rgba(255, 161, 193, 0.15);
+    border-radius: $radius-medium;
+    transition: $primary-transition;
+  }
+
+  @include element('state') {
+    @extend %layer-flex-row;
+    align-items: center;
+    max-width: 200px;
+    font-size: $font-size-caption;
+    color: white;
+    line-height: 1;
+    user-select: none;
+    transition: .1s $primary-transition-function;
+
+    @include overflow-ellipsis;
+
+    .md-icon {
+      margin-right: $indent-small;
+      width: 18px;
+      height: 18px;
+
+      fill: white;
+    }
+
+    span {
+      position: relative;
+      top: 1px;
+    }
+  }
+
+  @include element('text') {
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  @include modifier('ping') {
+    &:hover {
+      #{get-element('text')} {
+        color: white !important;
+      }
+    }
+
+    @include modifies-element('text') {
+      text-transform: none;
+      color: transparentize(white, .3);
+    }
+
+    @include modifies-element('inner') {
+      padding: 0;
+    }
+
+    @include modifies-element('states') {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 0;
+      padding: $indent-xsmall $indent-small;
+      background-color: transparentize(white, .9);
+    }
+
+    @include modifies-element('state') {
+      font-size: $font-size-caption - 1;
+      overflow: visible;
+    }
+  }
+}

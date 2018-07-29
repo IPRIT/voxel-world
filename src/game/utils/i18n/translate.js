@@ -1,23 +1,39 @@
 import { detectLanguage } from "./detect-language";
-import ru from './translations/ru-ru';
 import en from './translations/en-us';
+import ru from './translations/ru-ru';
 import { storage } from "../storage";
+
+const availableTranslations = { en, ru };
 
 const STORAGE_KEY = 'settings:language';
 
 let targetLanguage = null;
 
+// debug
+if (typeof window !== 'undefined') {
+  window.toLang = (lang = 'ru') => {
+    storage.setItem( STORAGE_KEY, lang );
+  };
+}
+
 /**
  * @param {string} appTextId
+ * @param {Object|any} params
  * @returns {string}
  */
-export function translate (appTextId) {
+export function translate (appTextId, params = null) {
   if (!targetLanguage && typeof window !== 'undefined') {
     targetLanguage = extractSetupLanguage() || detectLanguage();
     console.log( `[Language Detector] Target language is "${targetLanguage}".` );
   }
-  let translation = getTranslation( targetLanguage );
-  return translation[ appTextId ] || appTextId;
+  const dictionary = getTranslation( targetLanguage );
+  const translation = dictionary[ appTextId ] || appTextId;
+
+  if (typeof translation === 'function') {
+    return translation( params );
+  }
+
+  return translation;
 }
 
 /**
@@ -25,9 +41,7 @@ export function translate (appTextId) {
  * @returns {*}
  */
 export function getTranslation (language) {
-  // storage.setItem( STORAGE_KEY, 'ru' );
-  const translations = { en, ru };
-  return translations[ language ] || en;
+  return availableTranslations[ language ] || en;
 }
 
 /**

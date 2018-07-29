@@ -6,6 +6,7 @@ import { World } from "./world";
 import { UpdateWarper } from "./utils/update-warper";
 import { RuntimeShaders } from "./utils/shaders/RuntimeShaders";
 import { AppStore } from "./utils/store/app-store";
+import { SocketManager } from "./network";
 
 export class Game {
 
@@ -164,8 +165,16 @@ export class Game {
       // this.world.update( deltaTime );
     });
 
+    const socketManager = SocketManager.getManager();
     let gui = new dat.GUI();
-    gui.add(this._updateWarper, 'timeScale', -.5, 5);
+    let common = gui.addFolder('Common');
+    common.add(this._updateWarper, 'timeScale', -.5, 5);
+
+    let socketFolder = gui.addFolder('Network');
+    socketManager.on('connecting', _ => {
+      socketFolder.add(socketManager.socket, 'connect');
+      socketFolder.add(socketManager, 'disconnect');
+    });
 
     document.querySelector('.dg.ac').addEventListener('mousedown', ev => {
       ev.stopPropagation();

@@ -40,7 +40,7 @@
   &-enter,
   &-leave-to {
     opacity: 0;
-    transform: translateY(-15px);
+    transform: translateY(-5px);
   }
 }
 
@@ -53,7 +53,7 @@
   &-enter,
   &-leave-to {
     opacity: 0;
-    transform: translateY(15px);
+    transform: translateY(5px);
   }
 }
 
@@ -66,7 +66,7 @@
   &-enter,
   &-leave-to {
     opacity: 0;
-    transform: translateX(-15px);
+    transform: translateX(-5px);
   }
 }
 
@@ -79,7 +79,7 @@
   &-enter,
   &-leave-to {
     opacity: 0;
-    transform: translateX(15px);
+    transform: translateX(5px);
   }
 }
 
