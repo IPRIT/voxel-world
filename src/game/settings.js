@@ -1,6 +1,4 @@
 /* Chunks */
-import { PLAYER_GRAVITY } from "./living-object/player/player-defaults";
-
 export const WORLD_MAP_CHUNK_SIZE_POWER = 6;
 export const WORLD_MAP_CHUNK_HEIGHT_POWER = 5; // can't be greater than 5 due to UInt32Array limitations
 

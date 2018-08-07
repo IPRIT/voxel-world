@@ -25,6 +25,7 @@
     },
 
     data: () => ({
+      nonreactive: new Map(),
       connectState: connectionStates.DISCONNECTED,
       reconnectingAttempts: 0,
 
@@ -33,6 +34,7 @@
       transition: 'slide-y-transition',
 
       latency: 5,
+      avgLatenciesNumber: 5,
 
       connectionStates
     }),
@@ -70,6 +72,20 @@
         this.connectState = connectionStates.DISCONNECTED;
         this.reconnectingAttempts = 0;
         this.latency = 0;
+      },
+
+      updateLatency (ms) {
+        if (!this.nonreactive.has( 'lastLatencies' )) {
+          this.nonreactive.set( 'lastLatencies', [] );
+        }
+        const lastLatencies = this.nonreactive.get( 'lastLatencies' );
+        lastLatencies.push( ms );
+        if (lastLatencies.length > this.avgLatenciesNumber) {
+          lastLatencies.splice( 0, lastLatencies.length - this.avgLatenciesNumber );
+        }
+        this.latency = Math.ceil(
+          lastLatencies.reduce((sum, value) => sum + value, 0) / lastLatencies.length
+        );
       }
     },
 
@@ -120,7 +136,7 @@
       io.on('connecting', _ => this.onConnecting());
       io.on('reconnecting', attempts => this.onReconnectAttempt( attempts ));
 
-      io.on('pong', ms => this.latency = ms);
+      io.on('pong', ms => this.updateLatency( ms ));
     }
   };
 </script>
