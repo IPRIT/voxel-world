@@ -1,12 +1,13 @@
 <script>
   import { translate } from "../game/utils/i18n";
+  import RoyalGoogleButton from "./RoyalGoogleButton";
 
   export default {
     name: 'royal-start-menu',
-
+    components: { RoyalGoogleButton },
     computed: {
       quickPlayText () {
-        return translate( 'resource_loading' );
+        return translate( 'quick_play' );
       }
     }
   };
@@ -20,6 +21,8 @@
     <hr>
     <div>
       <nuxt-link :to="{ name: 'play' }">{{ quickPlayText }}</nuxt-link>
+
+      <RoyalGoogleButton/>
     </div>
   </div>
 </template>

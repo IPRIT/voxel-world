@@ -1,5 +1,5 @@
-const path = require('path');
 const fs = require('fs');
+const { config } = require('./config');
 
 const isProduction = process.env.NODE_ENV === 'production' || false;
 const isDevelopment = process.env.NODE_ENV === 'development' || false;
@@ -81,7 +81,9 @@ module.exports = {
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'The Most Delightful Battle Royal in your browser' },
-      { hid: 'keywords', name: 'keywords', content: 'voxel,royal battle,browser,королевская битва,браузер,minecraft online,mmo games' }
+      { hid: 'keywords', name: 'keywords', content: 'voxel,royal battle,browser,королевская битва,браузер,minecraft online,mmo games' },
+      { name: 'google-signin-scope', content: 'profile email' },
+      { name: 'google-signin-client_id', content: config.google.clientId }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

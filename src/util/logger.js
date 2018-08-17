@@ -1,7 +1,7 @@
 /**
  * @param {string} ns
  */
-export function consoleLogNamespaced (ns = 'global') {
+export function consoleWrap (ns = 'global') {
   const themes = {
     log: {
       primaryPanel: ['#ff5644', '#db00af'],

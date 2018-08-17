@@ -23,5 +23,6 @@ export default {
     return `Latency: ${ms} ms`;
   },
 
+  'quick_play': 'Quick play',
   'resource_loading': 'Loading...'
 };

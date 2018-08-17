@@ -1,6 +1,6 @@
-import { consoleLogNamespaced } from "../util/logger";
+import { consoleWrap } from "../util/logger";
 
-const logger = consoleLogNamespaced('Axios');
+const logger = consoleWrap('Axios');
 
 export default function ({ $axios, req }) {
   $axios.onRequest( onRequest );

@@ -23,5 +23,6 @@ export default {
     return `Пинг: ${ms} мс`;
   },
 
+  'quick_play': 'Быстрая игра',
   'resource_loading': 'Идет загрузка...'
 };
