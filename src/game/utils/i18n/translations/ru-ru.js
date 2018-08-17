@@ -22,4 +22,6 @@ export default {
   'network_latency': ms => {
     return `Пинг: ${ms} мс`;
   },
+
+  'resource_loading': 'Идет загрузка...'
 };

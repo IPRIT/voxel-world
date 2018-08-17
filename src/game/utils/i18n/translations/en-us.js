@@ -22,4 +22,6 @@ export default {
   'network_latency': ms => {
     return `Latency: ${ms} ms`;
   },
+
+  'resource_loading': 'Loading...'
 };

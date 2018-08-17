@@ -1,0 +1,11 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('start-menu', 'component') {
+  text-align: center;
+  font-size: $font-size-display-1;
+
+  > div {
+    padding: $indent-medium;
+  }
+}

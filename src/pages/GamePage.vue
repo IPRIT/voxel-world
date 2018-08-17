@@ -1,32 +1,38 @@
 <script>
-  import RoyalNetworkConnection from "../components/utils/RoyalNetworkConnection";
+  import RoyalGameLoading from '../components/RoyalGameLoading';
+
+  const RoyalGame = () => ({
+    // The component to load (should be a Promise)
+    component: import(/* webpackChunkName: "components/royal-game" */ '../components/RoyalGame'),
+    // A component to use while the async component is loading
+    loading: RoyalGameLoading,
+    // Delay before showing the loading component. Default: 200ms.
+    delay: 0,
+    // The error component will be displayed if a timeout is
+    // provided and exceeded. Default: Infinity.
+    timeout: 100000
+  });
+
   export default {
     name: 'game-page',
+
+    components: {
+      RoyalGame
+    },
 
     transition: {
       name: 'page',
       mode: 'out-in'
-    },
-
-    components: {
-      MdFavoriteBorder: () => import(/* webpackChunkName: "pages/game-page" */ 'md-svg-vue/dist/action/MdFavoriteBorder.vue'),
-
-      RoyalTargetBar: () => import(/* webpackChunkName: "pages/game-page" */ '../components/RoyalTargetBar'),
-      RoyalNetworkConnection: () => import(/* webpackChunkName: "pages/game-page" */ '../components/utils/RoyalNetworkConnection')
-    },
-
-    data: () => ({}),
+    }
   };
 </script>
 
 <template>
-  <div class="game-ui">
-    <royal-target-bar></royal-target-bar>
-
-    <royal-network-connection></royal-network-connection>
+  <div class="game-page">
+    <royal-game></royal-game>
   </div>
 </template>
 
 <style lang="scss">
-  @import "../styles/components/pages/game-ui";
+  @import "../styles/components/pages/game";
 </style>

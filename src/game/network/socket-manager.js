@@ -36,9 +36,10 @@ export class SocketManager extends EventEmitter {
   /**
    * @param {string} url
    * @param {Object} query
+   * @param {*} options
    * @return {Promise<any>}
    */
-  connect (url = '/', query = {}) {
+  connect (url = '/', query = {}, options = {}) {
     if (this._socket) {
       return Promise.reject( '[ws] Socket.io already connected' );
     }
@@ -48,7 +49,8 @@ export class SocketManager extends EventEmitter {
       transports: [ 'websocket' ],
       reconnectionDelay: 100,
       reconnectionDelayMax: 200,
-      timeout: 5000
+      timeout: 5000,
+      ...options
     });
 
     this.emit( 'connecting', url );
@@ -71,6 +73,7 @@ export class SocketManager extends EventEmitter {
    */
   disconnect () {
     this._socket.disconnect();
+    this._socket = null;
   }
 
   /**

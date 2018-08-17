@@ -1,0 +1,5 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('game-ui', 'component') {
+}

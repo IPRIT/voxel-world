@@ -1,0 +1,13 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('game-loading', 'component') {
+  height: 100%;
+  height: 100vh;
+  width: 100%;
+
+  @extend %layer-flex-row;
+  justify-content: center;
+  align-items: center;
+  font-size: $font-size-heading;
+}
