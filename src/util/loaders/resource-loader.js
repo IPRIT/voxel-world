@@ -3,7 +3,7 @@ import { DownloadOperation } from "./download-operation";
 export class ResourceLoader extends DownloadOperation {
 
   /**
-   * Loads script and run it
+   * Load & run script by resource url
    *
    * @param {string} resourceUrl
    * @return {Promise<any>}
