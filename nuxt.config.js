@@ -87,7 +87,7 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: 'stylesheet', type: 'text/css', href: 'https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:300,400,700&amp;subset=cyrillic' }
+      { rel: 'stylesheet', type: 'text/css', href: 'https://fonts.googleapis.com/css?family=Comfortaa:300,400,700|Yanone+Kaffeesatz:300,400,700&amp;subset=cyrillic' }
     ]
   },
   /*

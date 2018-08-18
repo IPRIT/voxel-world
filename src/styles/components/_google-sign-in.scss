@@ -1,0 +1,148 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('google-sign-in', 'component') {
+  $button-height: 40px;
+
+  @extend %layer-flex-row;
+  font-family: $font-family-ui;
+  position: relative;
+
+  @include element('button') {
+    @extend %layer-flex-row;
+    align-items: stretch;
+
+    height: $button-height;
+    margin: 0;
+    padding: 0 $indent-small;
+    overflow: hidden;
+    position: relative;
+
+    box-sizing: border-box;
+    user-select: none;
+    outline: none;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparentize(black, 1);
+
+    text-align: center;
+    font-size: $font-size-body;
+    font-weight: 700;
+    line-height: $button-height;
+
+    transition: transform .1s ease-out, color .15s linear;
+    background-color: #fff;
+    border: 0;
+    border-radius: 4px;
+    transform: scale(1);
+    box-shadow: 0 4px 6px 0 transparentize(black, .95),
+    0 1px 0 1px transparentize(black, .95),
+    0 0 0 1px transparentize(black, .95);
+
+    &:before {
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      content: '';
+    }
+
+    &:hover {
+      box-shadow: 0 2px 7px 0 rgba(22,56,99,.2),
+      0 1px 0 1px rgba(0,0,0,.05),
+      0 0 0 1px rgba(0,0,0,.05);
+    }
+
+    &:active {
+      transition: none;
+      transform: scale(0.96);
+    }
+
+    @include modifier('reset-auth') {
+      margin-left: $indent-small;
+      border-radius: 50%;
+      min-width: $button-height;
+    }
+  }
+
+  @include element('button-text') {
+    max-width: calc(100% - 28px);
+    margin-left: $indent-small;
+    margin-right: $indent-xsmall;
+    transition: all .1s ease-out;
+
+    > span {
+      display: block;
+      max-width: 100%;
+      @include overflow-ellipsis;
+    }
+
+    @include modifier('hidden') {
+      opacity: 0;
+    }
+  }
+
+  @include element('button-overlay') {
+    @extend %layer-absolute-fill;
+    @extend %layer-flex-column;
+    top: 1px;
+    justify-content: center;
+    text-align: right;
+    padding-left: $button-height;
+    white-space: normal;
+    line-height: 1;
+  }
+
+  @include element('button-overlay-text') {
+    @extend %layer-flex-column;
+    justify-content: center;
+    height: 100%;
+    background-color: white;
+    padding-right: $indent-small;
+  }
+
+  @include element('button-icon') {
+    @extend %layer-flex-column;
+    justify-content: center;
+  }
+
+  @include element('button-icon-img') {
+    max-width: $button-height - $indent-medium;
+  }
+
+  @include modifier('no-reset') {
+    transition: all .1s ease-out;
+
+    @include modifies-element-modifier('button', 'reset-auth') {
+      transition: all .1s ease-out,
+        border-radius .1s ease-out,
+        box-shadow .1s ease-out .1s,
+        left .1s ease-out .1s,
+        margin-left .1s ease-out .1s,
+        min-width .3s ease-in-out .2s,
+        width .3s ease-in-out .2s,
+        opacity .2s ease-out .3s;
+      margin-left: 0 !important;
+      border-radius: 4px !important;
+      border-bottom-left-radius: 0 !important;
+      border-top-left-radius: 0 !important;
+      position: relative;
+      left: -2px;
+      box-shadow: 3px 4px 7px 0 rgba(0,0,0,.05), 1px 1px 0 1px rgba(0,0,0,.05), 1px 0 0 1px rgba(0,0,0,.05);
+      width: 0;
+      min-width: 0;
+      padding: 0;
+      opacity: 0;
+
+      .md-icon {
+        transition: all .1s ease-out;
+        opacity: 0;
+        margin-left: $indent-small;
+      }
+    }
+  }
+}

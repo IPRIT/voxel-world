@@ -22,7 +22,9 @@
     <div>
       <nuxt-link :to="{ name: 'play' }">{{ quickPlayText }}</nuxt-link>
 
-      <RoyalGoogleButton/>
+      <div style="margin: 32px auto; max-width: 500px;">
+        <RoyalGoogleButton/>
+      </div>
     </div>
   </div>
 </template>
