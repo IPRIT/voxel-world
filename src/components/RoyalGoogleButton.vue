@@ -4,6 +4,8 @@
   import { GoogleManager } from "../util/auth/google-manager";
   import { config } from '../config';
   import { nonreactiveMapGetter } from "../util/vue-utils";
+  import { authenticate } from "../api";
+  import { translate } from "../game/utils/i18n";
 
   const nonreactive = new Map([
     [ 'authInstance', false ]
@@ -18,14 +20,20 @@
 
     data: () => ({
       nonreactive,
+
+      isPlatformLoaded: false,
+      isAuthenticating: false,
       isSignedIn: false,
+
       googleUser: null,
+      googleToken: null,
+      googleBasicProfile: null,
 
       resetHover: false,
       resetHoverDelay: null,
       resetHoverDelayMs: 200,
 
-      test: false
+      autoLoginAfterPlatformLoaded: false
     }),
 
     mounted () {
@@ -40,44 +48,67 @@
             client_id: config.google.clientId,
             scope: 'profile email'
           });
-        }).then(auth => {
+        }).then(auth2 => {
           // Listen for sign-in state changes.
-          auth.isSignedIn.listen( this.signInChanged.bind( this ) );
+          auth2.isSignedIn.listen( this.onSignInChanged.bind( this ) );
 
           // Listen for changes to current user.
-          auth.currentUser.listen( this.userChanged.bind( this ) );
+          auth2.currentUser.listen( this.onGoogleUserChanged.bind( this ) );
 
           // Sign in the user if they are currently signed in.
-          /*if (auth.isSignedIn.get() == true) {
-            auth.signIn();
-          }*/
+          if (auth2.isSignedIn.get() == true) {
+            this.onGoogleUserChanged( auth2.currentUser.get(), false );
+            this.isSignedIn = true;
+          }
 
-          this.authInstance = auth;
+          this.authInstance = auth2;
+          this.isPlatformLoaded = true;
+
+          if (this.autoLoginAfterPlatformLoaded
+            && this.canAuthenticate) {
+            this.authenticate();
+          }
         });
       },
 
-      signInChanged (isSignedIn) {
-        console.log( 'isSignedIn', isSignedIn );
+      onSignInChanged (isSignedIn) {
         this.isSignedIn = isSignedIn;
       },
 
-      userChanged (user) {
-        console.log( 'user', user );
+      onGoogleUserChanged (user, withAuthenticate = true) {
+        const auth = user.getAuthResponse();
+        const isAuthEmpty = !Object.keys(auth || {}).length;
 
-        if (!user) {
+        if (!user || isAuthEmpty) {
           return;
         }
 
-        this.googleUser = user;
-
         const profile = user.getBasicProfile();
-        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-        console.log('Name: ' + profile.getName());
-        console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+        this.googleUser = user;
+        this.googleBasicProfile = {
+          id: profile.getId(),
+          name: profile.getName(),
+          email: profile.getEmail(),
+          imageUrl: profile.getImageUrl()
+        };
+
+        // The ID token we need to pass to our server
+        const { id_token = '' } = auth || {};
+
+        if (id_token) {
+          this.googleToken = id_token;
+        }
+
+        if (withAuthenticate) {
+          this.authenticate();
+        }
       },
 
       onResetMouseEnter () {
+        if (!this.isSignedIn) {
+          return;
+        }
         this.resetHover = true;
         if (this.resetHoverDelay) {
           clearTimeout( this.resetHoverDelay );
@@ -89,6 +120,44 @@
         this.resetHoverDelay = setTimeout(_ => {
           this.resetHover = false;
         }, this.resetHoverDelayMs);
+      },
+
+      handleSignIn () {
+        if (!this.isPlatformLoaded) {
+          return ( this.autoLoginAfterPlatformLoaded = true );
+        }
+        // if we have google token we should authenticate
+        if (this.canAuthenticate) {
+          return this.authenticate();
+        }
+        this.authInstance.signIn();
+      },
+
+      async authenticate () {
+        if (this.isAuthenticating) {
+          return;
+        }
+        this.isAuthenticating = true;
+        return authenticate( this.$axios, this.googleToken, 'google' ).then(({ response }) => {
+          const { token } = response;
+          this.$emit( 'token', token );
+        }).finally(_ => {
+          this.isAuthenticating = false;
+        });
+      },
+
+      resetAuth () {
+        if (this.isAuthenticating) {
+          return;
+        }
+
+        this.googleUser = null;
+        this.googleBasicProfile = null;
+        this.googleToken = null;
+
+        if (this.authInstance) {
+          this.authInstance.signOut();
+        }
       }
     },
 
@@ -99,19 +168,40 @@
 
       classes () {
         return {
-          'google-sign-in_no-reset': !this.shouldRenderResetButton
+          'social-sign-in_no-reset': !this.isSignedIn
         };
       },
 
-      shouldRenderResetButton () {
-        return !this.test;
+      canAuthenticate () {
+        return this.googleUser && this.googleToken;
+      },
+
+      platformLoadingText () {
+        return translate( 'resource_loading' );
+      },
+
+      signInText () {
+        return translate( 'social_sign_in_google' );
+      },
+
+      signInAnotherText () {
+        return translate( 'social_sign_in_another' );
+      },
+
+      signingInText () {
+        return translate( 'social_signing_in' );
+      },
+
+      continueAsText () {
+        return translate( 'social_continue_as', this.googleBasicProfile.name);
       }
     },
 
     watch: {
-      shouldRenderResetButton (value) {
+      isSignedIn (value) {
         if (!value) {
           this.resetHover = false;
+          this.resetAuth();
         }
       }
     }
@@ -119,31 +209,39 @@
 </script>
 
 <template>
-  <div class="google-sign-in" :class="classes">
+  <div class="social-sign-in google" :class="classes">
 
-    <button class="google-sign-in__button">
-      <span class="google-sign-in__button-icon">
-        <img class="google-sign-in__button-icon-img" src="~/assets/ui/icons/google@1x.png" />
+    <button class="social-sign-in__button" @click="handleSignIn">
+      <span class="social-sign-in__button-icon">
+        <img class="social-sign-in__button-icon-img" src="~/assets/ui/icons/google@1x.png" />
       </span>
-      <span class="google-sign-in__button-text" :class="{ 'google-sign-in__button-text_hidden': resetHover }">
-        <span>Продолжить как Александр Белов</span>
+      <span class="social-sign-in__button-text" :class="{ 'social-sign-in__button-text_hidden': resetHover }">
+        <transition name="fade-transition" mode="out-in">
+          <span v-if="!isPlatformLoaded" key="platform-loading">{{ platformLoadingText }}</span>
+          <span v-else-if="isAuthenticating" key="signing-in">{{ signingInText }}</span>
+          <span v-else key="rest">
+            <span v-if="googleBasicProfile">{{ continueAsText }}</span>
+            <span v-else>{{ signInText }}</span>
+          </span>
+        </transition>
       </span>
 
       <transition name="slide-x-reverse-transition">
-        <span class="google-sign-in__button-overlay" v-show="resetHover">
-          <span class="google-sign-in__button-overlay-text">Войти под другим аккаунтом</span>
+        <span class="social-sign-in__button-overlay" v-show="resetHover">
+          <span class="social-sign-in__button-overlay-text">{{ signInAnotherText }}</span>
         </span>
       </transition>
     </button>
 
-    <button class="google-sign-in__button google-sign-in__button_reset-auth"
+    <button class="social-sign-in__button social-sign-in__reset-button"
             @mouseenter="onResetMouseEnter"
-            @mouseleave="onResetMouseLeave" @click="test = !test">
+            @mouseleave="onResetMouseLeave"
+            @click="resetAuth">
       <md-clear></md-clear>
     </button>
   </div>
 </template>
 
 <style lang="scss">
-  @import "../styles/components/google-sign-in";
+  @import "../styles/components/social-sign-in";
 </style>

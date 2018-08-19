@@ -24,5 +24,13 @@ export default {
   },
 
   'quick_play': 'Quick play',
-  'resource_loading': 'Loading...'
+  'resource_loading': 'Loading...',
+
+  'social_sign_in_google': 'Continue with Google',
+  'social_sign_in_facebook': 'Continue with Facebook',
+  'social_sign_in_another': 'Sign in with another account',
+  'social_signing_in': 'Signing in...',
+  'social_continue_as': displayName => {
+    return `Continue as ${displayName}`;
+  }
 };

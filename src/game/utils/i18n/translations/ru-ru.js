@@ -24,5 +24,13 @@ export default {
   },
 
   'quick_play': 'Быстрая игра',
-  'resource_loading': 'Идет загрузка...'
+  'resource_loading': 'Загрузка...',
+
+  'social_sign_in_google': 'Войти через Google',
+  'social_sign_in_facebook': 'Войти через Facebook',
+  'social_sign_in_another': 'Войти под другим аккаунтом',
+  'social_signing_in': 'Вход...',
+  'social_continue_as': displayName => {
+    return `Войти как ${displayName}`;
+  }
 };

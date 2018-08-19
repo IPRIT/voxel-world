@@ -1,8 +1,9 @@
 @import "../settings/index";
 @import "../tools/index";
 
-@include block('google-sign-in', 'component') {
+@include block('social-sign-in', 'component') {
   $button-height: 40px;
+  $facebook-color: #3b5a99;
 
   @extend %layer-flex-row;
   font-family: $font-family-ui;
@@ -13,7 +14,8 @@
     align-items: stretch;
 
     height: $button-height;
-    margin: 0;
+    width: 100%;
+    margin-right: $button-height + $indent-small;
     padding: 0 $indent-small;
     overflow: hidden;
     position: relative;
@@ -30,16 +32,21 @@
     text-align: center;
     font-size: $font-size-body;
     font-weight: 700;
-    line-height: $button-height;
+    font-family: $font-family-ui;
 
-    transition: transform .1s ease-out, color .15s linear;
+    transition: transform .1s ease-out, color .15s linear, margin-right .1s ease-out;
     background-color: #fff;
     border: 0;
     border-radius: 4px;
     transform: scale(1);
     box-shadow: 0 4px 6px 0 transparentize(black, .95),
-    0 1px 0 1px transparentize(black, .95),
-    0 0 0 1px transparentize(black, .95);
+      0 1px 0 1px transparentize(black, .95),
+      0 0 0 1px transparentize(black, .95);
+
+    .facebook & {
+      background-color: $facebook-color;
+      color: white;
+    }
 
     &:before {
       position: absolute;
@@ -52,28 +59,32 @@
     }
 
     &:hover {
-      box-shadow: 0 2px 7px 0 rgba(22,56,99,.2),
-      0 1px 0 1px rgba(0,0,0,.05),
-      0 0 0 1px rgba(0,0,0,.05);
+      box-shadow: 0 2px 7px 0 rgba(22,22,22,.2),
+        0 1px 0 1px rgba(0,0,0,.05),
+        0 0 0 1px rgba(0,0,0,.05);
+
+      .facebook & {
+        background-color: lighten($facebook-color, 2);
+        box-shadow: 0 2px 7px 0 rgba($facebook-color, 0.45),
+          0 1px 0 1px rgba(0,0,0,.05),
+          0 0 0 1px rgba(0,0,0,.05);
+      }
     }
 
     &:active {
       transition: none;
       transform: scale(0.96);
     }
-
-    @include modifier('reset-auth') {
-      margin-left: $indent-small;
-      border-radius: 50%;
-      min-width: $button-height;
-    }
   }
 
   @include element('button-text') {
+    @extend %layer-flex-column;
+    justify-content: center;
     max-width: calc(100% - 28px);
     margin-left: $indent-small;
     margin-right: $indent-xsmall;
     transition: all .1s ease-out;
+    flex: 1;
 
     > span {
       display: block;
@@ -86,10 +97,26 @@
     }
   }
 
+  @include element('reset-button') {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-left: $indent-small;
+    border-radius: 50%;
+    min-width: $button-height;
+    max-width: $button-height;
+    margin-right: 0;
+
+    .md-icon {
+      .facebook & {
+        fill: white;
+      }
+    }
+  }
+
   @include element('button-overlay') {
     @extend %layer-absolute-fill;
     @extend %layer-flex-column;
-    top: 1px;
     justify-content: center;
     text-align: right;
     padding-left: $button-height;
@@ -103,6 +130,11 @@
     height: 100%;
     background-color: white;
     padding-right: $indent-small;
+
+    .facebook & {
+      background-color: $facebook-color;
+      color: white;
+    }
   }
 
   @include element('button-icon') {
@@ -111,27 +143,27 @@
   }
 
   @include element('button-icon-img') {
+    width: $button-height - $indent-medium;
     max-width: $button-height - $indent-medium;
   }
 
   @include modifier('no-reset') {
     transition: all .1s ease-out;
 
-    @include modifies-element-modifier('button', 'reset-auth') {
+    @include modifies-element('button') {
+      margin-right: 0;
+    }
+
+    @include modifies-element('reset-button') {
       transition: all .1s ease-out,
         border-radius .1s ease-out,
         box-shadow .1s ease-out .1s,
-        left .1s ease-out .1s,
-        margin-left .1s ease-out .1s,
         min-width .3s ease-in-out .2s,
         width .3s ease-in-out .2s,
-        opacity .2s ease-out .3s;
-      margin-left: 0 !important;
+        opacity .2s ease-out .2s;
       border-radius: 4px !important;
       border-bottom-left-radius: 0 !important;
       border-top-left-radius: 0 !important;
-      position: relative;
-      left: -2px;
       box-shadow: 3px 4px 7px 0 rgba(0,0,0,.05), 1px 1px 0 1px rgba(0,0,0,.05), 1px 0 0 1px rgba(0,0,0,.05);
       width: 0;
       min-width: 0;

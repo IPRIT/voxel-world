@@ -1,10 +1,14 @@
 <script>
   import { translate } from "../game/utils/i18n";
   import RoyalGoogleButton from "./RoyalGoogleButton";
+  import RoyalFacebookButton from "./RoyalFacebookButton";
 
   export default {
     name: 'royal-start-menu',
-    components: { RoyalGoogleButton },
+    components: {
+      RoyalGoogleButton,
+      RoyalFacebookButton
+    },
     computed: {
       quickPlayText () {
         return translate( 'quick_play' );
@@ -22,8 +26,9 @@
     <div>
       <nuxt-link :to="{ name: 'play' }">{{ quickPlayText }}</nuxt-link>
 
-      <div style="margin: 32px auto; max-width: 500px;">
-        <RoyalGoogleButton/>
+      <div style="margin: 32px auto; max-width: 300px;">
+        <RoyalGoogleButton style="margin-bottom: 16px;"/>
+        <RoyalFacebookButton v-for="a in 1" :key="a" style="margin-bottom: 16px;"/>
       </div>
     </div>
   </div>

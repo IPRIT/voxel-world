@@ -6,6 +6,8 @@ const isDevelopment = process.env.NODE_ENV === 'development' || false;
 const isStaging = process.env.NODE_ENV === 'staging' || false;
 const isTest = process.env.NODE_ENV === 'test' || false;
 
+const browserBaseURL = `${config.serverApi.protocol || 'http'}://${config.serverApi.host}${config.serverApi.path || '/'}`;
+
 const productionModules = [
   /**
    * PWA plugin
@@ -70,6 +72,7 @@ module.exports = {
    * @link https://github.com/nuxt-community/axios-module
    */
   axios: {
+    browserBaseURL
   },
   /**
    * Headers of the page
