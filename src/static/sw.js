@@ -8,11 +8,15 @@ const workboxSW = new self.WorkboxSW({
 
 workboxSW.precache([
   {
-    "url": "/_nuxt/app.67bd89072169b5a92388.js",
-    "revision": "34448c6a2d179f5f32f56fc69f42e85e"
+    "url": "/_nuxt/app.d4abd8bececaea49b762.js",
+    "revision": "3d54e9ca1bd51e63aeb901e9f24c6079"
   },
   {
-    "url": "/_nuxt/db1aa2162427b65e20e7.worker.js",
+    "url": "/_nuxt/components/royal-game.953abe8f805678071fa2.js",
+    "revision": "c56b3dfdcc9f9d99345e52400e5a801a"
+  },
+  {
+    "url": "/_nuxt/e70dc88b21e49d20456c.worker.js",
     "revision": "282ec8d7ac649d5b928e985464482f51"
   },
   {
@@ -20,20 +24,20 @@ workboxSW.precache([
     "revision": "23db9bfee507678d6c170861b0ce769a"
   },
   {
-    "url": "/_nuxt/layouts_default.1dbf5ba97e30be97e894.js",
-    "revision": "a34445b969ad80420f0b6c092b559bf0"
+    "url": "/_nuxt/layouts_default.9b9a5014b6a611afafdf.js",
+    "revision": "7f0accfb7f45db590583f4b82c58fe4d"
   },
   {
-    "url": "/_nuxt/manifest.0f4f91db70b00c17bf5e.js",
-    "revision": "4569eda74b947974e7c8c423c2051c67"
+    "url": "/_nuxt/manifest.2eba9997596849165313.js",
+    "revision": "942c9ac370a3a8467503b45aa22a7ac5"
   },
   {
-    "url": "/_nuxt/pages/game-page.62bf7103bec0282b7dd9.js",
-    "revision": "857a92462d0073ab6eedacb40d1e77aa"
+    "url": "/_nuxt/pages/index-page.eaf998808a6dee54bbdc.js",
+    "revision": "4d0d4b7bbf23584f1379f39973d364eb"
   },
   {
-    "url": "/_nuxt/vendor.9e43d0fd2898bdff7751.js",
-    "revision": "427def1818ca4eb386dadd9910bc9593"
+    "url": "/_nuxt/vendor.63ff91d94094e1e1ed64.js",
+    "revision": "135c67d2cf5ecc114eda2364e20c00cd"
   }
 ])
 

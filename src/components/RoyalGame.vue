@@ -4,7 +4,7 @@
 
     components: {
       RoyalScene: () => import(/* webpackChunkName: "components/royal-game" */ './RoyalScene'),
-      RoyalGameUi: () => import(/* webpackChunkName: "components/royal-game" */ './RoyalGameUi')
+      RoyalGameUi: () => import(/* webpackChunkName: "components/royal-game" */ './RoyalGameUI')
     }
   };
 </script>
