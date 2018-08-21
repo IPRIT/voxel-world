@@ -2,10 +2,118 @@
 @import "../tools/index";
 
 @include block('start-menu', 'component') {
-  text-align: center;
-  font-size: $font-size-display-1;
+  height: 100%;
+  height: 100vh;
+  background: url('~/assets/ui/backgrounds/start-menu-01.png') no-repeat center center/cover;
+  padding: $indent-medium 0;
+  padding: 3vw 0;
 
-  > div {
+  @include element('logo') {
+    max-width: 328px;
+    margin: 0 auto;
+    font-size: $font-size-display-2;
+    font-family: $font-family-default;
+    text-align: center;
+    min-height: 120px;
+    color: #E91E63;
+    line-height: 1;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding: $indent-medium 0 $indent-large;
+    user-select: none;
+  }
+
+  @include element('menu') {
+    max-width: 400px;
+    background-color: $gray-light-color;
+    border-radius: 4px;
     padding: $indent-medium;
+    margin: 0 auto;
+
+    @include fine-shadow();
+  }
+
+  @include element('divider') {
+    width: 100%;
+    height: 1px;
+    margin: $indent-medium 0;
+    background-color: $gray-color;
+    position: relative;
+
+    &:before {
+      content: '';
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      @include background-image(linear-gradient(left, $gray-light-color 0%, $gray-color 100%));
+    }
+
+    &:after {
+      content: '';
+      height: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      @include background-image(linear-gradient(right, $gray-light-color 0%, $gray-color 100%));
+    }
+  }
+
+  @include element('menu-buttons') {
+    padding: $indent-medium;
+    background-color: white;
+    border: 1px solid $gray-color;
+    border-radius: 4px;
+  }
+
+  @include element('menu-button') {
+    &:not(:last-of-type) {
+      margin-bottom: $indent-small;
+    }
+
+    @include modifier('quick') {
+      background-color: #6d9e0c !important;
+      color: white;
+
+      &:hover {
+        @include fine-shadow(#6d9e0c, .5, true);
+      }
+    }
+
+    @include modifier('competitive') {
+      background-color: #9C27B0 !important;
+      color: white;
+
+      &:hover {
+        @include fine-shadow(#9C27B0, .5, true);
+      }
+    }
+  }
+
+  @include element('nickname-input') {
+    width: 100%;
+    padding: $indent-medium $indent-medium $indent-medium - 4;
+    border: 0;
+    border-radius: 4px;
+    outline: none;
+    font-family: $font-family-default;
+    font-size: $font-size-display-1;
+    text-align: center;
+    letter-spacing: .5px;
+    line-height: 1;
+
+    @include fine-shadow();
+
+    &:focus {
+      @include fine-shadow(black, .2);
+    }
+  }
+
+  @include element('social-auth-button') {
+    &:not(:last-of-type) {
+      margin-bottom: $indent-small;
+    }
   }
 }

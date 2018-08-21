@@ -16,6 +16,7 @@
   transform: translate3d(0, -$target-bar-height - 10, 0);
   transition: transform .2s cubic-bezier(0.4, 0, 0.34, 1.44);
   will-change: transform;
+  font-family: $font-family-default;
 
   @include shadow(5);
 

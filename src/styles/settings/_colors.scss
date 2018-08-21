@@ -14,9 +14,9 @@ $link-text: #275a95       !default;
 $border-color: #ccc       !default;
 
 // gray colors
-$color-gray-light: #ebeced;
-$color-gray: #d5d5d5;
-$color-gray-dark: #878b92;
+$gray-light-color: #f8f8f8;
+$gray-color: #d5d5d5;
+$gray-dark-color: #9e9e9e;
 
 $themes: (
   primary: $primary-color,
@@ -26,9 +26,9 @@ $themes: (
   success: $success-color,
   info: $info-color,
   warning: $warning-color,
-  gray: $color-gray,
-  gray-light: $color-gray-light,
-  gray-dark: $color-gray-dark,
+  gray: $gray-color,
+  gray-light: $gray-light-color,
+  gray-dark: $gray-dark-color,
   white: white,
   black: black
 );

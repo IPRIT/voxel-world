@@ -72,6 +72,8 @@ export class PlayerMe extends Player {
         livingObject.select();
         this.store.dispatch( 'setTarget', livingObject.objectInfo );
       }
+
+      livingObject.setTargetLocation( this.position.clone() );
     }
     super.setTargetObject( livingObject );
   }

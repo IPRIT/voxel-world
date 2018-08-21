@@ -1,0 +1,75 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('royal-button', 'component') {
+  $button-height: 40px;
+
+  @extend %layer-flex-row;
+  align-items: stretch;
+  justify-content: center;
+
+  height: $button-height;
+  width: 100%;
+  margin-right: $button-height + $indent-small;
+  padding: 0 $indent-small;
+  overflow: hidden;
+  position: relative;
+
+  box-sizing: border-box;
+  user-select: none;
+  outline: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparentize(black, 1);
+
+  text-align: center;
+  font-size: $font-size-body;
+  font-weight: 700;
+  font-family: $font-family-ui;
+
+  transition: transform .1s ease-out, color .15s linear, margin-right .1s ease-out;
+  background-color: #fff;
+  border: 0;
+  border-radius: 4px;
+  transform: scale(1);
+
+  @include fine-shadow();
+
+  &:before {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    content: '';
+  }
+
+  &:hover {
+    @include fine-shadow( rgb(22, 22, 22), .2 );
+  }
+
+  &:active {
+    transition: none;
+    transform: scale(0.96);
+  }
+
+  @include element('button-text') {
+    @extend %layer-flex-column;
+    justify-content: center;
+    max-width: 100%;
+    transition: all .1s ease-out;
+
+    > span {
+      display: block;
+      max-width: 100%;
+      @include overflow-ellipsis;
+    }
+
+    @include modifier('hidden') {
+      opacity: 0;
+    }
+  }
+}

@@ -260,6 +260,21 @@
 }
 
 /**
+ * Миксик для создания красивых теней
+ */
+@mixin fine-shadow ($base-color: black, $base-color-alpha: .05, $important: false) {
+  $shadow: 0 4px 6px 0 rgba($base-color, $base-color-alpha),
+    0 1px 0 1px rgba(black, .05),
+    0 0 0 1px rgba(black, .05);
+
+  @if $important {
+    box-shadow: $shadow !important;
+  } @else {
+    box-shadow: $shadow;
+  }
+}
+
+/**
  * Миксин для плавного перехода теней
  */
 @mixin shadow-transition($duration: 280ms, $easing: get($transition, 'fast-out-slow-in')) {

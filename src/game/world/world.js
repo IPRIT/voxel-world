@@ -52,6 +52,10 @@ export class World {
         }
       });
 
+      setTimeout(_ => {
+        enemy.setTargetLocation( new THREE.Vector3( enemy.position.x, enemy.position.y, enemy.position.z + 10 ) );
+      }, 5000);
+
       game.scene.add( enemy );
     }
 
@@ -79,7 +83,7 @@ export class World {
     let me = new PlayerMe();
     this._me = me;
 
-    me.position.set( coords.x, coords.y, coords.z );
+    me.position.set( coords.x, coords.y + 500, coords.z );
 
     me.init({
       classType: PlayerClassType.DEER,
@@ -93,9 +97,9 @@ export class World {
       }
     });
 
-    game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
+    /*game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
     game._transformControl.attach( me );
-    game.scene.add( game._transformControl );
+    game.scene.add( game._transformControl );*/
     game.scene.add( me );
 
     setTimeout(_ => {

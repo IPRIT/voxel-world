@@ -130,7 +130,7 @@ export class LivingObject extends WorldObjectAnimated {
    */
   init (options = {}) {
     this._initOptions( options );
-    this._createLabel( this._objectInfo.name );
+    // this._createLabel( this._objectInfo.name );
     this._createCaptureArea();
     return super.init( options );
   }

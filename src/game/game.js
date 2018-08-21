@@ -166,7 +166,7 @@ export class Game {
     });
 
     const socketManager = SocketManager.getManager();
-    let gui = new dat.GUI();
+    /*let gui = new dat.GUI();
     let common = gui.addFolder('Common');
     common.add(this._updateWarper, 'timeScale', -.5, 5);
 
@@ -178,7 +178,7 @@ export class Game {
 
     document.querySelector('.dg.ac').addEventListener('mousedown', ev => {
       ev.stopPropagation();
-    });
+    });*/
   }
 
   /**
@@ -188,10 +188,10 @@ export class Game {
     const deltaTime = this._clock.getDelta();
     // this._updateWarper.update( deltaTime );
     this.world.update( deltaTime );
-    this._runtimeShaders.update( deltaTime );
+    // this._runtimeShaders.update( deltaTime );
 
     // update renderer stats
-    this._renderStats.update( this._renderer );
+    // this._renderStats.update( this._renderer );
   }
 
   /**
@@ -249,7 +249,7 @@ export class Game {
    * @param {PerspectiveCamera} camera
    */
   set activeCamera (camera) {
-    this._runtimeShaders.registerCamera( camera );
+    // this._runtimeShaders.registerCamera( camera );
     this._activeCamera = camera;
   }
 
@@ -362,7 +362,7 @@ export class Game {
    * @private
    */
   _initStats () {
-    const stats = new JsPerformanceStats();
+    /*const stats = new JsPerformanceStats();
     stats.showPanel( 0 );
     document.body.appendChild( stats.dom );
     requestAnimationFrame( animate );
@@ -379,7 +379,7 @@ export class Game {
     this._renderStats.domElement.style.bottom = '0px';
     document.body.appendChild( this._renderStats.domElement );
 
-    return stats;
+    return stats;*/
   }
 
   /**
