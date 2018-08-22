@@ -9,7 +9,6 @@
 
 // просто возвращаем функцию state, чтобы создать store в Nuxt
 export const state = () => ({
-  target: null
 });
 
 export * from './_actions';

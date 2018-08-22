@@ -1,0 +1,13 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('royal-social-auth', 'component') {
+  position: relative;
+
+  @include element('loading-overlay') {
+    @extend %layer-absolute-fill;
+    @extend %layer-flex-row;
+    align-items: center;
+    justify-content: center;
+  }
+}

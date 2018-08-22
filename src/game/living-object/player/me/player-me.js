@@ -70,7 +70,7 @@ export class PlayerMe extends Player {
 
       if (!this.targetObject) {
         livingObject.select();
-        this.store.dispatch( 'setTarget', livingObject.objectInfo );
+        this.store.dispatch( 'game/setTarget', livingObject.objectInfo );
       }
 
       livingObject.setTargetLocation( this.position.clone() );
@@ -81,7 +81,7 @@ export class PlayerMe extends Player {
   resetTargetObject () {
     if (this.targetObject) {
       this.targetObject.deselect();
-      this.store.dispatch( 'resetTarget' );
+      this.store.dispatch( 'game/resetTarget' );
     }
     super.resetTargetObject();
   }

@@ -1,46 +1,36 @@
 /**
  * @type {{
- *   isSupported: {get(): boolean},
  *   getItem(string, {version?: number|string}=): *,
  *   setItem(string, (*), {expired?: number, version?: number|string}=): boolean,
- *   removeItem(string): boolean,
- *   _serializeItem((*)): (string|*),
- *   _deserializeItem(string): (Object|*)
+ *   removeItem(string): boolean
  * }}
  */
 export const storage = {
-  isSupported: {
-    /**
-     * @returns {boolean}
-     */
-    get () {
-      return typeof window.localStorage !== 'undefined';
-    }
-  },
   /**
    * @param {string} itemKey
    * @param {number|string?} version
    * @returns {*}
    */
   getItem (itemKey, { version = null } = {}) {
-    if (!this.isSupported) {
-      return null;
-    }
-    const serializedItem = localStorage.getItem(itemKey);
+    const serializedItem = universalStorage.getItem( itemKey );
+
     if (!serializedItem) {
       return null;
     }
-    const deserializedItem = this._deserializeItem(serializedItem);
+
+    const deserializedItem = this._deserializeItem( serializedItem );
     if (!deserializedItem) {
       return null;
     }
+
     if (deserializedItem.expiredAtMs && deserializedItem.expiredAtMs < Date.now()
       || version && deserializedItem.version !== version) {
-      this.removeItem(itemKey);
+      this.removeItem( itemKey );
       return null;
     }
     return deserializedItem.item;
   },
+
   /**
    * @param {string} itemKey
    * @param {object|*} itemValue
@@ -49,31 +39,28 @@ export const storage = {
    * @returns {boolean}
    */
   setItem (itemKey, itemValue, { expired = null, version = null } = {}) {
-    if (!this.isSupported) {
-      return false;
-    }
     const year = 365 * 3600 * 24 * 1000;
     const serializedItem = this._serializeItem({
-      expiredAtMs: expired || Date.now() + 10 * year,
+      expiredAtMs: expired || Date.now() + 5 * year,
       item: itemValue,
       version
     });
-    localStorage.setItem(
+
+    universalStorage.setItem(
       itemKey,
       serializedItem
     );
   },
+
   /**
    * @param {string} itemKey
    * @returns {boolean}
    */
   removeItem (itemKey) {
-    if (!this.isSupported) {
-      return false;
-    }
-    localStorage.removeItem(itemKey);
+    universalStorage.removeItem( itemKey );
     return true;
   },
+
   /**
    * @param {object|*} item
    * @returns {string|*}
@@ -81,12 +68,13 @@ export const storage = {
    */
   _serializeItem (item) {
     try {
-      return JSON.stringify(item);
+      return JSON.stringify( item );
     } catch (e) {
-      console.error('Cannot serialize object', item);
+      console.error('Cannot serialize an object', item);
       return null;
     }
   },
+
   /**
    * @param {string} string
    * @returns {object|*}
@@ -94,10 +82,50 @@ export const storage = {
    */
   _deserializeItem (string) {
     try {
-      return JSON.parse(string);
+      return JSON.parse( string );
     } catch (e) {
-      console.error('Cannot deserialize object', string);
+      console.error('Cannot deserialize an object', string);
       return string;
+    }
+  }
+};
+
+const serverStorage = new Map();
+
+/**
+ * @type {{isBrowser: {get(): *}, getItem(*=): *, setItem(*=, *=): void, hasItem(*=): *, removeItem(*=): void}}
+ */
+const universalStorage = {
+  isBrowser: {
+    get () {
+      return typeof window !== 'undefined';
+    }
+  },
+  getItem (itemKey) {
+    if (this.isBrowser) {
+      return localStorage.getItem( itemKey );
+    }
+    return serverStorage.get( itemKey );
+  },
+
+  setItem (itemKey, itemValue) {
+    if (this.isBrowser) {
+      localStorage.setItem( itemKey, itemValue );
+    } else {
+      serverStorage.set( itemKey, itemValue );
+    }
+  },
+
+  hasItem (itemKey) {
+    return !! this.getItem( itemKey );
+  },
+
+  removeItem (itemKey) {
+    console.log( itemKey );
+    if (this.isBrowser) {
+      localStorage.removeItem( itemKey );
+    } else {
+      serverStorage.delete( itemKey );
     }
   }
 };

@@ -50,10 +50,10 @@
           });
         }).then(auth2 => {
           // Listen for sign-in state changes.
-          auth2.isSignedIn.listen( this.onSignInChanged.bind( this ) );
+          this.signInListener = auth2.isSignedIn.listen( this.onSignInChanged.bind( this ) );
 
           // Listen for changes to current user.
-          auth2.currentUser.listen( this.onGoogleUserChanged.bind( this ) );
+          this.currentUserListener = auth2.currentUser.listen( this.onGoogleUserChanged.bind( this ) );
 
           // Sign in the user if they are currently signed in.
           if (auth2.isSignedIn.get() == true) {
@@ -138,7 +138,7 @@
           return;
         }
         this.isAuthenticating = true;
-        return authenticate( this.$axios, this.googleToken, 'google' ).then(({ response }) => {
+        return authenticate( this.$axios, { accessToken: this.googleToken }, 'google' ).then(({ response }) => {
           const { token } = response;
           this.$emit( 'token', token );
         }).finally(_ => {
@@ -163,7 +163,9 @@
 
     computed: {
       ...nonreactiveMapGetter(nonreactive, [
-        'authInstance'
+        'authInstance',
+        'signInListener',
+        'currentUserListener'
       ]),
 
       classes () {
@@ -204,6 +206,15 @@
           this.resetAuth();
         }
       }
+    },
+
+    beforeDestroy () {
+      if (this.signInListener) {
+        this.signInListener.remove();
+      }
+      if (this.currentUserListener) {
+        this.currentUserListener.remove();
+      }
     }
   };
 </script>
@@ -220,7 +231,10 @@
           <span v-if="!isPlatformLoaded" key="platform-loading">{{ platformLoadingText }}</span>
           <span v-else-if="isAuthenticating" key="signing-in">{{ signingInText }}</span>
           <span v-else key="rest">
-            <span v-if="googleBasicProfile">{{ continueAsText }}</span>
+            <span v-if="googleBasicProfile">
+              <span>{{ continueAsText }}&nbsp;</span>
+              <span>{{ googleBasicProfile.name }}</span>
+            </span>
             <span v-else>{{ signInText }}</span>
           </span>
         </transition>

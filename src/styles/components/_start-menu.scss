@@ -116,4 +116,11 @@
       margin-bottom: $indent-small;
     }
   }
+
+  @include element('account') {
+    text-align: center;
+    padding: $indent-medium 0;
+
+    @include font-heading;
+  }
 }

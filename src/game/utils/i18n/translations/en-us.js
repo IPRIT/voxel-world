@@ -3,6 +3,7 @@ import { pluralize } from "../pluralize";
 export default {
   'test': 'Hello world',
 
+  // game
   'critical_hit': 'Critical',
   'immunity': 'Resist',
   'miss': 'Miss',
@@ -13,6 +14,7 @@ export default {
   'animal': 'Animal',
   'animal_deer': 'Deer',
 
+  // ui
   'network_disconnected': 'Waiting for connection...',
   'network_connecting': 'Connecting...',
   'network_connected': 'Connected',
@@ -22,15 +24,18 @@ export default {
   'network_latency': ms => {
     return `Latency: ${ms} ms`;
   },
-
-  'quick_play': 'Quick play',
+  'loading': 'Loading...',
   'resource_loading': 'Loading...',
 
-  'social_sign_in_google': 'Continue with Google',
-  'social_sign_in_facebook': 'Continue with Facebook',
+  // menu
+  'signed_in_as': 'Signed in as',
+  'nickname_input_placeholder': 'Enter a nickname',
+  'quick_play': 'Quick play',
+
+  // social buttons
+  'social_sign_in_google': 'Save your progress with Google',
+  'social_sign_in_facebook': 'Save your progress with Facebook',
   'social_sign_in_another': 'Sign in with another account',
   'social_signing_in': 'Signing in...',
-  'social_continue_as': displayName => {
-    return `Continue as ${displayName}`;
-  }
+  'social_continue_as': 'Continue as'
 };

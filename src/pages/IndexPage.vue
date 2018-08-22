@@ -1,4 +1,8 @@
 <script>
+  import { createNamespacedHelpers } from 'vuex';
+
+  const userStore = createNamespacedHelpers( 'user' );
+
   export default {
     name: 'index-page',
 
@@ -11,7 +15,18 @@
       RoyalStartMenu: () => import(/* webpackChunkName: "pages/index-page" */ '../components/RoyalStartMenu')
     },
 
-    data: () => ({})
+    data: () => ({}),
+
+    async fetch ({ store }) {
+      const { dispatch } = store;
+      return dispatch( 'user/restoreSession' );
+    },
+
+    computed: {
+      ...userStore.mapState({
+        me: state => state.me
+      })
+    }
   };
 </script>
 

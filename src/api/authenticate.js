@@ -10,10 +10,10 @@ const endpoint = provider => {
 
 /**
  * @param {*} axios
- * @param {string} accessToken
+ * @param {Object} params
  * @param {string} authProvider
  * @return {*}
  */
-export function authenticate (axios, accessToken, authProvider = 'guest') {
-  return post( axios, endpoint( authProvider ), { accessToken } );
+export function authenticate (axios, params, authProvider = 'guest') {
+  return post( axios, endpoint( authProvider ), params );
 }

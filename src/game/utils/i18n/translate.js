@@ -1,7 +1,7 @@
 import { detectLanguage } from "./detect-language";
 import en from './translations/en-us';
 import ru from './translations/ru-ru';
-import { storage } from "../storage";
+import { storage } from "../../../util/storage";
 
 const STORAGE_KEY = 'settings:language';
 

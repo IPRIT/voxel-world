@@ -126,7 +126,7 @@
           return;
         }
         this.isAuthenticating = true;
-        return authenticate( this.$axios, this.facebookToken, 'facebook' ).then(({ response }) => {
+        return authenticate( this.$axios, { accessToken: this.facebookToken }, 'facebook' ).then(({ response }) => {
           const { token } = response;
           this.$emit( 'token', token );
         }).finally(_ => {
@@ -224,7 +224,10 @@
           <span v-if="!isPlatformLoaded" key="platform-loading">{{ platformLoadingText }}</span>
           <span v-else-if="isAuthenticating" key="signing-in">{{ signingInText }}</span>
           <span v-else key="rest">
-            <span v-if="facebookBasicProfile">{{ continueAsText }}</span>
+            <span v-if="facebookBasicProfile">
+              <span>{{ continueAsText }}&nbsp;</span>
+              <span>{{ facebookBasicProfile.name }}</span>
+            </span>
             <span v-else>{{ signInText }}</span>
           </span>
         </transition>
