@@ -1,5 +1,5 @@
 import { TextLabel } from "../../../utils/label/text-label/index";
-import { translate } from "../../../utils/i18n/translate";
+import { translate } from "../../../../util/i18n/translate";
 import { ensureNumber } from "../../../utils";
 
 export class DamageText extends TextLabel {

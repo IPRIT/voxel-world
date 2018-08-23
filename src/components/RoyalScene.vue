@@ -6,9 +6,9 @@
       window.THREE = require('three');
       window.THREEx = require('../game/libs/threex.keyboardstate').default;
       window.dat = require('dat.gui');
-      // require('three/examples/js/controls/TransformControls.js');
+      require('three/examples/js/controls/TransformControls.js');
 
-      const game = require('../main');
+      const game = require('../game/main');
       game.run( this.$store );
     }
   };

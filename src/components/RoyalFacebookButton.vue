@@ -5,7 +5,7 @@
   import { FacebookManager } from "../util/auth";
   import { config } from '../config';
   import { authenticate } from "../api";
-  import { translate } from "../game/utils/i18n";
+  import { translate } from "../util/i18n";
 
   export default {
     name: 'royal-facebook-button',
@@ -172,7 +172,7 @@
       },
 
       platform () {
-        const facebookManager = new FacebookManager();
+        const facebookManager = FacebookManager.getManager();
         return facebookManager.platform;
       },
 

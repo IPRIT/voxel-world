@@ -3,7 +3,7 @@
   import RoyalFacebookButton from "./RoyalFacebookButton";
 
   import { createNamespacedHelpers } from 'vuex';
-  import { translate } from "../game/utils/i18n";
+  import { translate } from "../util/i18n";
 
   const userStore = createNamespacedHelpers( 'user' );
 

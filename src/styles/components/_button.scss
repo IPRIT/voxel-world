@@ -56,6 +56,12 @@
     transform: scale(0.96);
   }
 
+  &:disabled {
+    background-color: $gray-color !important;
+    color: $gray-dark-color;
+    box-shadow: none !important;
+  }
+
   @include element('button-text') {
     @extend %layer-flex-column;
     justify-content: center;

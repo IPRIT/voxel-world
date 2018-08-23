@@ -31,6 +31,7 @@ export default {
   'signed_in_as': 'Signed in as',
   'nickname_input_placeholder': 'Enter a nickname',
   'quick_play': 'Quick play',
+  'queue_searching': 'Searching for players...',
 
   // social buttons
   'social_sign_in_google': 'Save your progress with Google',

@@ -1,5 +1,5 @@
 <script>
-  import { translate } from "../game/utils/i18n";
+  import { translate } from "../util/i18n";
 
   export default {
     name: 'royal-class-name',

@@ -58,8 +58,6 @@ export class SocketManager extends EventEmitter {
 
     this._attachEventListeners();
 
-    console.log( this );
-
     return new Promise((resolve, reject) => {
       this._socket.once( 'connect', resolve );
       this._socket.once( 'connect_error', reject );
@@ -158,11 +156,6 @@ export class SocketManager extends EventEmitter {
    */
   _onConnect () {
     log( 'Event: connect' );
-
-    const engine = this._socket.io.engine;
-    engine.pingInterval = 300;
-    engine.setPing();
-
     this.emit( 'connect' );
   }
 

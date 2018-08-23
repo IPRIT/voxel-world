@@ -109,6 +109,11 @@
     &:focus {
       @include fine-shadow(black, .2);
     }
+
+    &:disabled {
+      box-shadow: none !important;
+      color: $gray-color;
+    }
   }
 
   @include element('social-auth-button') {
@@ -122,5 +127,11 @@
     padding: $indent-medium 0;
 
     @include font-heading;
+  }
+
+  @include element('queue-status') {
+    text-align: center;
+    padding: $indent-medium 0;
+    font-size: $font-size-heading;
   }
 }

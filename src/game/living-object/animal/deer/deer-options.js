@@ -1,4 +1,4 @@
-import { translate } from "../../../utils/i18n";
+import { translate } from "../../../../util/i18n";
 
 export const options = {
   worldScale: .8,

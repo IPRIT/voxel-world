@@ -29,6 +29,7 @@ export default {
   'signed_in_as': 'Вы вошли как',
   'nickname_input_placeholder': 'Введите никнейм',
   'quick_play': 'Быстрая игра',
+  'queue_searching': 'Поиск игроков...',
 
   // social buttons
   'social_sign_in_google': 'Привязать аккаунт к Google',

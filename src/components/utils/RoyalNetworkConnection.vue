@@ -1,5 +1,5 @@
 <script>
-  import { translate } from "../../game/utils/i18n";
+  import { translate } from "../../util/i18n";
   import { SocketManager } from "../../game/network/socket-manager";
 
   import MdCloudDone from 'md-svg-vue/dist/file/MdCloudDone.vue';

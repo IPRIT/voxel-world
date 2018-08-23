@@ -5,7 +5,7 @@
   import { config } from '../config';
   import { nonreactiveMapGetter } from "../util/vue-utils";
   import { authenticate } from "../api";
-  import { translate } from "../game/utils/i18n";
+  import { translate } from "../util/i18n";
 
   const nonreactive = new Map([
     [ 'authInstance', false ]

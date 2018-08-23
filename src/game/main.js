@@ -1,5 +1,5 @@
-import { Game } from "./game";
-import { SocketManager } from "./game/network";
+import { Game } from "./index";
+import { SocketManager } from "./network/index";
 
 export function run (vuexStore) {
   window.game = Game.getInstance();
