@@ -21,11 +21,9 @@ module.exports = {
   /**
    * SPA routes
    */
-  /* generate: {
-    routes: [
-      '/'
-    ]
-  },*/
+  generate: {
+    fallback: 'index.html'
+  },
   router: {
     // Run the middleware/*.js on every pages
     // middleware: ['test']
