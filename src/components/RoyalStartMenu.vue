@@ -36,7 +36,11 @@
         this.isQueueStarted = true;
 
         const queue = new QueueManager();
-        return queue.joinQueue({ authToken: this.token, gameType: 'quick' }).then(_ => {
+        return queue.joinQueue({
+          authToken: this.token,
+          gameType: 'quick',
+          nickname: this.nickname
+        }).then(_ => {
           console.log('connected to queue');
         }).catch(_ => {
           this.isQueueStarted = false;

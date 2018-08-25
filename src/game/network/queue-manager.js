@@ -8,23 +8,25 @@ const QUEUE_PATH = '/queue';
 export class QueueManager extends EventEmitter {
 
   /**
-   * @param {string} authToken
-   * @param {string} gameType
+   * @param {Object} params
    * @return {Promise<any>}
    */
-  async joinQueue ({ authToken, gameType = 'quick' }) {
+  async joinQueue (params) {
+    const {
+      authToken,
+      gameType = 'quick',
+      nickname
+    } = params;
+
     if (!authToken) {
       throw new Error( '[QueueManager] authToken does not provided' );
     }
 
     const socketManager = SocketManager.getManager();
-    return socketManager.connect(QUEUE_SOCKET_SERVER_URI, {
-      authToken,
-      gameType
-    }, {
+    return socketManager.connect(QUEUE_SOCKET_SERVER_URI, params, {
       path: QUEUE_PATH
     }).then(_ => {
-      socketManager.socket.once( 'queue.serverFound', this.onServerFound.bind(this) );
+      socketManager.socket.once( 'queue.serverFound', this.onServerFound.bind( this ) );
     });
   }
 
