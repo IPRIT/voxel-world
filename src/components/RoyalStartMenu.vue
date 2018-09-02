@@ -2,11 +2,11 @@
   import RoyalButton from "./RoyalButton";
   import RoyalSocialAuth from "./RoyalSocialAuth";
 
-  import { translate } from "../util/i18n";
   import { createNamespacedHelpers } from 'vuex';
-  import { QueueManager } from "../game/network/queue-manager";
+  import { translate } from "../util/i18n";
 
   const userStore = createNamespacedHelpers( 'user' );
+  const queueStore = createNamespacedHelpers( 'queue' );
 
   export default {
     name: 'royal-start-menu',
@@ -17,34 +17,51 @@
     },
 
     data: () => ({
-      isQueueStarted: false
+      gameType: 'quick',
+      region: 'eu'
     }),
 
     methods: {
-      async startQuickPlay () {
+      async issueGuestToken () {
         const { dispatch } = this.$store;
-        if (!this.token) {
-          await dispatch( 'user/authenticate', {
-            provider: 'guest',
-            params: {
-              userNickname: this.nickname
-            }
-          });
+        if (this.token) {
+          return;
         }
-        console.log( 'Start quick play with:', this.token );
 
-        this.isQueueStarted = true;
-
-        const queue = new QueueManager();
-        return queue.joinQueue({
-          authToken: this.token,
-          gameType: 'quick',
-          nickname: this.nickname
-        }).then(_ => {
-          console.log('connected to queue');
-        }).catch(_ => {
-          this.isQueueStarted = false;
+        return dispatch( 'user/authenticate', {
+          provider: 'guest',
+          params: {
+            userNickname: this.nickname
+          }
         });
+      },
+
+      prepareQueueOptions (gameType = 'quick', region = 'eu') {
+        return {
+          authToken: this.token,
+          gameType,
+          region,
+          nickname: this.nickname
+        };
+      },
+
+      async startQueue (gameType = 'quick') {
+        this.gameType = gameType;
+
+        if (!this.token) {
+          await this.issueGuestToken();
+        }
+        console.log( 'Start quick play with token:', this.token );
+
+        const { dispatch } = this.$store;
+
+        const queueOptions = this.prepareQueueOptions( this.gameType, this.region );
+        return dispatch( 'queue/findServer', queueOptions );
+      },
+
+      cancelQueue () {
+        const { dispatch } = this.$store;
+        dispatch( 'queue/stop' );
       },
 
       signOut () {
@@ -57,6 +74,11 @@
       ...userStore.mapState({
         token: state => state.token,
         me: state => state.me
+      }),
+
+      ...queueStore.mapState({
+        queueActive: state => state.queueActive,
+        queueParams: state => state.queueParams
       }),
 
       nickname: {
@@ -75,6 +97,10 @@
 
       queueText () {
         return translate( 'queue_searching' );
+      },
+
+      cancelText () {
+        return translate( 'cancel' );
       },
 
       nicknameInputPlaceholder () {
@@ -98,8 +124,9 @@
 
     <div class="start-menu__menu">
 
-      <div class="start-menu__queue-status" v-show="isQueueStarted">
+      <div class="start-menu__queue-status" v-show="queueActive">
         {{ queueText }}
+        <a @click="cancelQueue">{{ cancelText }}</a>
       </div>
 
       <div class="start-menu__account" v-if="me && !me.isGuest">
@@ -115,7 +142,7 @@
                  class="start-menu__nickname-input"
                  v-model="nickname"
                  :placeholder="nicknameInputPlaceholder"
-                 :disabled="isQueueStarted">
+                 :disabled="queueActive">
         </div>
       </div>
 
@@ -123,8 +150,8 @@
 
       <div class="start-menu__menu-buttons">
         <RoyalButton class="start-menu__menu-button start-menu__menu-button_quick"
-                     @click="startQuickPlay"
-                     :disabled="isQueueStarted">{{ quickPlayText }}</RoyalButton>
+                     @click="startQueue('quick')"
+                     :disabled="queueActive">{{ quickPlayText }}</RoyalButton>
       </div>
 
       <transition name="fade-transition" mode="out-in">

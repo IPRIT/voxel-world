@@ -23,6 +23,7 @@ export default {
     return `Пинг: ${ms} мс`;
   },
   'loading': 'Загрузка...',
+  'cancel': 'Отмена',
   'resource_loading': 'Загрузка...',
 
   // menu

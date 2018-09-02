@@ -25,6 +25,7 @@ export default {
     return `Latency: ${ms} ms`;
   },
   'loading': 'Loading...',
+  'cancel': 'Cancel',
   'resource_loading': 'Loading...',
 
   // menu

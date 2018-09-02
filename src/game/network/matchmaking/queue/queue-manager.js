@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
-import { SocketManager } from "./socket-manager";
-import { config } from '../../config';
+import { SocketManager } from "../../socket-manager";
+import { config } from '../../../../../config';
+import { QueueEvents } from "./queue-events";
 
 const QUEUE_SOCKET_SERVER_URI = `${config.serverApi.protocol}://${config.serverApi.host}`;
 const QUEUE_PATH = '/queue';
@@ -13,9 +14,7 @@ export class QueueManager extends EventEmitter {
    */
   async joinQueue (params) {
     const {
-      authToken,
-      gameType = 'quick',
-      nickname
+      authToken
     } = params;
 
     if (!authToken) {
@@ -26,8 +25,16 @@ export class QueueManager extends EventEmitter {
     return socketManager.connect(QUEUE_SOCKET_SERVER_URI, params, {
       path: QUEUE_PATH
     }).then(_ => {
-      socketManager.socket.once( 'queue.serverFound', this.onServerFound.bind( this ) );
+      socketManager.socket.once( QueueEvents.SERVER_FOUND, this.onServerFound.bind( this ) );
     });
+  }
+
+  /**
+   * Disconnects from queue socket server
+   */
+  leaveQueue () {
+    const socketManager = SocketManager.getManager();
+    socketManager.disconnect();
   }
 
   /**
@@ -36,6 +43,6 @@ export class QueueManager extends EventEmitter {
   onServerFound (args) {
     console.log( '[queue] server found', args );
 
-    this.emit( 'queue.serverFound', args );
+    this.emit( QueueEvents.SERVER_FOUND, args );
   }
 }
