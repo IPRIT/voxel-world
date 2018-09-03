@@ -22,6 +22,14 @@
     }),
 
     methods: {
+      async fetchMe () {
+        if (!this.token) {
+          return;
+        }
+        const { dispatch } = this.$store;
+        return dispatch( 'user/fetchMe' );
+      },
+
       async issueGuestToken () {
         const { dispatch } = this.$store;
         if (this.token) {
@@ -50,13 +58,16 @@
 
         if (!this.token) {
           await this.issueGuestToken();
+          await this.fetchMe();
         }
         console.log( 'Start quick play with token:', this.token );
 
         const { dispatch } = this.$store;
 
         const queueOptions = this.prepareQueueOptions( this.gameType, this.region );
-        return dispatch( 'queue/findServer', queueOptions );
+        return dispatch( 'queue/findServer', queueOptions ).then(server => {
+          this.cancelQueue();
+        });
       },
 
       cancelQueue () {
@@ -65,6 +76,10 @@
       },
 
       signOut () {
+        if (this.queueActive) {
+          this.cancelQueue();
+        }
+
         const { dispatch } = this.$store;
         dispatch( 'user/resetSession' );
       }
@@ -124,11 +139,6 @@
 
     <div class="start-menu__menu">
 
-      <div class="start-menu__queue-status" v-show="queueActive">
-        {{ queueText }}
-        <a @click="cancelQueue">{{ cancelText }}</a>
-      </div>
-
       <div class="start-menu__account" v-if="me && !me.isGuest">
         {{ signedInText }} {{ me.displayName }}
         <div>
@@ -136,7 +146,12 @@
         </div>
       </div>
 
-      <div class="start-menu__auth">
+      <div class="start-menu__queue-status" v-show="queueActive">
+        {{ queueText }}
+        <a @click="cancelQueue">{{ cancelText }}</a>
+      </div>
+
+      <div class="start-menu__auth" v-if="!queueActive">
         <div class="start-menu__nickname">
           <input type="text"
                  class="start-menu__nickname-input"
@@ -144,22 +159,19 @@
                  :placeholder="nicknameInputPlaceholder"
                  :disabled="queueActive">
         </div>
+        <div class="start-menu__divider"></div>
       </div>
-
-      <div class="start-menu__divider"></div>
 
       <div class="start-menu__menu-buttons">
         <RoyalButton class="start-menu__menu-button start-menu__menu-button_quick"
                      @click="startQueue('quick')"
-                     :disabled="queueActive">{{ quickPlayText }}</RoyalButton>
+                     :disabled="queueActive">{{ queueActive ? queueText : quickPlayText }}</RoyalButton>
       </div>
 
-      <transition name="fade-transition" mode="out-in">
-        <div v-if="!me || me.isGuest" key="has-me">
-          <div class="start-menu__divider"></div>
-          <RoyalSocialAuth class="start-menu__social-auth"/>
-        </div>
-      </transition>
+      <div v-if="( !me || me.isGuest ) && !queueActive">
+        <div class="start-menu__divider"></div>
+        <RoyalSocialAuth class="start-menu__social-auth"/>
+      </div>
 
     </div>
 

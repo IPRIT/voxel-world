@@ -7,10 +7,7 @@ export const actions = {
     commit( mutations.SET_QUEUE_PARAMS, params );
 
     const matchmaking = MatchMaking.getInstance();
-    return matchmaking.findServer( params ).then(server => {
-      console.log('server found:', server);
-      return server;
-    }).catch(_ => {
+    return matchmaking.findServer( params ).catch(_ => {
       commit( mutations.SET_QUEUE_STATE, false );
       commit( mutations.SET_QUEUE_PARAMS, null );
     });

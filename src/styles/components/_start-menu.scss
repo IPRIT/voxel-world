@@ -62,23 +62,23 @@
   }
 
   @include element('menu-buttons') {
-    padding: $indent-medium;
-    background-color: white;
-    border: 1px solid $gray-color;
-    border-radius: 4px;
+    padding: $indent-medium 0;
   }
 
   @include element('menu-button') {
+    height: 60px !important;
+    font-size: $font-size-title !important;
+
     &:not(:last-of-type) {
       margin-bottom: $indent-small;
     }
 
     @include modifier('quick') {
-      background-color: #6d9e0c !important;
+      background-color: #e91e63 !important;
       color: white;
 
       &:hover {
-        @include fine-shadow(#6d9e0c, .5, true);
+        @include fine-shadow(#e91e63, .5, true);
       }
     }
 

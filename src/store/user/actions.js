@@ -14,11 +14,14 @@ export const actions = {
     return dispatch( 'fetchMe' );
   },
 
-  fetchMe ({ state, commit }) {
+  fetchMe ({ state, commit, dispatch }) {
     const token = state.token;
     return getMe( this.$axios, { token }).then(({ response }) => {
       commit( mutations.SET_ME, response );
       return response;
+    }).catch(error => {
+      console.error( error );
+      dispatch( 'resetSession' );
     });
   },
 
