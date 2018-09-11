@@ -23,6 +23,15 @@
     transition: {
       name: 'page',
       mode: 'out-in'
+    },
+
+    async asyncData ({ store, redirect } = {}) {
+      const { dispatch } = store;
+      const server = await dispatch( 'game/restoreServer' );
+
+      if (!server) {
+        return redirect({ name: 'index' });
+      }
     }
   };
 </script>

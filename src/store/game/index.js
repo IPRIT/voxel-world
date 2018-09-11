@@ -1,5 +1,6 @@
 export const state = () => ({
-  target: null
+  target: null,
+  server: null,
 });
 
 export * from './actions';

@@ -2,7 +2,7 @@ import * as mutations from "./mutations";
 import { MatchMaking } from "../../game/network/matchmaking";
 
 export const actions = {
-  findServer ({ commit }, params) {
+  startQueue ({ commit }, params) {
     commit( mutations.SET_QUEUE_STATE, true );
     commit( mutations.SET_QUEUE_PARAMS, params );
 
@@ -13,7 +13,7 @@ export const actions = {
     });
   },
 
-  stop ({ commit }) {
+  stopQueue ({ commit }) {
     const matchmaking = MatchMaking.getInstance();
     if (matchmaking.queue) {
       matchmaking.queue.leaveQueue();

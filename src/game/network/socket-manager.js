@@ -61,6 +61,7 @@ export class SocketManager extends EventEmitter {
     return new Promise((resolve, reject) => {
       this._socket.once( 'connect', resolve );
       this._socket.once( 'connect_error', reject );
+      this._socket.once( 'error', reject );
     });
   }
 
@@ -70,7 +71,7 @@ export class SocketManager extends EventEmitter {
    * Synonym of socket.close().
    */
   disconnect () {
-    this._socket.disconnect();
+    this._socket && this._socket.disconnect();
     this._socket = null;
   }
 

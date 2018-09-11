@@ -65,14 +65,17 @@
         const { dispatch } = this.$store;
 
         const queueOptions = this.prepareQueueOptions( this.gameType, this.region );
-        return dispatch( 'queue/findServer', queueOptions ).then(server => {
+        return dispatch( 'queue/startQueue', queueOptions ).then(server => {
           this.cancelQueue();
+          return dispatch( 'game/storeServer', server );
+        }).then(_ => {
+          this.$router.push({ name: 'play' });
         });
       },
 
       cancelQueue () {
         const { dispatch } = this.$store;
-        dispatch( 'queue/stop' );
+        dispatch( 'queue/stopQueue' );
       },
 
       signOut () {

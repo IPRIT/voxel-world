@@ -9,7 +9,7 @@
       require('three/examples/js/controls/TransformControls.js');
 
       const game = require('../game/main');
-      game.run( this.$store );
+      game.run( this.$store, this.$router );
     }
   };
 </script>
