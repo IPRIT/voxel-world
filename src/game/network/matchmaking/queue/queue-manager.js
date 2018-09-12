@@ -2,8 +2,9 @@ import EventEmitter from 'eventemitter3';
 import { SocketManager } from "../../socket-manager";
 import { config } from '../../../../../config';
 import { QueueEvents } from "./queue-events";
+import { resolveProtocol } from "../../../../util/common-utils";
 
-const QUEUE_SOCKET_SERVER_URI = `${config.serverApi.protocol}://${config.serverApi.host}`;
+const QUEUE_SOCKET_SERVER_URI = `${resolveProtocol()}://${config.serverApi.host}`;
 const QUEUE_PATH = '/queue';
 
 export class QueueManager extends EventEmitter {

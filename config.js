@@ -1,6 +1,6 @@
 const config = {
+  "env": process.env.NODE_ENV || process.env,
   "serverApi": {
-    "protocol": "http",
     "host": "localhost:9000",
     "path": "/api"
   },

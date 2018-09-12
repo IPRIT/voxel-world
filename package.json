@@ -38,6 +38,7 @@
     "parse-magica-voxel": "https://github.com/IPRIT/parse-magica-voxel.git",
     "runtime-shaderfrog": "^0.2.0",
     "socket.io-client": "^2.1.1",
+    "socketio-wildcard": "^2.0.0",
     "ssr-intersection-observer": "^0.5.0",
     "stats.js": "^0.17.0",
     "three": "^0.91.0",

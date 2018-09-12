@@ -1,12 +1,13 @@
-const fs = require('fs');
-const { config } = require('./config');
+const fs = require( 'fs' );
+const { config } = require( './config' );
 
 const isProduction = process.env.NODE_ENV === 'production' || false;
 const isDevelopment = process.env.NODE_ENV === 'development' || false;
 const isStaging = process.env.NODE_ENV === 'staging' || false;
 const isTest = process.env.NODE_ENV === 'test' || false;
 
-const browserBaseURL = `${config.serverApi.protocol || 'http'}://${config.serverApi.host}${config.serverApi.path || '/'}`;
+const protocol = 'http' + ( isProduction ? 's' : '' );
+const browserBaseURL = `${protocol}://${config.serverApi.host}${config.serverApi.path || '/'}`;
 
 const productionModules = [
   /**
@@ -198,7 +199,9 @@ function overrideWebpackConfig (config, ctx) {
 
   if (definitionPlugin) {
     const definitions = definitionPlugin.definitions;
-    // definitions['process.apiHost'] = `"${apiHost}"`;
+    definitions['process.env'] = `"${process.env.NODE_ENV}"`;
+    definitions['process.isDevelopment'] = isDevelopment;
+    definitions['process.isProduction'] = isProduction;
   }
   return config;
 }

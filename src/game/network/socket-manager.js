@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import EventEmitter from 'eventemitter3';
+import socketWildcard from 'socketio-wildcard';
 
 const log = (...args) => console.log( '[ws]', ...args );
 
@@ -52,6 +53,10 @@ export class SocketManager extends EventEmitter {
       timeout: 5000,
       ...options
     });
+
+    // activate wildcard mode for socket
+    const patch = socketWildcard( io.Manager );
+    patch( this._socket );
 
     this.emit( 'connecting', url );
     log( `Connecting to ${url}...` );

@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import { SocketManager } from "./socket-manager";
+import { resolveProtocol } from "../../util/common-utils";
 
 export class GameConnection extends EventEmitter {
 
@@ -51,6 +52,7 @@ export class GameConnection extends EventEmitter {
       sessionToken
     }).then(_ => {
       console.log('connected', session);
+      this._listen();
     });
   }
 
@@ -62,18 +64,43 @@ export class GameConnection extends EventEmitter {
   }
 
   /**
+   * @return {SocketManager}
+   */
+  get socketManager () {
+    return SocketManager.getManager();
+  }
+
+  /**
+   * @return {Socket}
+   */
+  get socket () {
+    return this.socketManager.socket;
+  }
+
+  /**
    * @param {Object} server
    * @return {string}
    * @private
    */
   _buildServerUri (server) {
-    return `https://${server.publicIp}`;
+    return `${resolveProtocol()}://${server.publicIp}`;
   }
 
   /**
-   * @return {SocketManager}
+   * @private
    */
-  get socketManager () {
-    return SocketManager.getManager();
+  _listen () {
+    const socket = this.socketManager.socket;
+    socket.on('*', this._onMessage.bind( this ));
+  }
+
+  /**
+   * @param {Object} message
+   * @private
+   */
+  _onMessage (message = {}) {
+    const { data } = message;
+    const eventName = data.shift();
+    this.emit( eventName, ...data );
   }
 }
