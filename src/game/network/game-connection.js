@@ -67,7 +67,7 @@ export class GameConnection extends EventEmitter {
    * @private
    */
   _buildServerUri (server) {
-    return `http://${server.publicIp}`;
+    return `https://${server.publicIp}`;
   }
 
   /**
