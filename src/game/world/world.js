@@ -36,7 +36,7 @@ export class World {
 
     let coords = new THREE.Vector3( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 10, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE );
 
-    for (let i = 0; i < 150; ++i) {
+    for (let i = 0; i < 5; ++i) {
       let enemy = new DeerAnimal();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 1000, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
@@ -59,7 +59,7 @@ export class World {
       game.scene.add( enemy );
     }
 
-    for (let i = 0; i < 20; ++i) {
+    for (let i = 0; i < 5; ++i) {
       let enemy = new PlayerEnemy();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 1000, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
@@ -97,9 +97,9 @@ export class World {
       }
     });
 
-    /*game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
+    game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
     game._transformControl.attach( me );
-    game.scene.add( game._transformControl );*/
+    game.scene.add( game._transformControl );
     game.scene.add( me );
 
     setTimeout(_ => {

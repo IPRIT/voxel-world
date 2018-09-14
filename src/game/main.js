@@ -13,6 +13,6 @@ export function run (vuexStore, router) {
   }).catch(_ => {
     console.log( _ );
     game.disconnect();
-    router.replace({ name: 'index' });
+    // router.replace({ name: 'index' });
   });
 }

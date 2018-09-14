@@ -1,7 +1,8 @@
-import { AbstractModelLoader } from "./abstract-model-loader";
 import { Vox } from "../../vox/index";
 import Promise from "bluebird";
 import { WORLD_MAP_SIZE } from "../../settings";
+import { DownloadOperationCached } from "../../../util/loaders/download-operation-cached";
+import { VoxLoader } from "../../vox";
 
 function getY(x, z) {
   x -= WORLD_MAP_SIZE / 2;
@@ -20,42 +21,14 @@ function model(x, z) {
 
 window.commonModel = model;
 
-export class VoxModelLoader extends AbstractModelLoader {
-
-  /**
-   * @param {string|number} fileIndex
-   * @param {string} fileUrl
-   * @param {number} attemptsNumber
-   * @returns {Promise<{cached: boolean, worldObject?: WorldObjectVox, model?: VoxModel}>}
-   */
-  async load (fileIndex, fileUrl, attemptsNumber = 15) {
-    let object = await super.load( fileIndex, fileUrl, attemptsNumber );
-    if (object.cached) {
-      return {
-        cached: true,
-        worldObject: object.model
-      };
-    }
-    return object;
-  }
+export class VoxModelLoader extends DownloadOperationCached {
 
   /**
    * @param {string} fileUrl
-   * @param {number} attemptsNumber
-   * @returns {Promise<*>}
+   * @return {Promise<VoxModel>}
    */
-  async tryLoad (fileUrl, attemptsNumber) {
-    return this.tryUntil(async attemptNumber => {
-      // console.log(`Trying to load vox model [attempt: ${attemptNumber}]: ${fileUrl}`);
-      // return commonModel;
-      let vox = new Vox();
-      let model;
-      try {
-        model = await vox.load( fileUrl );
-      } catch (e) {
-        throw new Error('Cannot load model');
-      }
-      return model;
-    }, attemptsNumber);
+  async download (fileUrl) {
+    const voxLoader = VoxLoader.getLoader();
+    return voxLoader.load( fileUrl );
   }
 }

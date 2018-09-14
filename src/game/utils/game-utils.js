@@ -17,7 +17,7 @@ export function rgbToInt(colorArray) {
  * @param {THREE.Vector3} vector
  * @returns {THREE.Vector3}
  */
-export function resetDecimal (vector) {
+export function floorVector (vector) {
   vector.x |= 0;
   vector.y |= 0;
   vector.z |= 0;

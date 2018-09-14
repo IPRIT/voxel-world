@@ -7,16 +7,58 @@ import {
 
 export class WorldChunkMap extends WorldChunkBase {
 
+  /**
+   * @type {number}
+   * @private
+   */
   _chunkIndexX = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _chunkIndexY = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _chunkIndexZ = 0;
 
+  /**
+   * @type {number}
+   * @private
+   */
   _fromX = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _fromY = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _fromZ = 0;
 
+  /**
+   * @type {number}
+   * @private
+   */
   _toX = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _toY = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
   _toZ = 0;
 
   /**
@@ -63,9 +105,9 @@ export class WorldChunkMap extends WorldChunkBase {
   }
 
   /**
-   * @param x
-   * @param y
-   * @param z
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
    */
   computeWorldPosition ({ x, y, z }) {
     return {

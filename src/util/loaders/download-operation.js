@@ -18,7 +18,7 @@ export class DownloadOperation {
    * @returns {Promise<*>}
    */
   async load (resourceUrl, attemptsNumber = 15) {
-    return this.tryLoad( resourceUrl, attemptsNumber );
+    return this._tryLoad( resourceUrl, attemptsNumber );
   }
 
   /**
@@ -27,10 +27,8 @@ export class DownloadOperation {
    * @returns {Promise<*>}
    * @private
    */
-  tryLoad (resourceUrl, attemptsNumber) {
-    return this.tryUntil(attemptNumber => {
-      return this.download( resourceUrl );
-    }, attemptsNumber);
+  _tryLoad (resourceUrl, attemptsNumber) {
+    return this._tryUntil(_ => this.download( resourceUrl ), attemptsNumber);
   }
 
   /**
@@ -39,7 +37,7 @@ export class DownloadOperation {
    * @returns {Promise<*>}
    * @private
    */
-  async tryUntil (asyncAction, maxAttemptsNumber) {
+  async _tryUntil (asyncAction, maxAttemptsNumber) {
     let attempts = 0;
 
     while (attempts < maxAttemptsNumber) {
@@ -48,8 +46,10 @@ export class DownloadOperation {
         return result;
       } catch (e) {
         attempts++;
-        await delay( 125 * Math.min(10, attempts) ** 2 + 500 );
+        await delay( 25 * Math.min(10, attempts) ** 2 + 500 );
       }
     }
+
+    throw new Error( 'Failed to download' );
   }
 }

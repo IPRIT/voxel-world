@@ -4,7 +4,6 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./settings";
 import JsPerformanceStats from 'stats.js';
 import { World } from "./world";
 import { UpdateWarper } from "./utils/update-warper";
-import { RuntimeShaders } from "./utils/shaders/RuntimeShaders";
 import { AppStore } from "./utils/store/app-store";
 import { SocketManager } from "./network";
 import { GameConnection } from "./network/game-connection";
@@ -153,19 +152,17 @@ export class Game {
     });
 
     const socketManager = SocketManager.getManager();
-    /*let gui = new dat.GUI();
+    let gui = new dat.GUI();
     let common = gui.addFolder('Common');
     common.add(this._updateWarper, 'timeScale', -.5, 5);
 
     let socketFolder = gui.addFolder('Network');
-    socketManager.on('connecting', _ => {
-      socketFolder.add(socketManager.socket, 'connect');
-      socketFolder.add(socketManager, 'disconnect');
-    });
+    socketFolder.add(socketManager.socket, 'connect');
+    socketFolder.add(socketManager, 'disconnect');
 
     document.querySelector('.dg.ac').addEventListener('mousedown', ev => {
       ev.stopPropagation();
-    });*/
+    });
   }
 
   /**
@@ -174,6 +171,9 @@ export class Game {
   update () {
     const deltaTime = this._clock.getDelta();
     this.world.update( deltaTime );
+
+    // update renderer stats
+    this._renderStats.update( this._renderer );
   }
 
   /**
@@ -259,7 +259,7 @@ export class Game {
     if (this._pauseToken) {
       return;
     }
-    this._animationFrameId = requestAnimationFrame( this._animate.bind(this) );
+    this._animationFrameId = requestAnimationFrame( this._animate.bind( this ) );
     this.render();
     this.update();
   }
@@ -310,7 +310,7 @@ export class Game {
    * @private
    */
   _initFog () {
-    this._scene.fog = new THREE.Fog(0xffa1c1, 50 * WORLD_MAP_BLOCK_SIZE, 600 * WORLD_MAP_BLOCK_SIZE);
+    // this._scene.fog = new THREE.Fog(0xffa1c1, 50 * WORLD_MAP_BLOCK_SIZE, 600 * WORLD_MAP_BLOCK_SIZE);
   }
 
   /**

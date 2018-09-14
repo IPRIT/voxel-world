@@ -1,18 +1,26 @@
-import { WorldChunkType } from '../../chunks/world-chunk-type';
-import { computeVertices } from "./compute-vertices";
+import WebworkerPromise from "webworker-promise";
 import MesherWorker from './compute-vertices.worker';
-import WorkerPool from 'webworker-promise/lib/pool';
+import { computeVertices } from "./compute-vertices";
+import { WorldChunkType } from '../../chunks/world-chunk-type';
 
-const workersNumber = 5;
-let workerPool;
+const isWorkersSupported = !!window.Worker;
+const workersNumber = 3;
 
-if (window.Worker) {
-  workerPool = WorkerPool.create({
+let workerPool = [];
+let workerIndex = 0;
+
+if (isWorkersSupported) {
+  /*workerPool = WorkerPool.create({
     create: () => new MesherWorker(),
     maxThreads: workersNumber,
     maxConcurrentPerWorker: 1
+  });*/
+
+  workerPool = Array( workersNumber ).fill( 0 ).map(_ => {
+    return new WebworkerPromise( new MesherWorker() );
   });
 }
+
 
 export class WorldObjectVoxMesher {
 
@@ -150,9 +158,10 @@ export class WorldObjectVoxMesher {
       heightMap: chunk.heightMap.map
     };
 
-    if (!workerPool) {
-      return computeVertices( context );
+    if (isWorkersSupported && workerPool.length) {
+      const worker = workerPool[ workerIndex++ % workerPool.length ];
+      return worker.postMessage( context );
     }
-    return workerPool.postMessage( context );
+    return computeVertices( context );
   }
 }

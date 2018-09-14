@@ -20,7 +20,7 @@ export class WorldObjectSkinned extends WorldObjectBase {
    * Setting up skinned object
    */
   constructor () {
-    super(WorldObjectType.OBJECT, ModelType.SKINNED);
+    super( WorldObjectType.OBJECT, ModelType.SKINNED );
   }
 
   /**
@@ -74,12 +74,12 @@ export class WorldObjectSkinned extends WorldObjectBase {
    * @private
    */
   async _load () {
-    let { model } = await this._loadObjectModel();
-    return [ model ];
+    let { item } = await this._loadObjectModel();
+    return [ item ];
   }
 
   /**
-   * @return {Promise<{cached: boolean, skinnedMesh?: THREE.SkinnedMesh, model?: {geometry: *, material: *}}>}
+   * @return {Promise<{cached: boolean, item: THREE.SkinnedMesh | {geometry: *, material: *}}>}
    * @private
    */
   async _loadObjectModel () {

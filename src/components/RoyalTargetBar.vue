@@ -1,6 +1,8 @@
 <script>
   import RoyalClassName from "./RoyalClassName";
-  import { mapState } from 'vuex';
+  import { createNamespacedHelpers } from 'vuex';
+
+  const gameStore = createNamespacedHelpers( 'game' );
 
   export default {
     name: 'royal-target-bar',
@@ -10,7 +12,7 @@
     },
 
     computed: {
-      ...mapState({
+      ...gameStore.mapState({
         target: state => state.target
       }),
 

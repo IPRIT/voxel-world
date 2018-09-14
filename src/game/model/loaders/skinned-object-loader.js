@@ -21,13 +21,13 @@ export class SkinnedObjectLoader extends SkinnedModelLoader {
 
   /**
    * @param {string} modelName
-   * @returns {Promise<{cached: boolean, skinnedMesh?: THREE.SkinnedMesh, model?: {geometry: *, material: *}}>}
+   * @returns {Promise<{cached: boolean, item: THREE.SkinnedMesh | {geometry: *, material: *}}>}
    */
   async load (modelName) {
     let fileName = `${modelName}.json`;
     let pathToFile = `/resources/models/skinned/${modelName}/default/`;
-    let modelUrl = `${pathToFile}${fileName}`;
+    let fileUrl = `${pathToFile}${fileName}`;
 
-    return super.load( fileName, modelUrl, 15 );
+    return super.load( fileUrl );
   }
 }

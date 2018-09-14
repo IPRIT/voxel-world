@@ -1,16 +1,11 @@
-import Promise from 'bluebird';
-import { WorldObjectVox, WorldObjectType } from "../world-object/index";
-import { resetDecimal } from "../../utils/index";
+import { WorldObjectVox } from "../world-object/index";
 import { WorldMapLoader } from "./world-map-loader";
 import {
   WORLD_MAP_BLOCK_SIZE,
   WORLD_MAP_CHUNK_HEIGHT,
   WORLD_MAP_CHUNK_SIZE, WORLD_MAP_CHUNK_SIZE_POWER,
-  WORLD_MAP_CHUNK_SIZE_VECTOR,
-  WORLD_MAP_CHUNK_VIEW_DISTANCE,
   WORLD_MAP_SIZE
 } from "../../settings";
-import { ModelType } from "../../model";
 import { WorldMapCollisions } from "./world-map-collisions";
 import { Tween } from "../../utils/tween";
 
@@ -35,24 +30,10 @@ export class WorldMap extends THREE.Group {
   _groundPlate = null;
 
   /**
-   * @type {boolean}
-   * @private
-   */
-  _chunksLoading = false;
-
-  /**
    * @type {Array<Tween>}
    * @private
    */
   _showingAnimations = [];
-
-  /**
-   * @param {number} x
-   * @param {number} z
-   * @returns {*[]}
-   * @private
-   */
-  _dummyModelFunction = (x, z) => ([{ x, y: 0, z }, [255, 255, 255]]);
 
   /**
    * World preparing
@@ -83,119 +64,9 @@ export class WorldMap extends THREE.Group {
   /**
    * @param {THREE.Vector3} position
    */
-  async updateAtPosition (position) {
-    if (this._chunksLoading) {
-      return;
-    }
-    this._chunksLoading = true;
-
-    let newVisibleChunks = this.getVisibleChunksAt( position, true );
-    let chunksToLoad = newVisibleChunks.filter(chunkIndex => {
-      return !this._map.has( chunkIndex );
-    });
-    let chunksToUnload = [ ...this._map.keys() ].filter(chunkIndex => {
-      return !newVisibleChunks.includes( chunkIndex );
-    });
-
-    return this._loadChunks( chunksToLoad, chunksToUnload );
-  }
-
-  /**
-   * @param {THREE.Vector3} position
-   * @returns {{from: THREE.Vector3, to: THREE.Vector3}}
-   */
-  getVisibleBoxAt (position) {
-    position = new THREE.Vector3(position.x, position.y, position.z);
-
-    let worldBorders = [
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(WORLD_MAP_SIZE - 1, WORLD_MAP_CHUNK_HEIGHT - 1, WORLD_MAP_SIZE - 1)
-    ];
-
-    let chunkSize = new THREE.Vector3( ...WORLD_MAP_CHUNK_SIZE_VECTOR );
-
-    let viewAreaBox = new THREE.Vector3(
-      WORLD_MAP_CHUNK_SIZE * WORLD_MAP_CHUNK_VIEW_DISTANCE,
-      WORLD_MAP_CHUNK_HEIGHT,
-      WORLD_MAP_CHUNK_SIZE * WORLD_MAP_CHUNK_VIEW_DISTANCE
-    );
-
-    /**
-     * @type {THREE.Vector3}
-     */
-    let viewBorderFrom = position.clone()
-      .sub( viewAreaBox )
-      .sub( chunkSize.clone().subScalar(1) )
-      .max( worldBorders[0] )
-      .divide( chunkSize );
-
-    /**
-     * @type {THREE.Vector3}
-     */
-    let viewBorderTo = position.clone()
-      .add( viewAreaBox )
-      .add( chunkSize.clone().subScalar(1) )
-      .min( worldBorders[1] )
-      .divide( chunkSize );
-
-    resetDecimal( viewBorderFrom );
-    resetDecimal( viewBorderTo );
-
-    viewBorderFrom.multiply( chunkSize );
-    viewBorderTo.multiply( chunkSize )
-      .add( chunkSize.clone().subScalar(1) );
-
-    return {
-      from: viewBorderFrom,
-      to: viewBorderTo
-    };
-  }
-
-  /**
-   * @param {THREE.Vector3} position
-   */
-  getVisibleChunksBoxAt (position) {
-    position = new THREE.Vector3(position.x, position.y, position.z);
-    let visibleBox = this.getVisibleBoxAt( position );
-    let chunkSize = new THREE.Vector3( ...WORLD_MAP_CHUNK_SIZE_VECTOR );
-
-    return {
-      from: resetDecimal( visibleBox.from.clone().divide( chunkSize ).setY(0) ),
-      to: resetDecimal( visibleBox.to.clone().divide( chunkSize ).setY(0) )
-    };
-  }
-
-  /**
-   * @param {THREE.Vector3} position
-   * @param {boolean} sort
-   * @returns {string[]}
-   */
-  getVisibleChunksAt (position, sort = false) {
-    position = new THREE.Vector3(position.x, position.y, position.z);
-    let visibleChunksBox = this.getVisibleChunksBoxAt( position );
-    let chunksIndicies = [];
-    for (let xIndex = visibleChunksBox.from.x; xIndex <= visibleChunksBox.to.x; ++xIndex) {
-      for (let zIndex = visibleChunksBox.from.z; zIndex <= visibleChunksBox.to.z; ++zIndex) {
-        chunksIndicies.push( new THREE.Vector3(xIndex, 0, zIndex) );
-      }
-    }
-
-    if (sort) {
-      let chunkSize = new THREE.Vector3( ...WORLD_MAP_CHUNK_SIZE_VECTOR );
-      let curChunk = resetDecimal(
-        position.clone()
-          .divide( chunkSize )
-          .setY(0)
-      );
-
-      chunksIndicies = chunksIndicies.sort((chunkA, chunkB) => {
-        return curChunk.distanceTo( chunkA ) - curChunk.distanceTo( chunkB );
-      });
-    }
-
-    return chunksIndicies.map(chunkVector => {
-      return this._buildChunkStringIndex( chunkVector.x, chunkVector.z );
-    });
+  updateAtPosition (position) {
+    const mapLoader = WorldMapLoader.getLoader();
+    return mapLoader.update( this, position );
   }
 
   /**
@@ -313,6 +184,25 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
+   * @param {string[]} chunks
+   */
+  unloadChunks (chunks = []) {
+    for (let chunkIndex of chunks) {
+      this.unloadChunk( chunkIndex );
+    }
+  }
+
+  /**
+   * @param {string} chunkIndex
+   */
+  unloadChunk (chunkIndex) {
+    if (this._map.has( chunkIndex )) {
+      let chunk = this._map.get( chunkIndex );
+      this.detach( chunk );
+    }
+  }
+
+  /**
    * @param {WorldObjectVox} mapObject
    */
   attach (mapObject) {
@@ -409,114 +299,6 @@ export class WorldMap extends THREE.Group {
    */
   _initCollisions () {
     this._collisions = new WorldMapCollisions( this );
-  }
-
-  /**
-   * @param {Array<string>} chunksToLoad
-   * @param {Array<string>} chunksToUnload
-   * @returns {Promise<any>}
-   * @private
-   */
-  _loadChunks (chunksToLoad = [], chunksToUnload = []) {
-    // loading chunks
-    return Promise.resolve( chunksToLoad ).map(chunkToLoad => {
-      return Promise.all([
-        chunkToLoad,
-        this._loadChunkModel( chunkToLoad )
-          .catch(error => this._onChunkLoadError( error, chunkToLoad ))
-      ]);
-    }, { concurrency: 20 }).mapSeries(async ([ chunkToLoad, data ]) => {
-      let [ x, z ] = this._parseChunkIndex( chunkToLoad );
-      let { cached, model = null, worldObject = null } = data || {};
-      if (!cached && model) {
-        // if not cached just create a chunk with a received model
-        worldObject = await this._createWorldChunk( model, { x, y: 0, z } );
-      } else if (!model && !worldObject) {
-        // when error occurred both objects are empty
-        return;
-      }
-
-      // adding chunk to the world
-      this.attach( worldObject );
-
-      // unload next chunk
-      if (chunksToUnload.length) {
-        let chunkIndex = chunksToUnload.shift();
-        this._unloadChunk( chunkIndex );
-      }
-    }).finally(_ => {
-      // unload the rest
-      this._unloadChunks( chunksToUnload );
-      this._chunksLoading = false;
-    });
-  }
-
-  /**
-   * @param {string} chunkIndex
-   * @returns {Promise<{cached: boolean, worldObject?: WorldObjectVox, model?: VoxModel}>}
-   */
-  async _loadChunkModel (chunkIndex) {
-    let mapLoader = WorldMapLoader.getLoader();
-    return mapLoader.load( chunkIndex );
-  }
-
-  /**
-   * @param {string[]} chunks
-   */
-  _unloadChunks (chunks = []) {
-    for (let chunkIndex of chunks) {
-      this._unloadChunk( chunkIndex );
-    }
-  }
-
-  /**
-   * @param {string} chunkIndex
-   */
-  _unloadChunk (chunkIndex) {
-    let mapLoader = WorldMapLoader.getLoader();
-    if (this._map.has( chunkIndex )) {
-      let chunk = this._map.get( chunkIndex );
-      mapLoader.addToCache( chunkIndex, chunk );
-      this.detach( chunk );
-    }
-  }
-
-  /**
-   * @param {*} error
-   * @param {string} targetChunk
-   * @private
-   */
-  _onChunkLoadError (error, targetChunk) {
-    console.log('Using fallback chunk due to error:', error);
-
-    let [ x, z ] = this._parseChunkIndex( targetChunk );
-    // using a function to generate plane
-    let fallback = this._createWorldChunk(
-      this._dummyModelFunction,
-      { x, y: 0, z }
-    );
-    this.attach( fallback );
-  }
-
-  /**
-   * @param {VoxModel|function|null} model
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
-   * @returns {WorldObjectVox}
-   */
-  _createWorldChunk (model, { x, y, z }) {
-    const mapChunkObject = new WorldObjectVox( WorldObjectType.MAP, ModelType.VOX );
-
-    mapChunkObject.setModel( model );
-    mapChunkObject.position.set(
-      x * WORLD_MAP_CHUNK_SIZE,
-      y + WORLD_MAP_BLOCK_SIZE / 2,
-      z * WORLD_MAP_CHUNK_SIZE
-    );
-    mapChunkObject.position.multiplyScalar( WORLD_MAP_BLOCK_SIZE );
-
-    return mapChunkObject.init();
   }
 
   /**
