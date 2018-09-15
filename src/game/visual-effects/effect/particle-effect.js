@@ -3,8 +3,14 @@ import { Game } from "../../game";
 import { LivingObject } from "../../living-object/index";
 import { ParticleSystem } from "../particle/index";
 import { extendDeep } from "../../utils";
+import { ParticleSystemEvents } from "../particle/particle-system-events";
 
 let EFFECT_ID = 1;
+
+export const ParticleEffectEvents = {
+  START_FINISHING: 'startFinishing',
+  FINISHED: 'finished'
+};
 
 export class ParticleEffect {
 
@@ -88,6 +94,11 @@ export class ParticleEffect {
 
   init () {
     this._particleSystem = new ParticleSystem( this._particleSystemOptions );
+
+    this._particleSystem.on(ParticleSystemEvents.FINISHED, _ => {
+      this._particleSystem.release();
+      this.finish();
+    });
 
     this.parentContainer.add( this._particleSystem );
 
@@ -329,12 +340,6 @@ export class ParticleEffect {
     }
     const particleSystem = this._particleSystem;
     particleSystem.update( deltaTime );
-
-    if (particleSystem.isFinished) {
-      particleSystem.release();
-
-      this.finish();
-    }
   }
 
   /**

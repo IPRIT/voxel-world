@@ -2,6 +2,8 @@ import { ParticleSystemState } from "./particle-system-state";
 import { ParticlesPool } from "./particles-pool";
 import { Game } from "../../game";
 import { isVectorZeroStrict, warp } from "../../utils";
+import { ParticlesBucketEvents } from "./particles-bucket-events";
+import { ParticleSystemEvents } from "./particle-system-events";
 
 const zeroVector = new THREE.Vector3();
 
@@ -182,12 +184,6 @@ export class ParticleSystem extends THREE.Object3D {
   _freeParticles = [];
 
   /**
-   * @type {Array<Function>}
-   * @private
-   */
-  _onStartFinishingFns = [];
-
-  /**
    * @param {*} options
    */
   constructor (options = {}) {
@@ -202,6 +198,7 @@ export class ParticleSystem extends THREE.Object3D {
     if (this.isFinished) {
       return;
     }
+
     deltaTime *= this._timeScale;
     this._timeElapsed += deltaTime * 1000;
 
@@ -220,10 +217,11 @@ export class ParticleSystem extends THREE.Object3D {
    */
   start () {
     this._bucket = this.pool.take( this._maxParticlesNumber );
+    this._bucket.on( ParticlesBucketEvents.RELEASED, this._beforeBucketRelease.bind( this ) );
+
     this._particleIsHSLRange
       ? this._bucket.setHSLRange( ...this._particleColorRange )
       : this._bucket.setHexRange( ...this._particleColorRange );
-    this._bucket.beforeRelease( this._beforeBucketRelease.bind(this) );
 
     this._freeParticles = [].concat( this._bucket.particles );
     this._usingParticles = [];
@@ -268,10 +266,16 @@ export class ParticleSystem extends THREE.Object3D {
   }
 
   /**
-   * @param {Function} callback
+   * @param {string} eventName
+   * @param {Function} fn
    */
-  onStartFinishing (callback) {
-    this._onStartFinishingFns.push( callback );
+  on (eventName, fn) {
+    this.addEventListener( eventName, fn );
+  }
+
+  emit (eventName, ...args) {
+    // todo
+    this.dispatchEvent( { type: eventName } );
   }
 
   /**
@@ -322,7 +326,7 @@ export class ParticleSystem extends THREE.Object3D {
    * @returns {boolean}
    */
   get isFinished () {
-    return !(this._usingParticles && this._usingParticles.length) && this.isStopped;
+    return this._state === ParticleSystemState.FINISHED;
   }
 
   /**
@@ -413,8 +417,16 @@ export class ParticleSystem extends THREE.Object3D {
     if (!this.isStopped) {
       this._spawnParticles();
     }
+
     this._updateParticles( deltaTime );
     this._updateRotation( deltaTime );
+
+    if (this.isStopped && (!this._usingParticles || !this._usingParticles.length)) {
+      if (!this.isFinished) {
+        this._onFinished();
+        this._state = ParticleSystemState.FINISHED;
+      }
+    }
   }
 
   /**
@@ -586,8 +598,13 @@ export class ParticleSystem extends THREE.Object3D {
    * @private
    */
   _onStartFinishing () {
-    for (let i = 0; i < this._onStartFinishingFns.length; ++i) {
-      this._onStartFinishingFns[ i ]();
-    }
+    this.emit( ParticleSystemEvents.START_FINISHING );
+  }
+
+  /**
+   * @private
+   */
+  _onFinished () {
+    this.emit( ParticleSystemEvents.FINISHED );
   }
 }

@@ -4,6 +4,7 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_CHUNK_SIZE } from "../../settings";
 import { WorldObjectType, WorldObjectVox } from "../world-object";
 import { ModelType } from "../../model";
 import { WorldChunkLoader } from "../chunks/world-chunk-loader";
+import { parseChunkIndex } from "../../utils";
 
 export const WorldMapLoadingOperationEvents = {
   CHUNK_LOADED: 'chunkLoaded',
@@ -101,8 +102,8 @@ export class WorldMapLoadingOperation extends EventEmitter {
         this._loadChunk( chunkIndex )
       ]);
     }, { concurrency: 20 }).mapSeries(async ([ chunkIndex, data ]) => {
-      let [x, z] = this._parseChunkIndex( chunkIndex );
-      let { cached, item = null } = data || {};
+      const [ x, z ] = parseChunkIndex( chunkIndex );
+      const { cached, item = null } = data || {};
 
       const worldObject = await this._createWorldChunk( item, { x, y: 0, z } );
       this.emit( WorldMapLoadingOperationEvents.CHUNK_LOADED, worldObject, chunkIndex );
@@ -129,7 +130,7 @@ export class WorldMapLoadingOperation extends EventEmitter {
   _onChunkLoadError (error, chunkIndex) {
     console.warn('[WorldMapLoader] Using fallback chunk due to error:', error);
 
-    const [ x, z ] = this._parseChunkIndex( chunkIndex );
+    const [ x, z ] = parseChunkIndex( chunkIndex );
     return this._createWorldChunk(
       this._dummyModelFunction,
       { x, y: 0, z }
@@ -157,14 +158,5 @@ export class WorldMapLoadingOperation extends EventEmitter {
     mapChunkObject.position.multiplyScalar( WORLD_MAP_BLOCK_SIZE );
 
     return mapChunkObject.init();
-  }
-
-  /**
-   * @param {string} chunkIndex
-   * @returns {number[]}
-   * @private
-   */
-  _parseChunkIndex (chunkIndex) {
-    return chunkIndex.split('|').map( Number );
   }
 }

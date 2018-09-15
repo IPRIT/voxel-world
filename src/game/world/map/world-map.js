@@ -8,6 +8,7 @@ import {
 } from "../../settings";
 import { WorldMapCollisions } from "./world-map-collisions";
 import { Tween } from "../../utils/tween";
+import { buildChunkIndex } from "../../utils";
 
 export class WorldMap extends THREE.Group {
 
@@ -215,7 +216,7 @@ export class WorldMap extends THREE.Group {
     });
     tween.start();
     tween.then(_ => {
-      // webgl doesn't sort transparent objects properly by z depth
+      // webgl doesn't sort transparent objects properly by z-depth
       // so we need turn off this to get rid of unexpected results
       mapObject.material.transparent = false;
     });
@@ -244,13 +245,13 @@ export class WorldMap extends THREE.Group {
   }
 
   /**
-   * @param {WorldObjectVox|string} mapObject
+   * @param {WorldObjectVox|string} mapObjectOrIndex
    */
-  unregister (mapObject) {
-    if (typeof mapObject === 'string') {
-      this._map.delete( mapObject );
-    } else if (mapObject.chunkInited) {
-      this._map.delete( mapObject.chunk.mapChunkIndex );
+  unregister (mapObjectOrIndex) {
+    if (typeof mapObjectOrIndex === 'string') {
+      this._map.delete( mapObjectOrIndex );
+    } else if (mapObjectOrIndex.chunkInited) {
+      this._map.delete( mapObjectOrIndex.chunk.mapChunkIndex );
     }
   }
 
@@ -270,7 +271,7 @@ export class WorldMap extends THREE.Group {
    * @returns {number}
    */
   get chunksSideNumber () {
-    return Math.ceil(WORLD_MAP_SIZE / WORLD_MAP_CHUNK_SIZE);
+    return Math.ceil( WORLD_MAP_SIZE / WORLD_MAP_CHUNK_SIZE );
   }
 
   /**
@@ -338,26 +339,7 @@ export class WorldMap extends THREE.Group {
     const { x, z } = position;
     const chunkIndexX = x >> WORLD_MAP_CHUNK_SIZE_POWER;
     const chunkIndexZ = z >> WORLD_MAP_CHUNK_SIZE_POWER;
-    return this._buildChunkStringIndex(chunkIndexX, chunkIndexZ);
-  }
-
-  /**
-   * @param {number} x
-   * @param {number} z
-   * @returns {string}
-   * @private
-   */
-  _buildChunkStringIndex (x, z) {
-    return `${x}|${z}`;
-  }
-
-  /**
-   * @param {string} chunkIndex
-   * @returns {number[]}
-   * @private
-   */
-  _parseChunkIndex (chunkIndex) {
-    return chunkIndex.split('|').map(Number);
+    return buildChunkIndex(chunkIndexX, chunkIndexZ);
   }
 }
 

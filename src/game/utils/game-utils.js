@@ -153,11 +153,15 @@ export function lowestMaxBit (v) {
   return v >> 1;
 }
 
-const powersOfTwoInv = {};
-const powersOfTwo = {};
+const powersOfTwoInv = {
+  1: 0
+};
+const powersOfTwo = {
+  0: 1
+};
 
-for (let i = 0; i < 32; ++i) {
-  const powerOfTwo = 2 ** i;
+for (let i = 1; i < 32; ++i) {
+  const powerOfTwo = powersOfTwo[ i - 1 ] * 2;
   powersOfTwo[ i ] = powerOfTwo;
   powersOfTwoInv[ powerOfTwo ] = i;
 }
@@ -226,9 +230,32 @@ export function valueBetween (value, min = -Infinity, max = Infinity) {
  * @returns {number}
  */
 export function ensureNumber (value) {
-  value = Number(value);
-  if (Number.isNaN(value)) {
-    return 0;
-  }
-  return value;
+  value = Number( value );
+  return Number.isNaN( value ) ? 0 : value;
+}
+
+/**
+ * @param {number} x
+ * @param {number} z
+ * @returns {string}
+ */
+export function buildChunkIndex (x, z) {
+  return `${x}|${z}`;
+}
+
+/**
+ * @param {string} value
+ * @returns {number[]}
+ */
+export function parseChunkIndex (value) {
+  return value.split( '|' ).map( ensureNumber );
+}
+
+/**
+ * @param {string} value
+ * @returns {THREE.Vector3}
+ */
+export function parseChunkIndexToVector (value) {
+  const parsedIndex = parseChunkIndex( value );
+  return new THREE.Vector3( parsedIndex[ 0 ], 0, parsedIndex[ 1 ] );
 }

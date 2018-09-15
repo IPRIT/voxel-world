@@ -115,6 +115,7 @@ export class Particle extends THREE.Mesh {
     if (this.isStopped) {
       return;
     }
+
     deltaTime *= this._timeScale;
 
     this._updateVelocity( deltaTime );

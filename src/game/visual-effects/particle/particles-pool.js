@@ -1,5 +1,6 @@
 import { ParticlesBucket } from "./particles-bucket";
 import { CubeParticle } from "./cube-particle";
+import { ParticlesBucketEvents } from "./particles-bucket-events";
 
 const PARTICLES_DEFAULT_POOL_SIZE = 1e4;
 
@@ -50,7 +51,7 @@ export class ParticlesPool {
    */
   createPool (sourceObject = null) {
     if (this._poolReady) {
-      console.warn('[Warn] Particles Pool already initialized');
+      return console.warn('[Warn] Particles Pool already initialized');
     }
     this._pool = [];
 
@@ -68,18 +69,22 @@ export class ParticlesPool {
    * @returns {ParticlesBucket}
    */
   take (particlesNumber = 0) {
+    console.log( `[ParticlesPool#take] requesting ${particlesNumber} particles...` );
     particlesNumber = Math.min( Math.max( particlesNumber, 0 ), this.poolFreeSize );
 
     if (!this._poolReady) {
       particlesNumber = 0;
     }
 
-    // console.info(`[ParticlesPool] got ${particlesNumber} particles from the pool`);
-
     let particles = this._pool.splice( 0, particlesNumber );
     let bucket = new ParticlesBucket( particles );
 
+    bucket.once(ParticlesBucketEvents.RELEASED, _ => this.transfer( bucket ));
+
     this._buckets.push( bucket );
+
+    console.log( `[ParticlesPool#take] took ${particlesNumber} particles. Bucket ID: #${bucket.id}.` );
+
     return bucket;
   }
 
@@ -87,9 +92,7 @@ export class ParticlesPool {
    * @param {ParticlesBucket} particlesBucket
    */
   transfer (particlesBucket) {
-    if (!particlesBucket.isReleased) {
-      return particlesBucket.release();
-    }
+    console.log( `[ParticlesPool#transfer] transferring...` );
 
     let bucketIndex = this._findBucketIndex( particlesBucket );
     if (bucketIndex >= 0) {
@@ -98,6 +101,8 @@ export class ParticlesPool {
 
     let particles = particlesBucket.particles || [];
     this._pool = this._pool.concat( particles );
+
+    console.log( `[ParticlesPool#transfer] transferred ${particles.length}.` );
   }
 
   /**

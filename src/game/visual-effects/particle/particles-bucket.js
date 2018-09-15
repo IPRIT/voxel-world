@@ -1,8 +1,9 @@
-import { ParticlesPool } from "./particles-pool";
+import EventEmitter from 'eventemitter3';
+import { ParticlesBucketEvents } from "./particles-bucket-events";
 
 let PARTICLES_BUCKET_ID = 1;
 
-export class ParticlesBucket {
+export class ParticlesBucket extends EventEmitter {
 
   /**
    * @type {number}
@@ -29,12 +30,6 @@ export class ParticlesBucket {
   _disposed = false;
 
   /**
-   * @type {Array<Function>}
-   * @private
-   */
-  _onFulfill = [];
-
-  /**
    * @type {number}
    * @private
    */
@@ -50,8 +45,9 @@ export class ParticlesBucket {
    * @param {Array<Particle>} particles
    */
   constructor (particles = []) {
+    super();
     this._particles = particles;
-    this._setSelfDestructTimer();
+    this._createSelfDestructTimer();
   }
 
   /**
@@ -61,47 +57,12 @@ export class ParticlesBucket {
     if (this._released) {
       return;
     }
-    this.fulfill( this._particles );
+
+    this.emit( ParticlesBucketEvents.RELEASED, this._particles );
+
     this._released = true;
 
-    let pool = ParticlesPool.getPool();
-    pool.transfer( this );
-
-    this.dispose();
-  }
-
-  /**
-   * Release and destroy the bucket
-   */
-  dispose () {
-    if (this._disposed) {
-      return;
-    } else if (!this._released) {
-      this.release();
-    }
-    this._clearSelfDestructTimer();
-    this._particles = null;
-    this._onFulfill = null;
-    this._disposed = true;
-  }
-
-  /**
-   * @param {Function} onFulfill
-   * @returns {ParticlesBucket}
-   */
-  beforeRelease (onFulfill) {
-    this._onFulfill.push( onFulfill );
-    return this;
-  }
-
-  /**
-   * @param {Array<Particle>} particles
-   */
-  fulfill (particles) {
-    let lastResult = particles;
-    for (let i = 0; i < this._onFulfill.length; ++i) {
-      lastResult = this._onFulfill[ i ]( lastResult );
-    }
+    this._dispose();
   }
 
   /**
@@ -171,10 +132,35 @@ export class ParticlesBucket {
   }
 
   /**
+   * Release and destroy the bucket
+   */
+  _dispose () {
+    if (this._disposed) {
+      return;
+    }
+
+    this.removeAllListeners();
+
+    this._clearSelfDestructTimer();
+    this._particles = null;
+    this._disposed = true;
+  }
+
+  /**
    * @private
    */
-  _setSelfDestructTimer() {
-    this._timeout = setTimeout(_ => this.release(), this._timeoutMs);
+  _onTimeLimitExceeded () {
+    this.emit( ParticlesBucketEvents.TIME_LIMIT_EXCEEDED );
+    this.release();
+  }
+
+  /**
+   * @private
+   */
+  _createSelfDestructTimer() {
+    this._timeout = setTimeout(_ => {
+      this._onTimeLimitExceeded();
+    }, this._timeoutMs);
   }
 
   /**
@@ -183,6 +169,7 @@ export class ParticlesBucket {
   _clearSelfDestructTimer () {
     if (this._timeout) {
       clearTimeout( this._timeout );
+      this._timeout = null;
     }
   }
 }

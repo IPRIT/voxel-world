@@ -1,12 +1,13 @@
+import { buildChunkIndex, floorVector, parseChunkIndexToVector } from "../../utils";
+import { WorldMapLoadingOperation, WorldMapLoadingOperationEvents } from "./world-map-loading-operation";
 import {
   WORLD_MAP_CHUNK_HEIGHT,
   WORLD_MAP_CHUNK_SIZE,
   WORLD_MAP_CHUNK_SIZE_POWER,
-  WORLD_MAP_CHUNK_SIZE_VECTOR, WORLD_MAP_CHUNK_VIEW_DISTANCE,
+  WORLD_MAP_CHUNK_SIZE_VECTOR,
+  WORLD_MAP_CHUNK_VIEW_DISTANCE,
   WORLD_MAP_SIZE
 } from "../../settings";
-import { floorVector } from "../../utils";
-import { WorldMapLoadingOperation, WorldMapLoadingOperationEvents } from "./world-map-loading-operation";
 
 export class WorldMapLoader {
 
@@ -128,7 +129,7 @@ export class WorldMapLoader {
 
     for (let xIndex = visibleChunksBox.from.x; xIndex <= visibleChunksBox.to.x; ++xIndex) {
       for (let zIndex = visibleChunksBox.from.z; zIndex <= visibleChunksBox.to.z; ++zIndex) {
-        chunkIndexes.push( this._buildChunkIndex( xIndex, zIndex ) );
+        chunkIndexes.push( buildChunkIndex( xIndex, zIndex ) );
       }
     }
 
@@ -228,9 +229,9 @@ export class WorldMapLoader {
    */
   _groupChunksByDistance (targetChunkIndex, chunks = []) {
     // converting indexes to their vector positions
-    const targetChunkPosition = this._parseChunkIndexToVector( targetChunkIndex );
+    const targetChunkPosition = parseChunkIndexToVector( targetChunkIndex );
     const chunksPositions = chunks.map(chunkIndex => {
-      return this._parseChunkIndexToVector( chunkIndex );
+      return parseChunkIndexToVector( chunkIndex );
     });
 
     // grouping
@@ -244,7 +245,7 @@ export class WorldMapLoader {
       }
       const group = groupsMap.get( distanceFloored );
       group.push(
-        this._buildChunkIndex( chunkPosition.x, chunkPosition.z )
+        buildChunkIndex( chunkPosition.x, chunkPosition.z )
       );
     }
 
@@ -269,38 +270,9 @@ export class WorldMapLoader {
    */
   _getChunkIndex (position) {
     const { x, z } = position;
-    return this._buildChunkIndex(
+    return buildChunkIndex(
       x >> WORLD_MAP_CHUNK_SIZE_POWER,
       z >> WORLD_MAP_CHUNK_SIZE_POWER
     );
-  }
-
-  /**
-   * @param {number} x
-   * @param {number} z
-   * @returns {string}
-   * @private
-   */
-  _buildChunkIndex (x, z) {
-    return `${x}|${z}`;
-  }
-
-  /**
-   * @param {string} chunkIndex
-   * @returns {number[]}
-   * @private
-   */
-  _parseChunkIndex (chunkIndex) {
-    return chunkIndex.split('|').map( Number );
-  }
-
-  /**
-   * @param {string} chunkIndex
-   * @returns {THREE.Vector3}
-   * @private
-   */
-  _parseChunkIndexToVector (chunkIndex) {
-    const parsedIndex = this._parseChunkIndex( chunkIndex );
-    return new THREE.Vector3( parsedIndex[0], 0, parsedIndex[1] );
   }
 }
