@@ -1,5 +1,6 @@
-import { ParticleEffect } from "./particle-effect";
+import { ParticleEffect, ParticleEffectEvents } from "./particle-effect";
 import { TransitionPlayback } from "../transition/index";
+import { TransitionEvents } from "../transition/transition-events";
 
 export class FlowingEffect extends ParticleEffect {
 
@@ -15,26 +16,32 @@ export class FlowingEffect extends ParticleEffect {
    */
   _transitionOptions = {};
 
+  /**
+   * Initializing effect
+   */
   init () {
     this.isFlowing = true;
 
     super.init();
 
     this._transition = new TransitionPlayback( this.from, this.to, this._transitionOptions );
-    this._transition.onFinished(_ => {
-      if (this.particleSystem) {
-        this.particleSystem.isRunning && this.particleSystem.stop();
+    this._transition.once(TransitionEvents.FINISHED, _ => {
+      if (this.particleSystem && this.particleSystem.isRunning) {
+        this.particleSystem.stop();
       }
     });
+
+    this.once( ParticleEffectEvents.FINISHED, _ => this.dispose() );
   }
 
   /**
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (this.isFinished || this.isPaused) {
+    if (this.isFinished) {
       return;
     }
+
     super.update( deltaTime );
 
     deltaTime *= this.timeScale;
@@ -53,7 +60,6 @@ export class FlowingEffect extends ParticleEffect {
   dispose () {
     super.dispose();
 
-    this._transition && this._transition.dispose();
     this._transition = null;
     this._transitionOptions = null;
   }
@@ -62,13 +68,13 @@ export class FlowingEffect extends ParticleEffect {
    * @param {*} options
    */
   setOptions (options) {
-    super.setOptions( options );
-
     let {
       transitionOptions = {}
-    } = this.options;
+    } = options;
 
     this._transitionOptions = transitionOptions;
+
+    super.setOptions( options );
   }
 
   /**
@@ -86,15 +92,13 @@ export class FlowingEffect extends ParticleEffect {
     if (!this._transition) {
       return;
     }
+
     const transition = this._transition;
     transition.update( deltaTime );
 
-    const particleSystem = this.particleSystem;
-    particleSystem.position.copy( transition.currentPosition );
-
-    if (transition.isFinished) {
-      transition.dispose();
-      this._transition = null;
+    if (transition.currentPosition) {
+      const particleSystem = this.particleSystem;
+      particleSystem.position.copy( transition.currentPosition );
     }
   }
 }

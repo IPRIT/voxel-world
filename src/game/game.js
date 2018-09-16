@@ -1,12 +1,17 @@
 import 'bluebird';
-import RendererStats from 'three-webgl-stats';
-import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "./settings";
 import JsPerformanceStats from 'stats.js';
+import RendererStats from 'three-webgl-stats';
+
 import { World } from "./world";
 import { UpdateWarper } from "./utils/update-warper";
 import { AppStore } from "./utils/store/app-store";
 import { SocketManager } from "./network";
 import { GameConnection } from "./network/game-connection";
+
+import {
+  WORLD_MAP_BLOCK_SIZE,
+  WORLD_MAP_SIZE
+} from "./settings";
 
 export class Game {
 
@@ -132,9 +137,19 @@ export class Game {
   _pauseToken = false;
 
   /**
+   * @type {boolean}
+   * @private
+   */
+  _inited = false;
+
+  /**
    * Initialize a game
    */
   init () {
+    if (this._inited) {
+      return;
+    }
+
     this._clock = new THREE.Clock( true );
     this._stats = this._initStats();
 
@@ -163,6 +178,8 @@ export class Game {
     document.querySelector('.dg.ac').addEventListener('mousedown', ev => {
       ev.stopPropagation();
     });
+
+    this._inited = true;
   }
 
   /**

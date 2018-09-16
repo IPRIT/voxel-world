@@ -128,29 +128,16 @@ export class Particle extends THREE.Mesh {
   }
 
   /**
-   * Use this method for resetting some variables before start
-   */
-  beforeStart () {
-    this._currentLifetimeMs = 0;
-  }
-
-  /**
    * Run particle animation
    */
   start () {
-    this.beforeStart();
+    this._beforeStart();
     this._lifeStartedAtMs = Date.now();
     this._state = ParticleState.RUNNING;
   }
 
-  beforeRelease () {
-    if (this.parent) {
-      this.parent.remove( this );
-    }
-  }
-
   release () {
-    this.beforeRelease();
+    this._beforeRelease();
     this._state = ParticleState.NOT_RUNNING;
   }
 
@@ -330,6 +317,22 @@ export class Particle extends THREE.Mesh {
   _checkLifetime () {
     if (this._currentLifetimeMs >= this._lifetimeMs) {
       this.release();
+    }
+  }
+
+  /**
+   * Use this method for resetting some variables before start
+   */
+  _beforeStart () {
+    this._currentLifetimeMs = 0;
+  }
+
+  /**
+   * @private
+   */
+  _beforeRelease () {
+    if (this.parent) {
+      this.parent.remove( this );
     }
   }
 }

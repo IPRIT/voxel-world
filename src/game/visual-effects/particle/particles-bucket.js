@@ -58,9 +58,16 @@ export class ParticlesBucket extends EventEmitter {
       return;
     }
 
-    this.emit( ParticlesBucketEvents.RELEASED, this._particles );
+    this.emit( ParticlesBucketEvents.BEFORE_RELEASE, this._particles );
+
+    // for each particle resetting state and detaching from the parent object
+    for (let i = 0; i < this._particles.length; ++i) {
+      this._particles[ i ].release();
+    }
 
     this._released = true;
+
+    this.emit( ParticlesBucketEvents.RELEASED );
 
     this._dispose();
   }

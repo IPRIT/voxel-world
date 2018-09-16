@@ -1,4 +1,5 @@
 import { EffectState } from "./effect-state";
+import { ParticleEffectEvents } from "./particle-effect";
 
 export class EffectComposer {
 
@@ -196,11 +197,15 @@ export class EffectComposer {
       effectInstance.setTo( this._to );
       effectInstance.init();
 
+      effectInstance.on(ParticleEffectEvents.FINISHED, _ => this._onEffectFinished( effectInstance ));
+
       const next = () => this._traverse( children );
 
-      nextImmediately
-        ? effectInstance.onStartFinishing( next )
-        : effectInstance.onFinished( next );
+      const nextTriggerEvent = nextImmediately
+        ? ParticleEffectEvents.FINISHING
+        : ParticleEffectEvents.FINISHED;
+
+      effectInstance.on( nextTriggerEvent, next );
 
       this._addToQueue( effectInstance, this._timeElapsed + delayTimeout );
     }
@@ -244,14 +249,24 @@ export class EffectComposer {
    * @private
    */
   _updateActiveEffects (deltaTime) {
-    for (let i = 0, length = this._activeEffects.length; i < length; ++i) {
-      const effect = this._activeEffects[ i ];
-      effect.update( deltaTime );
+    this._activeEffects.forEach(effect => effect.update( deltaTime ));
+  }
 
-      if (effect.isFinished) {
-        this._activeEffects.splice( i--, 1 );
-        length--;
-      }
+  /**
+   * @param {ParticleEffect} targetEffect
+   * @private
+   */
+  _onEffectFinished (targetEffect) {
+    if (!targetEffect) {
+      return;
+    }
+
+    const indexToDelete = this._activeEffects.findIndex(effect => {
+      return effect.id === targetEffect.id;
+    });
+
+    if (indexToDelete >= 0) {
+      this._activeEffects.splice( indexToDelete, 1 );
     }
   }
 }

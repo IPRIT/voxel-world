@@ -1,10 +1,12 @@
+import EventEmitter from 'eventemitter3';
+import { TransitionEvents } from "./transition-events";
 import { TransitionState } from "./transition-state";
-import { warp } from "../../utils/index";
 import { LivingObject } from "../../living-object";
+import { warp } from "../../utils/index";
 
 let TRANSITION_ID = 1;
 
-export class TransitionPlayback {
+export class TransitionPlayback extends EventEmitter {
 
   /**
    * @type {number}
@@ -25,7 +27,7 @@ export class TransitionPlayback {
    * @type {number}
    * @private
    */
-  _state = TransitionState.PAUSED;
+  _state = TransitionState.NOT_STARTED;
 
   /**
    * @type {number}
@@ -82,17 +84,13 @@ export class TransitionPlayback {
   _options = {};
 
   /**
-   * @type {Array<Function>}
-   * @private
-   */
-  _onFinishedFns = [];
-
-  /**
    * @param {LivingObject|THREE.Vector3} from
    * @param {LivingObject|THREE.Vector3} to
    * @param {*} options
    */
   constructor (from, to, options = {}) {
+    super();
+
     if (from instanceof LivingObject) {
       this._fromObject = from;
     } else {
@@ -112,7 +110,7 @@ export class TransitionPlayback {
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (this.isPaused || this.isFinished) {
+    if (!this.isRunning) {
       return;
     }
     this._updateVelocity( deltaTime );
@@ -123,11 +121,12 @@ export class TransitionPlayback {
    * Play transition
    */
   start () {
-    if ((this._fromObject || this._fromPosition)
-      && (this._toObject || this._toPosition)
-      && !this.isRunning) {
+    if (this.fromPosition && this.toPosition && !this.isRunning) {
+
+      this._state = TransitionState.RUNNING;
 
       this._startPosition = this.fromPosition.clone();
+
       if (this._fromObject) {
         this._startPosition.add({
           x: 0, y: this._fromObject.objectHeight / 2, z: 0
@@ -135,7 +134,8 @@ export class TransitionPlayback {
       }
 
       this._currentPosition = this._startPosition.clone();
-      this._state = TransitionState.RUNNING;
+
+      this.emit( TransitionEvents.STARTED );
     }
   }
 
@@ -144,35 +144,26 @@ export class TransitionPlayback {
    */
   pause () {
     this._state = TransitionState.PAUSED;
+    this.emit( TransitionEvents.PAUSED );
   }
 
   /**
-   * Finish the transition and dispatch `onFinished` event
+   * Finish transition
    */
   finish () {
     this._state = TransitionState.FINISHED;
-
-    for (let i = 0, length = this._onFinishedFns.length; i < length; ++i) {
-      this._onFinishedFns[ i ]();
-    }
+    this.emit( TransitionEvents.FINISHED );
+    this._dispose();
   }
 
   /**
    * Reset transition
    */
   reset () {
-    !this.isFinished && this.finish();
+    this._state = TransitionState.NOT_STARTED;
     this._initOptions( this._options );
     this._currentPosition = new THREE.Vector3();
     this._startPosition = new THREE.Vector3();
-    this._onFinishedFns = [];
-  }
-
-  /**
-   * @param {Function} callback
-   */
-  onFinished (callback) {
-    this._onFinishedFns.push( callback );
   }
 
   /**
@@ -187,21 +178,6 @@ export class TransitionPlayback {
    */
   setVelocity (velocity) {
     this._velocity = velocity;
-  }
-
-  /**
-   * Destroys the transition
-   */
-  dispose () {
-    !this.isFinished && this.finish();
-    this._fromObject = null;
-    this._fromPosition = null;
-    this._toObject = null;
-    this._toPosition = null;
-    this._currentPosition = null;
-    this._startPosition = null;
-    this._options = null;
-    this._onFinishedFns = null;
   }
 
   /**
@@ -360,5 +336,20 @@ export class TransitionPlayback {
       + this._acceleration * deltaTime * deltaTime * .5
     );
     return Math.min( deltaDistance, this.distanceToDestination );
+  }
+
+  /**
+   * Destroys the transition
+   */
+  _dispose () {
+    this._fromObject = null;
+    this._fromPosition = null;
+    this._toObject = null;
+    this._toPosition = null;
+    this._currentPosition = null;
+    this._startPosition = null;
+    this._options = null;
+
+    this.removeAllListeners();
   }
 }

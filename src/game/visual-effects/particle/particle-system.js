@@ -1,3 +1,4 @@
+import EventEmitter from 'eventemitter3';
 import { ParticleSystemState } from "./particle-system-state";
 import { ParticlesPool } from "./particles-pool";
 import { Game } from "../../game";
@@ -8,6 +9,12 @@ import { ParticleSystemEvents } from "./particle-system-events";
 const zeroVector = new THREE.Vector3();
 
 export class ParticleSystem extends THREE.Object3D {
+
+  /**
+   * @type {EventEmitter}
+   * @private
+   */
+  _eventEmitter = null;
 
   /**
    * @type {*}
@@ -163,7 +170,7 @@ export class ParticleSystem extends THREE.Object3D {
    * @type {number}
    * @private
    */
-  _state = ParticleSystemState.NOT_RUNNING;
+  _state = ParticleSystemState.NOT_STARTED;
 
   /**
    * @type {ParticlesBucket}
@@ -188,7 +195,26 @@ export class ParticleSystem extends THREE.Object3D {
    */
   constructor (options = {}) {
     super();
+    this._eventEmitter = new EventEmitter();
     this._initOptions( options );
+  }
+
+  /**
+   * Starts the system
+   */
+  start () {
+    this._state = ParticleSystemState.RUNNING;
+
+    this._bucket = this.pool.take( this._maxParticlesNumber );
+    this._bucket.on( ParticlesBucketEvents.TIME_LIMIT_EXCEEDED, this._onBucketTimeLimitExceeded.bind( this ) );
+
+    this._particleIsHSLRange
+      ? this._bucket.setHSLRange( ...this._particleColorRange )
+      : this._bucket.setHexRange( ...this._particleColorRange );
+
+    this._freeParticles = [].concat( this._bucket.particles );
+    this._usingParticles = [];
+    this._timeElapsed = 0;
   }
 
   /**
@@ -202,67 +228,24 @@ export class ParticleSystem extends THREE.Object3D {
     deltaTime *= this._timeScale;
     this._timeElapsed += deltaTime * 1000;
 
+    if (this.isRunning) {
+      this._spawnParticles();
+    }
+
     this._updateSystem( deltaTime );
+
+    if (this.isFinishing && (!this._usingParticles || !this._usingParticles.length)) {
+      if (!this.isFinished) {
+        this._finish();
+      }
+    }
   }
 
   /**
-   * @param {THREE.Vector3} axis
+   * Start finishing process
    */
-  updateAxis (axis) {
-    this._axis = axis;
-  }
-
-  /**
-   * Starts the system
-   */
-  start () {
-    this._bucket = this.pool.take( this._maxParticlesNumber );
-    this._bucket.on( ParticlesBucketEvents.RELEASED, this._beforeBucketRelease.bind( this ) );
-
-    this._particleIsHSLRange
-      ? this._bucket.setHSLRange( ...this._particleColorRange )
-      : this._bucket.setHexRange( ...this._particleColorRange );
-
-    this._freeParticles = [].concat( this._bucket.particles );
-    this._usingParticles = [];
-    this._timeElapsed = 0;
-    this._state = ParticleSystemState.RUNNING;
-  }
-
   stop () {
-    this._state = ParticleSystemState.NOT_RUNNING;
-
-    this._onStartFinishing();
-  }
-
-  /**
-   * Release the particles
-   */
-  release () {
-    this._bucket && this._bucket.release();
-  }
-
-  /**
-   * Disposes the system
-   */
-  dispose () {
-    this._options = null;
-    this._optionsCache = null;
-    this._particleOptions = null;
-    this._bucket = null;
-    this._axis = null;
-    this._usingParticles = null;
-    this._freeParticles = null;
-
-    this._particleGenerateContext = null;
-    this._particleColorRange = null;
-    this._particleLifetime = null;
-    this._particleVelocity = null;
-    this._particleRotationVelocity = null;
-    this._particlePositionOffset = null;
-    this._particleAcceleration = null;
-    this._particleScale = null;
-    this._particleOpacityVelocity = null;
+    this._startFinishing();
   }
 
   /**
@@ -270,12 +253,30 @@ export class ParticleSystem extends THREE.Object3D {
    * @param {Function} fn
    */
   on (eventName, fn) {
-    this.addEventListener( eventName, fn );
+    this._eventEmitter.on( eventName, fn );
   }
 
+  /**
+   * @param {string} eventName
+   * @param {Function} fn
+   */
+  once (eventName, fn) {
+    this._eventEmitter.once( eventName, fn );
+  }
+
+  /**
+   * @param {string} eventName
+   * @param {*} args
+   */
   emit (eventName, ...args) {
-    // todo
-    this.dispatchEvent( { type: eventName } );
+    this._eventEmitter.emit( eventName, ...args );
+  }
+
+  /**
+   * Remove all event listeners
+   */
+  removeAllListeners () {
+    this._eventEmitter.removeAllListeners();
   }
 
   /**
@@ -318,8 +319,8 @@ export class ParticleSystem extends THREE.Object3D {
   /**
    * @returns {boolean}
    */
-  get isStopped () {
-    return this._state === ParticleSystemState.NOT_RUNNING;
+  get isFinishing () {
+    return this._state === ParticleSystemState.FINISHING;
   }
 
   /**
@@ -389,44 +390,12 @@ export class ParticleSystem extends THREE.Object3D {
   }
 
   /**
-   * @param {Array<Particle>} particles
-   * @private
-   */
-  _beforeBucketRelease (particles) {
-    if (this.isRunning) {
-      this._state = ParticleSystemState.NOT_RUNNING;
-    }
-
-    for (let i = 0; i < this._usingParticles.length; ++i) {
-      this._usingParticles[ i ].release();
-    }
-
-    // removing yourself
-    if (this.parent) {
-      this.parent.remove( this );
-    }
-
-    this.dispose();
-  }
-
-  /**
    * @param {number} deltaTime
    * @private
    */
   _updateSystem (deltaTime) {
-    if (!this.isStopped) {
-      this._spawnParticles();
-    }
-
     this._updateParticles( deltaTime );
     this._updateRotation( deltaTime );
-
-    if (this.isStopped && (!this._usingParticles || !this._usingParticles.length)) {
-      if (!this.isFinished) {
-        this._onFinished();
-        this._state = ParticleSystemState.FINISHED;
-      }
-    }
   }
 
   /**
@@ -597,14 +566,66 @@ export class ParticleSystem extends THREE.Object3D {
   /**
    * @private
    */
-  _onStartFinishing () {
-    this.emit( ParticleSystemEvents.START_FINISHING );
+  _startFinishing () {
+    this._state = ParticleSystemState.FINISHING;
+    this.emit( ParticleSystemEvents.FINISHING );
   }
 
   /**
    * @private
    */
-  _onFinished () {
+  _finish () {
+    this._state = ParticleSystemState.FINISHED;
     this.emit( ParticleSystemEvents.FINISHED );
+    this._release();
+    this._dispose();
+  }
+
+  /**
+   * Release the system
+   */
+  _release () {
+    if (this._bucket) {
+      this._bucket.release();
+    }
+  }
+
+  /**
+   * @param {Array<Particle>} particles
+   * @private
+   */
+  _onBucketTimeLimitExceeded (particles) {
+    this._finish();
+  }
+
+  /**
+   * Disposes the system
+   */
+  _dispose () {
+    // removing yourself
+    if (this.parent) {
+      this.parent.remove( this );
+    }
+
+    this._options = null;
+    this._optionsCache = null;
+    this._particleOptions = null;
+    this._bucket = null;
+    this._axis = null;
+    this._usingParticles = null;
+    this._freeParticles = null;
+
+    this._particleGenerateContext = null;
+    this._particleColorRange = null;
+    this._particleLifetime = null;
+    this._particleVelocity = null;
+    this._particleRotationVelocity = null;
+    this._particlePositionOffset = null;
+    this._particleAcceleration = null;
+    this._particleScale = null;
+    this._particleOpacityVelocity = null;
+
+    this.removeAllListeners();
+    this._eventEmitter = null;
   }
 }

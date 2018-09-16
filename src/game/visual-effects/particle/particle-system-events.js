@@ -1,4 +1,4 @@
 export const ParticleSystemEvents = {
-  START_FINISHING: 'startFinishing',
+  FINISHING: 'finishing',
   FINISHED: 'finished'
 };

@@ -1,3 +1,4 @@
+import EventEmitter from 'eventemitter3';
 import { EffectState } from "./effect-state";
 import { Game } from "../../game";
 import { LivingObject } from "../../living-object/index";
@@ -8,11 +9,11 @@ import { ParticleSystemEvents } from "../particle/particle-system-events";
 let EFFECT_ID = 1;
 
 export const ParticleEffectEvents = {
-  START_FINISHING: 'startFinishing',
+  FINISHING: 'startFinishing',
   FINISHED: 'finished'
 };
 
-export class ParticleEffect {
+export class ParticleEffect extends EventEmitter {
 
   /**
    * @type {number}
@@ -24,7 +25,7 @@ export class ParticleEffect {
    * @type {number}
    * @private
    */
-  _state = EffectState.PAUSED;
+  _state = EffectState.NOT_STARTED;
 
   /**
    * @type {*}
@@ -63,12 +64,6 @@ export class ParticleEffect {
   _particleSystem = null;
 
   /**
-   * @type {Array<Function>}
-   * @private
-   */
-  _onFinishedFns = [];
-
-  /**
    * @type {number}
    * @private
    */
@@ -94,11 +89,8 @@ export class ParticleEffect {
 
   init () {
     this._particleSystem = new ParticleSystem( this._particleSystemOptions );
-
-    this._particleSystem.on(ParticleSystemEvents.FINISHED, _ => {
-      this._particleSystem.release();
-      this.finish();
-    });
+    this._particleSystem.on(ParticleSystemEvents.FINISHING, _ => this._startFinishing());
+    this._particleSystem.on(ParticleSystemEvents.FINISHED, _ => this._finish());
 
     this.parentContainer.add( this._particleSystem );
 
@@ -112,9 +104,10 @@ export class ParticleEffect {
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (this.isFinished || this.isPaused) {
+    if (this.isFinished) {
       return;
     }
+
     deltaTime *= this._timeScale;
     this._updateParticleSystem( deltaTime );
 
@@ -132,16 +125,6 @@ export class ParticleEffect {
     this._timeElapsed = 0;
   }
 
-  pause () {
-    this._state = EffectState.PAUSED;
-  }
-
-  finish () {
-    this._state = EffectState.FINISHED;
-    this._onFinished();
-    this.dispose();
-  }
-
   /**
    * Clear memory
    */
@@ -151,7 +134,8 @@ export class ParticleEffect {
     this._from = null;
     this._options = null;
     this._particleSystemOptions = null;
-    this._onFinishedFns = null;
+
+    this.removeAllListeners();
   }
 
   /**
@@ -201,20 +185,6 @@ export class ParticleEffect {
    */
   setTimeScale (timeScale = 1) {
     this._timeScale = timeScale;
-  }
-
-  /**
-   * @param {Function} callback
-   */
-  onStartFinishing (callback) {
-    this._particleSystem.onStartFinishing( callback );
-  }
-
-  /**
-   * @param {Function} callback
-   */
-  onFinished (callback) {
-    this._onFinishedFns.push( callback );
   }
 
   /**
@@ -319,8 +289,8 @@ export class ParticleEffect {
   /**
    * @returns {boolean}
    */
-  get isPaused () {
-    return this._state === EffectState.PAUSED;
+  get isFinishing () {
+    return this._state === EffectState.FINISHING;
   }
 
   /**
@@ -359,9 +329,17 @@ export class ParticleEffect {
   /**
    * @private
    */
-  _onFinished () {
-    for (let i = 0, length = this._onFinishedFns.length; i < length; ++i) {
-      this._onFinishedFns[ i ]();
-    }
+  _startFinishing () {
+    this._state = EffectState.FINISHING;
+    this.emit( ParticleEffectEvents.FINISHING );
+  }
+
+  /**
+   * @private
+   */
+  _finish () {
+    this._state = EffectState.FINISHED;
+    this.emit( ParticleEffectEvents.FINISHED );
+    this.dispose();
   }
 }
