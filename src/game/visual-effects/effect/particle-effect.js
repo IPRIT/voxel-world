@@ -87,6 +87,9 @@ export class ParticleEffect extends EventEmitter {
    */
   _isFlowing = false;
 
+  /**
+   * Initing particle effect
+   */
   init () {
     this._particleSystem = new ParticleSystem( this._particleSystemOptions );
     this._particleSystem.on(ParticleSystemEvents.FINISHING, _ => this._startFinishing());
