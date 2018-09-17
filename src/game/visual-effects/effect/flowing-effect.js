@@ -38,7 +38,7 @@ export class FlowingEffect extends ParticleEffect {
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (this.isFinished) {
+    if (this.isFinished || this.isPaused) {
       return;
     }
 

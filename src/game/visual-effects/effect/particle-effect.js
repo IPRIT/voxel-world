@@ -9,6 +9,8 @@ import { ParticleSystemEvents } from "../particle/particle-system-events";
 let EFFECT_ID = 1;
 
 export const ParticleEffectEvents = {
+  STARTED: 'started',
+  PAUSED: 'paused',
   FINISHING: 'startFinishing',
   FINISHED: 'finished'
 };
@@ -22,7 +24,7 @@ export class ParticleEffect extends EventEmitter {
   _id = EFFECT_ID++;
 
   /**
-   * @type {number}
+   * @type {Symbol}
    * @private
    */
   _state = EffectState.NOT_STARTED;
@@ -88,6 +90,12 @@ export class ParticleEffect extends EventEmitter {
   _isFlowing = false;
 
   /**
+   * @type {{}}
+   * @private
+   */
+  _effectListeners = {};
+
+  /**
    * Initing particle effect
    */
   init () {
@@ -101,13 +109,39 @@ export class ParticleEffect extends EventEmitter {
       && !this._isFlowing && this.toPosition) {
       this._particleSystem.position.copy( this.toPosition );
     }
+
+    this.on( ParticleEffectEvents.STARTED, this._effectListeners.onStart );
+    this.on( ParticleEffectEvents.FINISHING, this._effectListeners.onStartFinishing );
+    this.on( ParticleEffectEvents.FINISHED, this._effectListeners.onFinish );
+  }
+
+  /**
+   * Starts the effect
+   */
+  start () {
+    this._state = EffectState.RUNNING;
+    this.emit( ParticleEffectEvents.STARTED );
+
+    if (this._particleSystem) {
+      this._particleSystem.start();
+    }
+
+    this._timeElapsed = 0;
+  }
+
+  /**
+   * Pause the effect
+   */
+  pause () {
+    this._state = EffectState.PAUSED;
+    this.emit( ParticleEffectEvents.PAUSED );
   }
 
   /**
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (this.isFinished) {
+    if (this.isFinished || this.isPaused) {
       return;
     }
 
@@ -116,16 +150,6 @@ export class ParticleEffect extends EventEmitter {
 
     this._timeElapsed += deltaTime * 1000;
     this._checkDuration();
-  }
-
-  start () {
-    this._state = EffectState.RUNNING;
-
-    if (this._particleSystem) {
-      this._particleSystem.start();
-    }
-
-    this._timeElapsed = 0;
   }
 
   /**
@@ -148,16 +172,21 @@ export class ParticleEffect extends EventEmitter {
     this._options = options;
 
     let {
-      attachToTarget = false,
       duration = 0,
       timeScale = 1,
-      particleSystemOptions = {}
+      attachToTarget = false,
+      particleSystemOptions = {},
+      onStart = () => {},
+      onStartFinishing = () => {},
+      onFinish = () => {}
     } = this._options;
 
     this._attachedToTarget = attachToTarget;
     this._duration = duration;
     this._timeScale = timeScale;
     this._particleSystemOptions = particleSystemOptions;
+
+    this._effectListeners = { onStart, onStartFinishing, onFinish };
   }
 
   /**
@@ -287,6 +316,13 @@ export class ParticleEffect extends EventEmitter {
    */
   get isRunning () {
     return this._state === EffectState.RUNNING;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isPaused () {
+    return this._state === EffectState.PAUSED;
   }
 
   /**

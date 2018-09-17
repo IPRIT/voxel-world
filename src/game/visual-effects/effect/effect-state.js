@@ -1,6 +1,7 @@
 export const EffectState = {
-  NOT_STARTED: 0x1,
-  RUNNING: 0x2,
-  FINISHING: 0x4,
-  FINISHED: 0x6
+  NOT_STARTED: Symbol( 'NOT_STARTED' ),
+  RUNNING: Symbol( 'RUNNING' ),
+  PAUSED: Symbol( 'PAUSED' ),
+  FINISHING: Symbol( 'FINISHING' ),
+  FINISHED: Symbol( 'FINISHED' )
 };

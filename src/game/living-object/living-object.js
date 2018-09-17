@@ -5,7 +5,7 @@ import { Game } from "../game";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
-import { LavaStrikeEffect } from "../visual-effects/skills/lava-strike";
+import { LavaStrike } from "../visual-effects/skills/lava-strike";
 import { GushEffect } from "../visual-effects/skills/gush";
 import { TornadoEffect } from "../visual-effects/skills/components/common/tornado";
 import { WhirlEffect } from "../visual-effects/skills/components/unsorted/whirl";
@@ -184,7 +184,7 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    let skills = [ LavaStrikeEffect, GushEffect, TornadoEffect, WhirlEffect ];
+    let skills = [ LavaStrike, GushEffect, TornadoEffect, WhirlEffect ];
 
     /**
      * @type {EffectComposer}

@@ -1,9 +1,9 @@
-import { EffectComposer } from "../../effect/index";
-import { structure } from './structure';
+import { Skill } from "../skill/skill";
+import { LavaStrikeStructure } from './structure';
 
-export class LavaStrikeEffect extends EffectComposer {
+export class LavaStrike extends Skill {
 
   constructor () {
-    super( structure );
+    super( new LavaStrikeStructure() );
   }
 }

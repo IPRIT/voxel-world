@@ -1,7 +1,15 @@
+import EventEmitter from 'eventemitter3';
 import { EffectState } from "./effect-state";
 import { ParticleEffectEvents } from "./particle-effect";
+import { SkillStructure } from "../skills/skill";
 
-export class EffectComposer {
+export const EffectComposerEvents = {
+  STARTED: 'started',
+  PAUSED: 'paused',
+  FINISHED: 'finished'
+};
+
+export class EffectComposer extends EventEmitter {
 
   /**
    * @type {number}
@@ -34,10 +42,10 @@ export class EffectComposer {
   _to = null;
 
   /**
-   * @type {Array<*>}
+   * @type {SkillStructure|Array<*>}
    * @private
    */
-  _effects = [];
+  _effectStructure = [];
 
   /**
    * @type {Array<*>}
@@ -52,29 +60,36 @@ export class EffectComposer {
   _activeEffects = [];
 
   /**
-   * @param {Array<{
+   * @param {
+   * SkillStructure|Array<{
    *  effect: ParticleEffect,
    *  effectOptions: {},
    *  delayTimeout: number,
    *  nextImmediately: boolean,
    *  children: Array<*>
-   * }>} effects
+   * }>} structure
    */
-  constructor (effects = []) {
-    this._effects = effects;
+  constructor (structure = []) {
+    super();
+    this._effectStructure = structure;
   }
 
   init () {
-    this._traverse( this._effects );
+    let structure = this._effectStructure;
+    if (this._effectStructure instanceof SkillStructure) {
+      structure = this._effectStructure.structure;
+    }
+    this._traverse( structure );
   }
 
   /**
    * @param {number} deltaTime
    */
   update (deltaTime) {
-    if (!this.isRunning) {
+    if (this.isFinished || this.isPaused) {
       return;
     }
+
     deltaTime *= this._timeScale;
 
     this._updateQueue();
@@ -89,20 +104,23 @@ export class EffectComposer {
 
   start () {
     this._state = EffectState.RUNNING;
+    this.emit( EffectComposerEvents.STARTED );
   }
 
   pause () {
     this._state = EffectState.PAUSED;
+    this.emit( EffectComposerEvents.PAUSED );
   }
 
   finish () {
     this._state = EffectState.FINISHED;
+    this.emit( EffectComposerEvents.FINISHED );
 
     this.dispose();
   }
 
   dispose () {
-    this._effects = null;
+    this._effectStructure = null;
     this._queue = null;
     this._activeEffects = null;
     this._from = null;
