@@ -9,10 +9,9 @@ export class SkillStructure extends EventEmitter {
   _structure = [];
 
   /**
-   * @param structure
+   * @param {Array<Object>} structure
    */
-  constructor (structure) {
-    super();
+  setStructure (structure) {
     this._structure = structure;
   }
 
@@ -25,7 +24,7 @@ export class SkillStructure extends EventEmitter {
   }
 
   /**
-   * @returns {Array<Object>}
+   * @returns {Array<*>}
    */
   get structure () {
     return this._structure;

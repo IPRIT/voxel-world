@@ -30,8 +30,6 @@ export class FlowingEffect extends ParticleEffect {
         this.particleSystem.stop();
       }
     });
-
-    this.once( ParticleEffectEvents.FINISHED, _ => this.dispose() );
   }
 
   /**

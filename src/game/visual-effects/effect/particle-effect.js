@@ -179,7 +179,7 @@ export class ParticleEffect extends EventEmitter {
       onStart = () => {},
       onStartFinishing = () => {},
       onFinish = () => {}
-    } = this._options;
+    } = options;
 
     this._attachedToTarget = attachToTarget;
     this._duration = duration;

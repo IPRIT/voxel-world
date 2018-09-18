@@ -14,6 +14,7 @@ import { LivingObjectType } from "./living-object-type";
 import { LivingObjectInfo } from "./info";
 import { PlayerClassType } from "./player/player-class-type";
 import { AnimalType } from "./animal/animal-type";
+import { SkillEvents } from "../visual-effects/skills/skill/skill-events";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -151,13 +152,7 @@ export class LivingObject extends WorldObjectAnimated {
       this._updateVerticalPosition( deltaTime );
     }
 
-    this._effects && this._effects.forEach((effect, index) => {
-      effect.update( deltaTime );
-
-      if (effect.isDone) {
-        this._effects.splice( index, 1 );
-      }
-    });
+    this._effects && this._effects.forEach(effect => effect.update( deltaTime ));
 
     super.update( deltaTime );
   }
@@ -184,20 +179,25 @@ export class LivingObject extends WorldObjectAnimated {
       return;
     }
 
-    let skills = [ LavaStrike, GushEffect, TornadoEffect, WhirlEffect ];
+    let skills = [ LavaStrike/*, GushEffect, TornadoEffect, WhirlEffect */];
 
     /**
      * @type {EffectComposer}
      */
-    const effect = new skills[ Math.floor( Math.random() * skills.length ) % skills.length ]();
-    effect.setFrom( this );
-    effect.setTo( livingObject );
-    effect.init();
-    effect.start();
+    const skill = new skills[ Math.floor( Math.random() * skills.length ) % skills.length ]();
+    skill.setFrom( this );
+    skill.setTo( livingObject );
+    skill.init();
+    skill.start();
 
-    let damageQueue = DamageQueue.getQueue();
+    this._effects = (this._effects || []).concat( skill );
 
-    setTimeout(_ => {
+    skill.on(SkillEvents.LAUNCHED, _ => {
+      console.log('launched');
+    });
+
+    skill.on(SkillEvents.HIT, _ => {
+      let damageQueue = DamageQueue.getQueue();
       damageQueue.add({
         damage: Math.floor( Math.random() * 100000 ),
         isForeign: Game.getInstance().world.me.id === livingObject.id,
@@ -208,9 +208,16 @@ export class LivingObject extends WorldObjectAnimated {
         verticalOffset: livingObject.objectHeight * 2,
         maxVerticalOffset: livingObject.objectHeight / 2 + 1,
       });
-    }, 300);
+      console.log( 'hit' );
+    });
 
-    this._effects = (this._effects || []).concat( effect );
+    skill.on(SkillEvents.FINISHED, _ => {
+      const indexToDelete = this._effects.findIndex(_skill => {
+        return _skill.id === skill.id;
+      });
+      indexToDelete >= 0 && this._effects.splice( indexToDelete, 1 );
+      console.log( 'finished' );
+    });
 
     this._targetObject = livingObject;
   }

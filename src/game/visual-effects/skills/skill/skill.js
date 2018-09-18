@@ -22,7 +22,7 @@ export class Skill extends EffectComposer {
    * @private
    */
   _proxyEvents (structure, events) {
-    for (const eventName of events) {
+    for (const eventName of Object.values( events )) {
       structure.on( eventName, (...args) => this.emit( eventName, ...args ) );
     }
 

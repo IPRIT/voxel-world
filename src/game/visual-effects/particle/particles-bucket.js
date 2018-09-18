@@ -33,7 +33,7 @@ export class ParticlesBucket extends EventEmitter {
    * @type {number}
    * @private
    */
-  _timeoutMs = 100 * 1000; // todo: decrease later
+  _timeoutMs = 10 * 1000; // todo: decrease later
 
   /**
    * @type {*}

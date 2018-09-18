@@ -193,18 +193,18 @@ export class EffectComposer extends EventEmitter {
   }
 
   /**
-   * @param {Array<*>} effects
+   * @param {Array<*>} scheme
    * @private
    */
-  _traverse (effects = []) {
-    for (let i = 0; i < effects.length; ++i) {
+  _traverse (scheme = []) {
+    for (let i = 0; i < scheme.length; ++i) {
       let {
         effect,
         effectOptions = {},
         delayTimeout = 0,
         nextImmediately = true,
         children = []
-      } = effects[ i ];
+      } = scheme[ i ];
 
       /**
        * @type ParticleEffect

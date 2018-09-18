@@ -2,12 +2,23 @@ import { SmokeTailEffect } from "../components/common/smoke-tail/index";
 import { ExplosionEffect } from "../components/common/explosion/index";
 import { FireBallEffect } from "../components/lava-strike/fireball/index";
 import { SkillStructure } from "../skill";
+import { SkillEvents } from "../skill/skill-events";
 
 export class LavaStrikeStructure extends SkillStructure {
 
   constructor () {
+    super();
+
     const structure = [{
       effect: FireBallEffect,
+      effectOptions: {
+        onStart: () => {
+          this.emit( SkillEvents.LAUNCHED );
+        },
+        onStartFinishing: () => {
+          this.emit( SkillEvents.HIT );
+        }
+      },
       children: [{
         effect: ExplosionEffect,
         effectOptions: {
@@ -27,6 +38,6 @@ export class LavaStrikeStructure extends SkillStructure {
       delayTimeout: 20
     }];
 
-    super( structure );
+    this.setStructure( structure );
   }
 }
