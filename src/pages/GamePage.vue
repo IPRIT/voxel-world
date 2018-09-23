@@ -1,5 +1,6 @@
 <script>
   import RoyalGameLoading from '../components/RoyalGameLoading';
+  import { GameConnection } from "../game/network/game-connection";
 
   const RoyalGame = () => ({
     // The component to load (should be a Promise)
@@ -32,13 +33,18 @@
       if (!server) {
         return redirect({ name: 'index' });
       }
+    },
+
+    beforeDestroy () {
+      const gameConnection = GameConnection.getConnection();
+      gameConnection.disconnect();
     }
   };
 </script>
 
 <template>
   <div class="game-page">
-    <royal-game></royal-game>
+    <RoyalGame />
   </div>
 </template>
 

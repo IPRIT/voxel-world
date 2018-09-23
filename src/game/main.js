@@ -10,9 +10,9 @@ export function run (vuexStore, router) {
   game.connect().then(_ => {
     game.init();
     game.start();
-  }).catch(_ => {
-    console.log( _ );
+  }).catch(error => {
+    console.error( error );
     game.disconnect();
-    // router.replace({ name: 'index' });
+    router.replace({ name: 'index' });
   });
 }

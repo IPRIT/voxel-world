@@ -16,22 +16,6 @@ import {
 export class Game {
 
   /**
-   * @type {Game}
-   * @private
-   */
-  static _instance = null;
-
-  /**
-   * @returns {Game}
-   */
-  static getInstance () {
-    if (this._instance) {
-      return this._instance;
-    }
-    return ( this._instance = new Game() );
-  }
-
-  /**
    * Private variables
    */
 
@@ -137,19 +121,25 @@ export class Game {
   _pauseToken = false;
 
   /**
-   * @type {boolean}
+   * @type {Game}
    * @private
    */
-  _inited = false;
+  static _instance = null;
+
+  /**
+   * @returns {Game}
+   */
+  static getInstance () {
+    if (this._instance) {
+      return this._instance;
+    }
+    return ( this._instance = new Game() );
+  }
 
   /**
    * Initialize a game
    */
   init () {
-    if (this._inited) {
-      return;
-    }
-
     this._clock = new THREE.Clock( true );
     this._stats = this._initStats();
 
@@ -178,8 +168,6 @@ export class Game {
     document.querySelector('.dg.ac').addEventListener('mousedown', ev => {
       ev.stopPropagation();
     });
-
-    this._inited = true;
   }
 
   /**
