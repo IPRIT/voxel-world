@@ -1,4 +1,11 @@
-export class UpdateWarper {
+import EventEmitter from 'eventemitter3';
+import { FRAMES_PER_SECOND } from "./game-utils";
+
+export const UpdateWarperEvents = {
+  UPDATE: 'update'
+};
+
+export class UpdateWarper extends EventEmitter {
 
   /**
    * @type {number}
@@ -28,13 +35,13 @@ export class UpdateWarper {
    * @type {number}
    * @private
    */
-  _lastUpdateAt = 0;
+  _updateEach = 1;
 
   /**
-   * @type {Array<Function>}
+   * @type {number}
    * @private
    */
-  _updateFns = [];
+  _lastUpdateAt = 0;
 
   /**
    * @type {boolean}
@@ -47,7 +54,9 @@ export class UpdateWarper {
    * @param {number} timeScale
    */
   constructor (updatesPerSecond = 60, timeScale = 1) {
+    super();
     this._updatesPerSecond = Math.min( 60, Math.max( 1e-8, updatesPerSecond ) );
+    this._updateEach = FRAMES_PER_SECOND / this._updatesPerSecond;
     this._timeScale = timeScale;
   }
 
@@ -58,26 +67,14 @@ export class UpdateWarper {
     if (this._paused) {
       return;
     }
+
     this._timeElapsed += deltaTime;
-    const desiredInvokes = Math.floor( this._updatesPerSecond * this._timeElapsed );
-    const needToInvoke = desiredInvokes - this._updateInvokes;
+    this._updateInvokes++;
 
-    if (needToInvoke <= 0) {
-      return;
+    if (this._updateInvokes % this._updateEach < 1) {
+      this._callUpdate( (this._timeElapsed - this._lastUpdateAt) * this._timeScale );
+      this._lastUpdateAt = this._timeElapsed;
     }
-
-    this._invokeUpdate( (this._timeElapsed - this._lastUpdateAt) * this._timeScale );
-    this._updateInvokes += needToInvoke;
-    this._lastUpdateAt = this._timeElapsed;
-  }
-
-  /**
-   * Function to call each update
-   *
-   * @param {Function} fn
-   */
-  onUpdate (fn = () => {}) {
-    this._updateFns.push( fn );
   }
 
   /**
@@ -85,7 +82,7 @@ export class UpdateWarper {
    */
   dispose () {
     this._paused = true;
-    this._updateFns = null;
+    this.removeAllListeners();
   }
 
   /**
@@ -120,15 +117,7 @@ export class UpdateWarper {
    * @param {number} deltaTime
    * @private
    */
-  _invokeUpdate (deltaTime) {
-    this._updateInvokes++;
-
-    if (!this._updateFns || !this._updateFns.length) {
-      return;
-    }
-
-    for (let i = 0, length = this._updateFns.length; i < length; ++i) {
-      this._updateFns[ i ]( deltaTime );
-    }
+  _callUpdate (deltaTime) {
+    this.emit( UpdateWarperEvents.UPDATE, deltaTime );
   }
 }

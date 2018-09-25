@@ -3,7 +3,7 @@ import JsPerformanceStats from 'stats.js';
 import RendererStats from 'three-webgl-stats';
 
 import { World } from "./world";
-import { UpdateWarper } from "./utils/update-warper";
+import { UpdateWarper, UpdateWarperEvents } from "./utils/update-warper";
 import { AppStore } from "./utils/store/app-store";
 import { SocketManager } from "./network";
 import { GameConnection } from "./network/game-connection";
@@ -152,8 +152,8 @@ export class Game {
     this._initWorld();
 
     this._updateWarper = new UpdateWarper( 60, 1 );
-    this._updateWarper.onUpdate(deltaTime => {
-      // this.world.update( deltaTime );
+    this._updateWarper.on(UpdateWarperEvents.UPDATE, deltaTime => {
+      this.world.update( deltaTime );
     });
 
     const socketManager = SocketManager.getManager();
@@ -175,10 +175,11 @@ export class Game {
    */
   update () {
     const deltaTime = this._clock.getDelta();
-    this.world.update( deltaTime );
 
     // update renderer stats
     this._renderStats.update( this._renderer );
+
+    this._updateWarper.update( deltaTime );
   }
 
   /**
