@@ -30,6 +30,18 @@ export class WorldMapLoader {
   _lastChunkIndex = null;
 
   /**
+   * @type {number}
+   * @private
+   */
+  _lastUpdateAtMs = 0;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _updateTimeoutMs = 500;
+
+  /**
    * @type {WorldMapLoader}
    * @private
    */
@@ -56,9 +68,12 @@ export class WorldMapLoader {
 
     // Step 1
     const currentChunkIndex = this._getChunkIndex( position );
-    if (this._lastChunkIndex === currentChunkIndex) {
+    if (this._lastChunkIndex === currentChunkIndex
+      || this._lastUpdateAtMs + this._updateTimeoutMs > Date.now()) {
       return;
     }
+
+    this._lastUpdateAtMs = Date.now();
 
     if (this._downloadOperation) {
       this._downloadOperation.cancel();
