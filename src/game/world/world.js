@@ -1,11 +1,12 @@
 import { WorldMap } from "./map/world-map";
 import { PlayerMe } from "../living-object/player/me/player-me";
-import { PlayerClassType } from "../living-object/player/player-class-type";
 import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
 import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
-import { ParticlesPool } from "../visual-effects/particle/particles-pool";
-import { DeerAnimal } from "../living-object/animal";
+import { Players } from "./players";
+import { toBlockPosition } from "../utils";
+import { CharactersMap } from "../dictionary";
+import { DeerAnimal } from "../living-object/animal/deer";
 import { PlayerEnemy } from "../living-object/player/enemy";
 
 export class World {
@@ -22,25 +23,29 @@ export class World {
   _me = null;
 
   /**
-   * @type {Array<LivingObject>}
+   * @type {Players}
    * @private
    */
-  _players = [];
+  _players = Players.getPlayers();
 
+  /**
+   * @returns {Promise<*>}
+   */
   async init () {
     const game = Game.getInstance();
-    let map = new WorldMap();
-    map.init();
+    const map = new WorldMap();
+    game.scene.add( map.init() );
+
     this._map = map;
-    game.scene.add( map );
 
     let coords = new THREE.Vector3( WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE, 10, WORLD_MAP_SIZE / 2 * WORLD_MAP_BLOCK_SIZE );
 
-    for (let i = 0; i < 5; ++i) {
-      let enemy = new DeerAnimal();
+    /*for (let i = 0; i < 5; ++i) {
+      let enemy = new PlayerEnemy();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 1000, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
-      this._players.push( enemy );
+
+      this._players.addPlayer( enemy );
 
       enemy.init({
         objectInfo: {
@@ -56,17 +61,18 @@ export class World {
         enemy.setTargetLocation( new THREE.Vector3( enemy.position.x, enemy.position.y, enemy.position.z + 10 ) );
       }, 5000);
 
-      game.scene.add( enemy );
-    }
+      enemy.attachToGameScene();
+    }*/
 
     for (let i = 0; i < 5; ++i) {
       let enemy = new PlayerEnemy();
       let enemyCoords = coords.clone().add({ x: Math.random() * 1000 - 500, y: 1000, z: Math.random() * 1000 - 500 });
       enemy.position.set( enemyCoords.x, enemyCoords.y, enemyCoords.z );
-      this._players.push( enemy );
+
+      this._players.addPlayer( enemy );
 
       enemy.init({
-        classType: PlayerClassType.MYSTIC,
+        characterType: CharactersMap.MYSTIC,
         objectInfo: {
           id: enemy.id,
           name: 'Enemy ' + enemy.id,
@@ -77,16 +83,13 @@ export class World {
         }
       });
 
-      game.scene.add( enemy );
+      enemy.attachToGameScene();
     }
 
     let me = new PlayerMe();
-    this._me = me;
-
     me.position.set( coords.x, coords.y + 500, coords.z );
-
     me.init({
-      classType: PlayerClassType.DEER,
+      characterType: CharactersMap.MYSTIC,
       objectInfo: {
         id: me.id,
         name: 'Оленина', // 'Lorem ipsum\ndolor sit amet',
@@ -96,23 +99,11 @@ export class World {
         energy: 13003
       }
     });
+    this._players.setMe( me );
 
-    game._transformControl = new THREE.TransformControls( game._activeCamera, game._renderer.domElement );
-    game._transformControl.attach( me );
-    game.scene.add( game._transformControl );
-    game.scene.add( me );
+    me.attachToGameScene();
 
-    setTimeout(_ => {
-      this._runDemo();
-    }, 100);
-
-    SelectionOverlay.getOverlay(); // just init selection overlay once
-    const particlesPool = ParticlesPool.getPool(); // init once
-    particlesPool.createPool();
-
-    console.log(particlesPool);
-
-    const cylGeometry = new THREE.CylinderGeometry( 1600, 1600, 1000, 100, 2, true );
+    /*const cylGeometry = new THREE.CylinderGeometry( 1600, 1600, 1000, 100, 2, true );
     const material = new THREE.MeshNormalMaterial();
     material.transparent = true;
     material.opacity = .5;
@@ -121,30 +112,31 @@ export class World {
     const cylinder = new THREE.Mesh( cylGeometry, material );
     cylinder.position.copy( me.position );
 
-    game.scene.add( cylinder );
+    game.scene.add( cylinder );*/
   }
 
   update (deltaTime) {
-    if (this._me) {
-      this._me.update( deltaTime );
-      this._map.updateAtPosition(
-        this._me.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE )
-      );
-      this._map.updateShowingAnimations( deltaTime );
+    const game = Game.getInstance();
+    const players = this._players;
+    const map = this._map;
+    const me = players.me;
+
+    const currentPosition = me && me.blockPosition
+      || game.activeCamera && toBlockPosition( game.activeCamera.position );
+    if (currentPosition) {
+      map.updateAtPosition( currentPosition );
     }
 
-    if (this._players.length) {
-      for (let i = 0; i < this._players.length; ++i) {
-        this._players[ i ].update( deltaTime );
-      }
+    this._map.updateShowingAnimations( deltaTime );
+
+    if (players) {
+      players.update( deltaTime );
     }
 
     let selectionSprite = SelectionOverlay.getOverlay();
     if (selectionSprite.isAttached) {
       selectionSprite.update( deltaTime );
     }
-
-    game._transformControl && game._transformControl.update();
   }
 
   /**
@@ -170,7 +162,7 @@ export class World {
    * @returns {{ object: LivingObject, distance: number }}
    */
   getNearestLivingObjects (target) {
-    let objects = [].concat( this._players );
+    let objects = [].concat( this._players.otherPlayers );
     return objects.map(object => {
       const distance = object.position.distanceTo( target.position );
       return { object, distance };
@@ -197,59 +189,8 @@ export class World {
    * @returns {THREE.Mesh[]}
    */
   get playersMeshes () {
-    return (this._players || []).filter(_ => !!_.captureArea || !!_.mesh).map(player => {
-      return player.captureArea || player.mesh;
-    });
-  }
-
-  /**
-   * @private
-   */
-  _runDemo () {
-    this._players.forEach(player => {
-      // this._runDemoForPlayer( player );
-    });
-
-    this._players.forEach(player => {
-      let interval = setInterval(_ => {
-        // player.setTargetObject( this._me );
-      }, Math.random() * 100000 + 1000);
-
-      // setTimeout(_ => clearInterval( interval ), 100 * 1000);
-    });
-  }
-
-  /**
-   * @param {Player} player
-   * @private
-   */
-  _runDemoForPlayer (player) {
-    let pointIndex = 0;
-    let points = [ ];
-
-    for (let i = 0; i < 100; ++i) {
-      let point = new THREE.Vector3( 16353.944446908708, 2, 16356.723378763674 );
-      point.add({ x: Math.random() * 400 - 200, y: 0, z: Math.random() * 400 - 200 });
-      points.push( point );
-    }
-
-    player.__interval = setInterval(_ => {
-      if (!player.isComing) {
-        player.setTargetLocation( points[ pointIndex ++ % points.length ] );
-      }
-
-      if (Math.random() < .15) {
-        player.jump();
-      }
-    }, 1000);
-  }
-
-  /**
-   * @param {Player} player
-   * @private
-   */
-  _runDemoForPlayer2 (player) {
-    player.setTargetObject( this._me );
-    player.setTargetObject( this._me );
+    return this._players.otherPlayers
+      .map(player => player.captureArea || player.mesh)
+      .filter(area => !!area);
   }
 }

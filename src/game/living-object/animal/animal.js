@@ -1,6 +1,6 @@
 import { LivingObject } from "../living-object";
 import { WORLD_GRAVITY } from "../../settings";
-import { LivingObjectType } from "../living-object-type";
+import { LivingObjectType } from "../../dictionary/living-object";
 
 export class Animal extends LivingObject {
 

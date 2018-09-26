@@ -1,5 +1,5 @@
 import { Animal } from "../animal";
-import { AnimalType } from "../animal-type";
+import { AnimalMap } from "../../../dictionary";
 import { options as animalOptions } from './deer-options';
 
 export class DeerAnimal extends Animal {
@@ -12,7 +12,7 @@ export class DeerAnimal extends Animal {
     const preparedAnimalOptions = this.prepareAnimalOptions( options, animalOptions );
 
     Object.assign(options, {
-      classType: AnimalType.DEER,
+      characterType: AnimalMap.DEER,
       ...preparedAnimalOptions
     });
 

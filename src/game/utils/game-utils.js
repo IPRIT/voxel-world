@@ -1,3 +1,5 @@
+import { WORLD_MAP_BLOCK_SIZE } from "../settings";
+
 export const FRAMES_PER_SECOND = 60;
 export const FRAMES_DELTA_SEC = 1 / 60;
 export const FRAMES_DELTA_MS = 1000 / 60;
@@ -258,4 +260,24 @@ export function parseChunkIndex (value) {
 export function parseChunkIndexToVector (value) {
   const parsedIndex = parseChunkIndex( value );
   return new THREE.Vector3( parsedIndex[ 0 ], 0, parsedIndex[ 1 ] );
+}
+
+/**
+ * @param {Object} object
+ * @returns {Object}
+ */
+export function revertObject (object) {
+  return Object.keys( object ).reduce((result, key) => {
+    const value = object[ key ];
+    Reflect.set( result, value, key.toLowerCase() );
+    return result;
+  }, {});
+}
+
+/**
+ * @param {THREE.Vector3} position
+ * @returns {THREE.Vector3}
+ */
+export function toBlockPosition (position) {
+  return position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE );
 }

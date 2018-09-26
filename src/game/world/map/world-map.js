@@ -9,6 +9,7 @@ import {
 import { WorldMapCollisions } from "./world-map-collisions";
 import { Tween } from "../../utils/tween";
 import { buildChunkIndex } from "../../utils";
+import { TweenEvents } from "../../utils/tween/tween-events";
 
 export class WorldMap extends THREE.Group {
 
@@ -37,37 +38,15 @@ export class WorldMap extends THREE.Group {
   _showingAnimations = [];
 
   /**
-   * World preparing
+   * Preparing the world
+   *
+   * @returns {WorldMap}
    */
   init () {
     this._placeGroundPlate();
     this._initCollisions();
-  }
 
-  /**
-   * @param {number} deltaTime
-   */
-  updateShowingAnimations (deltaTime) {
-    if (!this._showingAnimations
-      || !this._showingAnimations.length) {
-      return;
-    }
-    for (let i = 0; i < this._showingAnimations.length; ++i) {
-      let animation = this._showingAnimations[ i ];
-      if (animation.isStopped) {
-        this._showingAnimations.splice( i--, 1 );
-      } else {
-        animation.update( deltaTime );
-      }
-    }
-  }
-
-  /**
-   * @param {THREE.Vector3} position
-   */
-  updateAtPosition (position) {
-    const mapLoader = WorldMapLoader.getLoader();
-    return mapLoader.update( this, position );
+    return this;
   }
 
   /**
@@ -80,6 +59,35 @@ export class WorldMap extends THREE.Group {
     let chunks = [ ...this._map.values() ];
     for (let i = 0; i < chunks.length; ++i) {
       chunks[i].update( force );
+    }
+  }
+
+  /**
+   * @param {THREE.Vector3} position
+   */
+  updateAtPosition (position) {
+    const mapLoader = WorldMapLoader.getLoader();
+    return mapLoader.update( this, position );
+  }
+
+  /**
+   * @param {number} deltaTime
+   */
+  updateShowingAnimations (deltaTime) {
+    if (this._showingAnimations) {
+      this._showingAnimations.forEach( animation => animation.update( deltaTime ) );
+    }
+  }
+
+  /**
+   * @param {Tween} animation
+   */
+  deleteShowingAnimation (animation) {
+    const indexToDelete = this._showingAnimations.findIndex(activeAnimation => {
+      return activeAnimation.id === animation.id;
+    });
+    if (indexToDelete >= 0) {
+      this._showingAnimations.splice( indexToDelete, 1 );
     }
   }
 
@@ -210,17 +218,18 @@ export class WorldMap extends THREE.Group {
     mapObject.material.transparent = true;
     mapObject.material.opacity = 0;
 
-    const tween = new Tween( mapObject.material, 'opacity', 1, {
+    const animation = new Tween( mapObject.material, 'opacity', 1, {
       duration: 400,
       timingFunction: 'easeInQuad'
     });
-    tween.start();
-    tween.then(_ => {
+    animation.start();
+    animation.on(TweenEvents.FINISHED, _ => {
       // webgl doesn't sort transparent objects properly by z-depth
       // so we need turn off this to get rid of unexpected results
       mapObject.material.transparent = false;
+      this.deleteShowingAnimation( animation );
     });
-    this._showingAnimations.push( tween );
+    this._showingAnimations.push( animation );
 
     this.add( mapObject );
     this.register( mapObject );

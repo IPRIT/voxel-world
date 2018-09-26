@@ -88,7 +88,7 @@ export class DomLabel {
     this._domContainer = document.querySelector( this._containerSelector );
     if (!this._domContainer) {
       this._domContainer = document.createElement( 'div' );
-      this._domContainer.className = this._containerSelector;
+      this._domContainer.characterTypeName = this._containerSelector;
       document.body.appendChild( this._domContainer );
     }
   }
@@ -101,7 +101,7 @@ export class DomLabel {
   create (text, options = {}) {
     this._initOptions( options );
     this._domElement = document.createElement( 'div' );
-    this._domElement.className = `living-object-label ${this._contentClass || ''}`.trim();
+    this._domElement.characterTypeName = `living-object-label ${this._contentClass || ''}`.trim();
     this._domElement.innerHTML = text;
 
     return this._domElement;

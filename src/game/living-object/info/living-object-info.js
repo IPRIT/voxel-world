@@ -1,4 +1,4 @@
-import { LivingObjectType } from "../living-object-type";
+import { LivingObjectType } from "../../dictionary/living-object";
 
 export class LivingObjectInfo {
 
@@ -24,13 +24,13 @@ export class LivingObjectInfo {
    * @type {number}
    * @private
    */
-  _classType = 0;
+  _characterType = 0;
 
   /**
    * @type {string}
    * @private
    */
-  _className;
+  _characterTypeName;
 
   /**
    * @type {string}
@@ -68,10 +68,10 @@ export class LivingObjectInfo {
   constructor (objectInfo = {}) {
     let {
       id,
-      livingObjectType = LivingObjectType.OFFENSIVE_ANIMAL,
+      livingObjectType = LivingObjectType.OFFENSIVE,
       livingObjectTypeName,
-      classType = 0,
-      className = '',
+      characterType,
+      characterTypeName = '',
       name = 'Unknown name',
       maxHealth = 1,
       health = 1,
@@ -82,8 +82,8 @@ export class LivingObjectInfo {
     this._id = id;
     this._livingObjectType = livingObjectType;
     this._livingObjectTypeName = livingObjectTypeName;
-    this._classType = classType;
-    this._className = className;
+    this._characterType = characterType;
+    this._characterTypeName = characterTypeName;
     this._name = name;
     this._maxHealth = maxHealth;
     this._health = health;
@@ -115,15 +115,15 @@ export class LivingObjectInfo {
   /**
    * @return {number}
    */
-  get classType () {
-    return this._classType;
+  get characterType () {
+    return this._characterType;
   }
 
   /**
    * @return {string}
    */
-  get className () {
-    return this._className;
+  get characterTypeName () {
+    return this._characterTypeName;
   }
 
   /**
@@ -143,8 +143,8 @@ export class LivingObjectInfo {
   /**
    * @return {boolean}
    */
-  get isOffensiveAnimal () {
-    return this._livingObjectType === LivingObjectType.OFFENSIVE_ANIMAL;
+  get isOffensive () {
+    return this._livingObjectType === LivingObjectType.OFFENSIVE;
   }
 
   /**

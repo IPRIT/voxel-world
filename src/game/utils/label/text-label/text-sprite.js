@@ -98,7 +98,7 @@ export class TextSprite extends THREE.Sprite {
    */
   updateMatrix (...args) {
     this.updateScale();
-    return super.updateMatrix(...args);
+    return super.updateMatrix( ...args );
   }
 
   /**

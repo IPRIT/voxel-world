@@ -1,20 +1,20 @@
+import { Game } from "../game";
 import { WorldObjectAnimated } from "../world/world-object/animated";
+import { TextLabel } from "../utils/label/text-label";
 import { warp } from "../utils";
 import { ObjectGravity } from "../physic";
-import { Game } from "../game";
-import { WORLD_MAP_BLOCK_SIZE } from "../settings";
-import { TextLabel } from "../utils/label/text-label";
 import { SelectionOverlay } from "./utils";
 import { LavaStrike } from "../visual-effects/skills/lava-strike";
 import { GushEffect } from "../visual-effects/skills/gush";
 import { TornadoEffect } from "../visual-effects/skills/components/common/tornado";
 import { WhirlEffect } from "../visual-effects/skills/components/unsorted/whirl";
 import { DamageQueue } from "./utils/damage";
-import { LivingObjectType } from "./living-object-type";
 import { LivingObjectInfo } from "./info";
-import { PlayerClassType } from "./player/player-class-type";
-import { AnimalType } from "./animal/animal-type";
 import { SkillEvents } from "../visual-effects/skills/skill/skill-events";
+import { LivingObjectType } from "../dictionary/living-object";
+import { CharactersMapReverted, LivingObjectTypeReverted } from "../dictionary";
+import { WORLD_MAP_BLOCK_SIZE } from "../settings";
+import { Players } from "../world/players";
 
 export class LivingObject extends WorldObjectAnimated {
 
@@ -68,7 +68,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {number}
    * @private
    */
-  _classType;
+  _characterType;
 
   /**
    * @type {LivingObjectInfo}
@@ -111,7 +111,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {boolean}
    * @private
    */
-  _coming = false;
+  _isComing = false;
 
   /**
    * @type {boolean}
@@ -140,8 +140,8 @@ export class LivingObject extends WorldObjectAnimated {
    * @param {number} deltaTime
    */
   update ( deltaTime ) {
-    if (this._coming) {
-      if (this.getComingLocationDistance() > warp( this._velocityScalar, deltaTime )) {
+    if (this._isComing) {
+      if (this.getTargetLocationDistance() > warp( this._velocityScalar, deltaTime )) {
         this._nextPosition( deltaTime );
       } else {
         this.setComingState( false );
@@ -196,11 +196,13 @@ export class LivingObject extends WorldObjectAnimated {
       console.log('launched');
     });
 
+    const players = Players.getPlayers();
+
     skill.on(SkillEvents.HIT, _ => {
       let damageQueue = DamageQueue.getQueue();
       damageQueue.add({
         damage: Math.floor( Math.random() * 100000 ),
-        isForeign: Game.getInstance().world.me.id === livingObject.id,
+        isForeign: players.me.id === livingObject.id,
         isCritical: Math.random() > .7,
         isMiss: Math.random() > .8,
         isImmunity: Math.random() > .9
@@ -233,7 +235,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @param {boolean} coming
    */
   setComingState (coming = true) {
-    this._coming = coming;
+    this._isComing = coming;
 
     if (this.animationMixerInited) {
       let actionName;
@@ -258,7 +260,7 @@ export class LivingObject extends WorldObjectAnimated {
   /**
    * @returns {THREE.Vector3}
    */
-  getComingLocation () {
+  getTargetLocation () {
     if (this._targetLocation) {
       return this._targetLocation.clone();
     }
@@ -267,8 +269,8 @@ export class LivingObject extends WorldObjectAnimated {
   /**
    * @returns {number}
    */
-  getComingLocationDistance () {
-    let comingLocation = this.getComingLocation();
+  getTargetLocationDistance () {
+    let comingLocation = this.getTargetLocation();
     return comingLocation && comingLocation.setY( 0 )
       .distanceTo(
         this.position.clone().setY( 0 )
@@ -306,6 +308,22 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
+   * Attach to game scene
+   */
+  attachToGameScene () {
+    const game = Game.getInstance();
+    game.scene.add( this );
+  }
+
+  /**
+   * Detach from the game scene
+   */
+  detachFromGameScene () {
+    const game = Game.getInstance();
+    game.scene.remove( this );
+  }
+
+  /**
    * Disposes the object
    */
   dispose () {
@@ -338,7 +356,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @returns {boolean}
    */
   get isComing () {
-    return this._coming;
+    return this._isComing;
   }
 
   /**
@@ -429,36 +447,21 @@ export class LivingObject extends WorldObjectAnimated {
    * @return {string}
    */
   get livingObjectTypeName () {
-    if (this.isPlayer) {
-      return 'player';
-    } else if (this.isAnimal) {
-      return 'animal';
-    } else if (this.isOffensiveAnimal) {
-      return 'offensive_animal';
-    }
-    return 'unknown';
+    return LivingObjectTypeReverted[ this._livingObjectType ];
   }
 
   /**
    * @return {number}
    */
-  get classType () {
-    return this._classType;
+  get characterType () {
+    return this._characterType;
   }
 
   /**
    * @return {string}
    */
-  get className () {
-    if (this.isPlayer) {
-      return PlayerClassType.resolveClassName( this._classType )
-        .toLowerCase();
-    } else if (this.isAnimal) {
-      return AnimalType.resolveClassName( this._classType )
-        .toLowerCase();
-    } else {
-      return 'unknown_class_type';
-    }
+  get characterTypeName () {
+    return CharactersMapReverted[ this._characterType ];
   }
 
   /**
@@ -478,8 +481,8 @@ export class LivingObject extends WorldObjectAnimated {
   /**
    * @return {boolean}
    */
-  get isOffensiveAnimal () {
-    return this._livingObjectType === LivingObjectType.OFFENSIVE_ANIMAL;
+  get isOffensive () {
+    return this._livingObjectType === LivingObjectType.OFFENSIVE;
   }
 
   /**
@@ -495,7 +498,7 @@ export class LivingObject extends WorldObjectAnimated {
    */
   _initOptions (options) {
     let {
-      classType,
+      characterType,
       livingObjectType,
       objectBlocksHeight,
       objectBlocksRadius,
@@ -505,7 +508,7 @@ export class LivingObject extends WorldObjectAnimated {
       gravity
     } = options;
 
-    this._classType = classType;
+    this._characterType = characterType;
     this._livingObjectType = livingObjectType;
     this._objectBlocksHeight = objectBlocksHeight;
     this._objectBlocksRadius = objectBlocksRadius;
@@ -513,7 +516,7 @@ export class LivingObject extends WorldObjectAnimated {
     this._velocityScalar = velocityScalar;
 
     Object.assign(options, {
-      modelName: this.className
+      modelName: this.characterTypeName
     });
 
     this._gravity.setAcceleration( gravity );
@@ -521,8 +524,8 @@ export class LivingObject extends WorldObjectAnimated {
     this._objectInfo = new LivingObjectInfo({
       livingObjectType,
       livingObjectTypeName: this.livingObjectTypeName,
-      classType,
-      className: this.className,
+      characterType,
+      characterTypeName: this.characterTypeName,
       ...objectInfo
     });
   }
@@ -654,7 +657,7 @@ export class LivingObject extends WorldObjectAnimated {
       this._gravity.resetVelocity();
 
       if (falling) {
-        !this._coming && this._stopVerticalUpdate();
+        !this._isComing && this._stopVerticalUpdate();
         this._isJumping && (this._isJumping = false);
       }
     }
@@ -681,7 +684,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @private
    */
   _updateVelocityDirection () {
-    let target = this.getComingLocation().setY( 0 );
+    let target = this.getTargetLocation().setY( 0 );
     let current = this.position.clone().setY( 0 );
     this._velocityDirection = target.sub( current ).normalize();
 

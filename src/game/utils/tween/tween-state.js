@@ -1,4 +1,6 @@
 export const TweenState = {
-  STOPPED: 0x1,
-  RUNNING: 0x2
+  NOT_STARTED: 1,
+  RUNNING: 2,
+  PAUSED: 3,
+  FINISHED: 4
 };

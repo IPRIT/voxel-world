@@ -1,9 +1,11 @@
+import EventEmitter from 'eventemitter3';
 import { TweenState } from "./tween-state";
 import * as timingFunctions from './tween-timing-functions';
+import { TweenEvents } from "./tween-events";
 
 let TWEEN_ID = 1;
 
-export class Tween {
+export class Tween extends EventEmitter {
 
   /**
    * @type {number}
@@ -21,7 +23,7 @@ export class Tween {
    * @type {number}
    * @private
    */
-  _state = TweenState.STOPPED;
+  _state = TweenState.NOT_STARTED;
 
   /**
    * @type {number}
@@ -78,24 +80,6 @@ export class Tween {
   _startValues = [];
 
   /**
-   * @type {Promise}
-   * @private
-   */
-  _promise = null;
-
-  /**
-   * @type {Function}
-   * @private
-   */
-  _resolve = () => {};
-
-  /**
-   * @type {Function}
-   * @private
-   */
-  _reject = () => {};
-
-  /**
    * @type {{timeScale: number, duration: number, timingFunction: string}}
    */
   static DEFAULT_PARAMS = {
@@ -119,41 +103,12 @@ export class Tween {
    * @param {*} params
    */
   constructor (target, properties = [], deltaValues = [], params = {}) {
-    // we can't extends from Promise because Promise
-    // checks constructor internally to Promise function
-    // so should implement PromiseLike interface
-    this._promise = new Promise((resolve, reject) => {
-      this._resolve = resolve;
-      this._reject = reject;
-    });
+    super();
 
     this._target = target;
-    this._properties = [].concat( properties ); // can be as single value
+    this._properties = [].concat( properties ); // can be single value
     this._deltaValues = [].concat( deltaValues ); // --//--
     this._initParams( params );
-  }
-
-  /**
-   * Runs animation
-   */
-  start () {
-    this._state = TweenState.RUNNING;
-
-    this._startValues = this._getPropertyValues( this._properties );
-  }
-
-  /**
-   * Continue animation
-   */
-  resume () {
-    this._state = TweenState.RUNNING;
-  }
-
-  /**
-   * Stops animation
-   */
-  stop () {
-    this._state = TweenState.STOPPED;
   }
 
   /**
@@ -163,6 +118,7 @@ export class Tween {
     if (!this.isRunning) {
       return;
     }
+
     deltaTime *= this._timeScale;
     this._timeElapsed += deltaTime * 1000;
 
@@ -171,34 +127,31 @@ export class Tween {
   }
 
   /**
-   * @param {*} error
+   * Runs animation
    */
-  cancel (error = null) {
-    if (this.isRunning) {
-      this.stop();
+  start () {
+    if (this.isNotStarted) {
+      this._startValues = this._getPropertyValues( this._properties );
     }
-    !error && this._resolve();
-    error && this._reject( error );
-    // this.dispose();
+    this._state = TweenState.RUNNING;
+    this.emit( TweenEvents.STARTED );
   }
 
   /**
-   * Disposes the object
+   * Stops animation
    */
-  dispose () {
-    if (this.isRunning) {
-      return console.warn('Calling dispose while tween is running');
-    }
+  pause () {
+    this._state = TweenState.PAUSED;
+    this.emit( TweenEvents.PAUSED );
+  }
 
-    this._params = null;
-    this._resolve = null;
-    this._reject = null;
-    this._timingFunction = null;
-    this._deltaValues = null;
-    this._startValues = null;
-    this._properties = null;
-    this._target = null;
-    this._promise = null;
+  /**
+   * Finish & dispose the tween
+   */
+  finish () {
+    this._state = TweenState.FINISHED;
+    this.emit( TweenEvents.FINISHED, this._timeElapsed );
+    this._dispose();
   }
 
   /**
@@ -209,22 +162,6 @@ export class Tween {
   }
 
   /**
-   * @param {Function} onFulfilled
-   * @returns {Promise<any>}
-   */
-  then (onFulfilled) {
-    return this.promise.then( onFulfilled );
-  }
-
-  /**
-   * @param {Function} onRejected
-   * @returns {Promise<any>}
-   */
-  catch (onRejected) {
-    return this.promise.catch( onRejected );
-  }
-
-  /**
    * @returns {number}
    */
   get id () {
@@ -232,10 +169,10 @@ export class Tween {
   }
 
   /**
-   * @returns {Promise}
+   * @returns {boolean}
    */
-  get promise () {
-    return this._promise;
+  get isNotStarted () {
+    return this._state === TweenState.NOT_STARTED;
   }
 
   /**
@@ -248,8 +185,15 @@ export class Tween {
   /**
    * @returns {boolean}
    */
-  get isStopped () {
-    return this._state === TweenState.STOPPED;
+  get isPaused () {
+    return this._state === TweenState.PAUSED;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isFinished () {
+    return this._state === TweenState.FINISHED;
   }
 
   /**
@@ -330,7 +274,7 @@ export class Tween {
    */
   _checkDuration () {
     if (this._timeElapsed >= this._duration) {
-      this.cancel();
+      this.finish();
     }
   }
 
@@ -364,5 +308,21 @@ export class Tween {
   _getTimingFunction (functionName) {
     const defaultFunctionName = Tween.DEFAULT_PARAMS.timingFunction;
     return timingFunctions[ functionName ] || timingFunctions[ defaultFunctionName ];
+  }
+
+  /**
+   * Disposes the object
+   *
+   * @private
+   */
+  _dispose () {
+    this._params = null;
+    this._timingFunction = null;
+    this._deltaValues = null;
+    this._startValues = null;
+    this._properties = null;
+    this._target = null;
+
+    this.removeAllListeners();
   }
 }

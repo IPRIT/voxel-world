@@ -22,7 +22,7 @@
         }
 
         if (this.livingObject.isPlayer) {
-          return this.livingObject.className;
+          return this.livingObject.characterTypeName;
         }
 
         return this.livingObject.livingObjectTypeName;

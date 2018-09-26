@@ -1,7 +1,7 @@
 <script>
   import RoyalClassName from "./RoyalClassName";
-  import { createNamespacedHelpers } from 'vuex';
 
+  import { createNamespacedHelpers } from 'vuex';
   const gameStore = createNamespacedHelpers( 'game' );
 
   export default {
@@ -16,15 +16,15 @@
         target: state => state.target
       }),
 
-      className () {
-        return this.target && this.target.className || '';
+      characterTypeName () {
+        return this.target && this.target.characterTypeName || '';
       },
 
       classes () {
         return {
           'target-bar': true,
           'target-bar_opened': !!this.target,
-          [this.className]: true
+          [this.characterTypeName]: true
         };
       },
 

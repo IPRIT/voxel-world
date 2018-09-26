@@ -12,6 +12,8 @@ import {
   WORLD_MAP_BLOCK_SIZE,
   WORLD_MAP_SIZE
 } from "./settings";
+import { SelectionOverlay } from "./living-object/utils";
+import { ParticlesPool } from "./visual-effects/particle/particles-pool";
 
 export class Game {
 
@@ -151,6 +153,9 @@ export class Game {
     this._addWorldLight();
     this._initWorld();
 
+    const particlesPool = ParticlesPool.getPool();
+    particlesPool.createPool();
+
     this._updateWarper = new UpdateWarper( 60, 1 );
     this._updateWarper.on(UpdateWarperEvents.UPDATE, deltaTime => {
       this.world.update( deltaTime );
@@ -175,10 +180,7 @@ export class Game {
    */
   update () {
     const deltaTime = this._clock.getDelta();
-
-    // update renderer stats
     this._renderStats.update( this._renderer );
-
     this._updateWarper.update( deltaTime );
   }
 

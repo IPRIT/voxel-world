@@ -6,10 +6,17 @@ export default {
   'immunity': 'Иммун.',
   'miss': 'Промах',
 
+  // characters
   'mystic': 'Мистик',
+  'warrior': 'Воин',
+  'archer': 'Лучник',
 
-  'player': 'Игроки',
-  'animal': 'Мирные животные',
+  // living objects
+  'player': 'Игрок',
+  'animal': 'Дружелюбный',
+  'offensive': 'Недружелюбный',
+
+  // animals
   'animal_deer': 'Олень',
 
   // ui

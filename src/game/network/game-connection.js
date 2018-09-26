@@ -51,7 +51,7 @@ export class GameConnection extends EventEmitter {
     return this.socketManager.connect(serverUri, {
       sessionToken
     }).then(_ => {
-      console.log('connected', session);
+      console.log('connected', session, this.socketManager.socket);
       this._listen();
     });
   }

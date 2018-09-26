@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import { DamageText } from "./damage-text";
 import { Game } from "../../../game";
 import { Tween } from "../../../utils/tween";
+import { TweenEvents } from "../../../utils/tween/tween-events";
 
 export class DamageQueue {
 
@@ -153,14 +154,31 @@ export class DamageQueue {
       timingFunction: 'linear'
     });
 
-    Promise.all([ opacityAnimation, verticalAnimation ]).delay( 300 ).then(_ => {
+    let once = false;
+    function onBothFinished () {
+      if (once) {
+        return;
+      }
+      once = true;
       damageText.dispose();
-      opacityAnimation.dispose();
-      verticalAnimation.dispose();
 
       if (fakeTarget && fakeTarget.parent) {
         fakeTarget.parent.remove( fakeTarget );
       }
+    }
+
+    verticalAnimation.on(TweenEvents.FINISHED, _ => {
+      if (opacityAnimation.isFinished) {
+        setTimeout( onBothFinished, 300 );
+      }
+      this._deleteAnimation( verticalAnimation );
+    });
+
+    opacityAnimation.on(TweenEvents.FINISHED, _ => {
+      if (verticalAnimation.isFinished) {
+        setTimeout( onBothFinished, 300 );
+      }
+      this._deleteAnimation( opacityAnimation );
     });
 
     return [ verticalAnimation, opacityAnimation ];
@@ -171,17 +189,21 @@ export class DamageQueue {
    * @private
    */
   _updateAnimations (deltaTime) {
-    if (!this._activeAnimations || !this._activeAnimations.length) {
-      return;
+    if (this._activeAnimations) {
+      this._activeAnimations.forEach( animation => animation.update( deltaTime ) );
     }
+  }
 
-    for (let i = 0; i < this._activeAnimations.length; ++i) {
-      let animation = this._activeAnimations[ i ];
-      animation.update( deltaTime );
-
-      if (animation.isStopped) {
-        this._activeAnimations.splice( i--, 1 );
-      }
+  /**
+   * @param {Tween} animation
+   * @private
+   */
+  _deleteAnimation (animation) {
+    const indexToDelete = this._activeAnimations.findIndex(activeAnimation => {
+      return activeAnimation.id === animation.id;
+    });
+    if (indexToDelete >= 0) {
+      this._activeAnimations.splice( indexToDelete, 1 );
     }
   }
 }

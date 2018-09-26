@@ -55,3 +55,13 @@ export class Multi {
     }
   }
 }
+
+/**
+ * Capitalize the 1st letter of the given text.
+ *
+ * @param {string} text - The text to capitalize.
+ * @returns {string} The text that the 1st letter was capitalized.
+ */
+export function capitalizeFirstLetter (text) {
+  return text[0].toUpperCase() + text.slice(1);
+}

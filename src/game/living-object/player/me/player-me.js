@@ -4,6 +4,7 @@ import { PlayerWorldLight } from "./player-world-light";
 import { PlayerControls } from "./player-controls";
 import { DamageQueue } from "../../utils/damage";
 import { AppStore } from "../../../utils/store/app-store";
+import { Game } from "../../../game";
 
 export class PlayerMe extends Player {
 
@@ -54,6 +55,9 @@ export class PlayerMe extends Player {
     if (this._light) {
       this._light.update();
     }
+    if (this._transformControl) {
+      this._transformControl.update();
+    }
 
     let damageQueue = DamageQueue.getQueue();
     damageQueue.update( deltaTime );
@@ -90,6 +94,24 @@ export class PlayerMe extends Player {
     if (!this.isJumping) {
       super.jump();
     }
+  }
+
+  attachToGameScene () {
+    const game = Game.getInstance();
+    this._transformControl = new THREE.TransformControls( game.activeCamera, game._renderer.domElement );
+    this._transformControl.attach( this );
+    game.scene.add( this._transformControl );
+
+    super.attachToGameScene();
+  }
+
+  detachFromGameScene () {
+    const game = Game.getInstance();
+    if (this._transformControl) {
+      game.scene.remove( this._transformControl );
+    }
+
+    super.detachFromGameScene();
   }
 
   /**

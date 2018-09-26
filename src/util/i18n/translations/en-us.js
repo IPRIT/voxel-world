@@ -8,10 +8,17 @@ export default {
   'immunity': 'Resist',
   'miss': 'Miss',
 
+  // characters
   'mystic': 'Mystic',
+  'warrior': 'Warrior',
+  'archer': 'Archer',
 
+  // living objects
   'player': 'Player',
   'animal': 'Animal',
+  'offensive': 'Offensive',
+
+  // animals
   'animal_deer': 'Deer',
 
   // ui

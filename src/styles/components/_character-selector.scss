@@ -1,0 +1,21 @@
+@import "../settings/index";
+@import "../tools/index";
+
+@include block('character-selector', 'component') {
+  @extend %layer-fixed-fill;
+  z-index: 10000000;
+  background-color: transparentize(black, .2);
+
+  @include element('inner') {
+    background-color: white;
+    margin: 10vw auto;
+    max-width: 400px;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  h2 {
+    text-align: center;
+    padding: 20px;
+  }
+}

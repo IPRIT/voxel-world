@@ -1,3 +1,5 @@
+import { WORLD_GRAVITY } from "../../settings";
+import { LivingObject } from "../index";
 import {
   PLAYER_BLOCKS_HEIGHT,
   PLAYER_BLOCKS_RADIUS,
@@ -5,9 +7,7 @@ import {
   PLAYER_VELOCITY_SCALAR,
   PLAYER_WORLD_SCALE
 } from "./player-defaults";
-import { LivingObjectType } from "../living-object-type";
-import { WORLD_GRAVITY } from "../../settings";
-import { LivingObject } from "../index";
+import { LivingObjectType } from "../../dictionary/living-object";
 
 export class Player extends LivingObject {
 
@@ -16,6 +16,12 @@ export class Player extends LivingObject {
    * @private
    */
   _options = {};
+
+  /**
+   * @type {Object}
+   * @private
+   */
+  _userInfo = null;
 
   /**
    * @param {object} options
@@ -35,5 +41,20 @@ export class Player extends LivingObject {
     });
 
     return super.init( options );
+  }
+
+  /**
+   * @returns {number}
+   */
+  get userId () {
+    // todo: change later
+    return this.id;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isMe () {
+    return false;
   }
 }
