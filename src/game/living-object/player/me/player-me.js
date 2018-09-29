@@ -5,6 +5,10 @@ import { PlayerControls } from "./player-controls";
 import { DamageQueue } from "../../utils/damage";
 import { AppStore } from "../../../utils/store/app-store";
 import { Game } from "../../../game";
+import { GameConnection } from "../../../network/game-connection";
+import { PlayerEvents } from "../../../network/events";
+import { throttle } from "../../../../util/common-utils";
+import { floorVector } from "../../../utils";
 
 export class PlayerMe extends Player {
 
@@ -25,6 +29,12 @@ export class PlayerMe extends Player {
    * @private
    */
   _controls = null;
+
+  /**
+   * @type {Function}
+   * @private
+   */
+  _sendTargetLocationDebounced = throttle( this._sendTargetLocation.bind( this ), 250 );
 
   /**
    * @param options
@@ -64,6 +74,16 @@ export class PlayerMe extends Player {
   }
 
   /**
+   * @param {THREE.Vector3} location
+   * @param {boolean} isInfinite
+   */
+  setTargetLocation (location, isInfinite = false) {
+    super.setTargetLocation( location, isInfinite );
+
+    this._sendTargetLocationDebounced();
+  }
+
+  /**
    * @param {LivingObject} livingObject
    */
   setTargetObject (livingObject) {
@@ -78,7 +98,9 @@ export class PlayerMe extends Player {
       }
 
       livingObject.setTargetLocation( this.position.clone() );
+      this.socket.emit( PlayerEvents.SET_TARGET_OBJECT, livingObject.id );
     }
+
     super.setTargetObject( livingObject );
   }
 
@@ -93,6 +115,8 @@ export class PlayerMe extends Player {
   jump () {
     if (!this.isJumping) {
       super.jump();
+
+      this.socket.emit( PlayerEvents.JUMP );
     }
   }
 
@@ -126,6 +150,20 @@ export class PlayerMe extends Player {
    */
   get store () {
     return AppStore.getStore();
+  }
+
+  /**
+   * @returns {GameConnection}
+   */
+  get connection () {
+    return GameConnection.getConnection();
+  }
+
+  /**
+   * @returns {Socket}
+   */
+  get socket () {
+    return this.connection.socket;
   }
 
   /**
@@ -168,5 +206,18 @@ export class PlayerMe extends Player {
   _initControls () {
     this._controls = new PlayerControls( this );
     this._controls.init();
+  }
+
+  /**
+   * @private
+   */
+  _sendTargetLocation () {
+    let target = this.targetLocation.clone();
+    if (this.targetLocationInfinite) {
+      target = floorVector( target.normalize(), 8 );
+    } else {
+      target = floorVector( target, 5 );
+    }
+    this.socket.emit( PlayerEvents.SET_TARGET_LOCATION, target.toArray(), this.targetLocationInfinite );
   }
 }

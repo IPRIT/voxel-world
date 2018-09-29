@@ -32,6 +32,7 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * @type {THREE.Vector3}
+   * @private
    */
   _targetLocation = null;
 
@@ -43,6 +44,7 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * @type {LivingObject}
+   * @private
    */
   _targetObject = null;
 
@@ -159,14 +161,14 @@ export class LivingObject extends WorldObjectAnimated {
 
   /**
    * @param {THREE.Vector3} location
-   * @param {boolean} infinite
+   * @param {boolean} isInfinite
    */
-  setTargetLocation (location, infinite = false) {
+  setTargetLocation (location, isInfinite = false) {
     if (!location) {
       return;
     }
     this._targetLocation = new THREE.Vector3( location.x, location.y, location.z );
-    this._targetLocationInfinite = infinite;
+    this._targetLocationInfinite = isInfinite;
     this._updateVelocityDirection();
     this.setComingState();
   }

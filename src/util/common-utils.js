@@ -65,3 +65,40 @@ export class Multi {
 export function capitalizeFirstLetter (text) {
   return text[0].toUpperCase() + text.slice(1);
 }
+
+/**
+ * @param {Function} fn
+ * @param {number} limit
+ * @returns {Function}
+ */
+export const throttle = (fn, limit) => {
+  let lastFn;
+  let lastRanAt;
+  return (...args) => {
+    if (!lastRanAt) {
+      fn( ...args );
+      lastRanAt = Date.now();
+    } else {
+      clearTimeout( lastFn );
+      lastFn = setTimeout(() => {
+        if ((Date.now() - lastRanAt) >= limit) {
+          fn( ...args );
+          lastRanAt = Date.now();
+        }
+      }, limit - (Date.now() - lastRanAt));
+    }
+  };
+};
+
+/**
+ * @param {Function} fn
+ * @param {number} delay
+ * @returns {Function}
+ */
+export const debounce = (fn, delay) => {
+  let debounceTimeout;
+  return (...args) => {
+    clearTimeout( debounceTimeout );
+    debounceTimeout = setTimeout( () => fn( ...args ), delay );
+  };
+};

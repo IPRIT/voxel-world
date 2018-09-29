@@ -17,12 +17,20 @@ export function rgbToInt(colorArray) {
 
 /**
  * @param {THREE.Vector3} vector
+ * @param {number} toFixed
  * @returns {THREE.Vector3}
  */
-export function floorVector (vector) {
-  vector.x |= 0;
-  vector.y |= 0;
-  vector.z |= 0;
+export function floorVector (vector, toFixed = 0) {
+  if (!toFixed) {
+    vector.x |= 0;
+    vector.y |= 0;
+    vector.z |= 0;
+  } else {
+    vector.x = ensureNumber( vector.x.toFixed( toFixed ) );
+    vector.y = ensureNumber( vector.y.toFixed( toFixed ) );
+    vector.z = ensureNumber( vector.z.toFixed( toFixed ) );
+  }
+
   return vector;
 }
 
