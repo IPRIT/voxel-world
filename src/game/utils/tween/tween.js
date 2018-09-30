@@ -149,8 +149,8 @@ export class Tween extends EventEmitter {
    * Finish & dispose the tween
    */
   finish () {
-    this._state = TweenState.FINISHED;
-    this.emit( TweenEvents.FINISHED, this._timeElapsed );
+    this._state = TweenState.COMPLETED;
+    this.emit( TweenEvents.COMPLETE, this._timeElapsed );
     this._dispose();
   }
 
@@ -192,8 +192,8 @@ export class Tween extends EventEmitter {
   /**
    * @returns {boolean}
    */
-  get isFinished () {
-    return this._state === TweenState.FINISHED;
+  get isCompleted () {
+    return this._state === TweenState.COMPLETED;
   }
 
   /**

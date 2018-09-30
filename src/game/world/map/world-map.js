@@ -223,7 +223,7 @@ export class WorldMap extends THREE.Group {
       timingFunction: 'easeInQuad'
     });
     animation.start();
-    animation.on(TweenEvents.FINISHED, _ => {
+    animation.on(TweenEvents.COMPLETE, _ => {
       // webgl doesn't sort transparent objects properly by z-depth
       // so we need turn off this to get rid of unexpected results
       mapObject.material.transparent = false;

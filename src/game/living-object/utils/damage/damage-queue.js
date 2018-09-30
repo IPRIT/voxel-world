@@ -167,15 +167,15 @@ export class DamageQueue {
       }
     }
 
-    verticalAnimation.on(TweenEvents.FINISHED, _ => {
-      if (opacityAnimation.isFinished) {
+    verticalAnimation.on(TweenEvents.COMPLETE, _ => {
+      if (opacityAnimation.isCompleted) {
         setTimeout( onBothFinished, 300 );
       }
       this._deleteAnimation( verticalAnimation );
     });
 
-    opacityAnimation.on(TweenEvents.FINISHED, _ => {
-      if (verticalAnimation.isFinished) {
+    opacityAnimation.on(TweenEvents.COMPLETE, _ => {
+      if (verticalAnimation.isCompleted) {
         setTimeout( onBothFinished, 300 );
       }
       this._deleteAnimation( opacityAnimation );

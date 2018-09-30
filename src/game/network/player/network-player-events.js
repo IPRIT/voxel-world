@@ -1,4 +1,4 @@
-export const PlayerEvents = {
+export const NetworkPlayerEvents = {
   DISCONNECTED: 'player.disconnected',
 
   SELECT_CHARACTER: 'player.selectCharacter',

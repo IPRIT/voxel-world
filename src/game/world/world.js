@@ -8,6 +8,7 @@ import { toBlockPosition } from "../utils";
 import { CharactersMap } from "../dictionary";
 import { DeerAnimal } from "../living-object/animal/deer";
 import { PlayerEnemy } from "../living-object/player/enemy";
+import { DamageQueue } from "../living-object/utils/damage/damage-queue";
 
 export class World {
   /**
@@ -127,16 +128,19 @@ export class World {
       map.updateAtPosition( currentPosition );
     }
 
-    this._map.updateShowingAnimations( deltaTime );
+    map.updateShowingAnimations( deltaTime );
 
     if (players) {
       players.update( deltaTime );
     }
 
-    let selectionSprite = SelectionOverlay.getOverlay();
+    const selectionSprite = SelectionOverlay.getOverlay();
     if (selectionSprite.isAttached) {
       selectionSprite.update( deltaTime );
     }
+
+    const damageQueue = DamageQueue.getQueue();
+    damageQueue.update( deltaTime );
   }
 
   /**

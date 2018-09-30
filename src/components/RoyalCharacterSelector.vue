@@ -2,9 +2,8 @@
   import RoyalButton from "./RoyalButton";
 
   import { GameConnection } from "../game/network/game-connection";
-  import { PlayerEvents } from "../game/network/events";
+  import { NetworkPlayerEvents } from "../game/network/player/network-player-events";
   import { CharactersMapReverted } from "../game/dictionary";
-  import { capitalizeFirstLetter } from "../util/common-utils";
 
   import { createNamespacedHelpers } from 'vuex';
   import { ensureNumber } from "../game/utils";
@@ -41,7 +40,7 @@
         const { dispatch } = this.$store;
         const { socket } = gameConnection;
 
-        socket && socket.emit( PlayerEvents.CHARACTER_SELECTED, hero.id );
+        socket && socket.emit( NetworkPlayerEvents.CHARACTER_SELECTED, hero.id );
         dispatch( 'ui/setCharacterSelectorState', false );
       }
     },
@@ -62,7 +61,7 @@
       const gameConnection = GameConnection.getConnection();
       const { dispatch } = this.$store;
 
-      gameConnection.on(PlayerEvents.SELECT_CHARACTER, _ => {
+      gameConnection.on(NetworkPlayerEvents.SELECT_CHARACTER, _ => {
         dispatch( 'ui/setCharacterSelectorState', true );
       });
     }
