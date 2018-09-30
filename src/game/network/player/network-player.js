@@ -44,16 +44,29 @@ export class NetworkPlayer extends Player {
    */
   setTargetObject (livingObject) {
     if (livingObject) {
-      this.socket.emit( NetworkPlayerEvents.SET_TARGET_OBJECT, livingObject.id );
+      this.socket.emit( NetworkPlayerEvents.SET_TARGET_OBJECT, livingObject.id, Date.now() );
     }
 
     super.setTargetObject( livingObject );
   }
 
   jump () {
-    this.socket.emit( NetworkPlayerEvents.JUMP );
+    this.socket.emit( NetworkPlayerEvents.JUMP, Date.now() );
 
     super.jump();
+  }
+
+  /**
+   * @param {boolean} state
+   */
+  setComingState (state) {
+    super.setComingState( state );
+
+    if (!state) {
+      this._lastTargetLocation = null;
+    }
+
+    this.socket.emit( NetworkPlayerEvents.SET_COMING_STATE, state, Date.now() );
   }
 
   /**
@@ -110,6 +123,11 @@ export class NetworkPlayer extends Player {
     this._lastTargetLocationSentAtMs = Date.now();
     this._lastTargetLocation = location;
 
-    this.socket.emit( NetworkPlayerEvents.SET_TARGET_LOCATION, location.toArray(), isInfinite, this._lastTargetLocationSentAtMs );
+    this.socket.emit(
+      NetworkPlayerEvents.SET_TARGET_LOCATION,
+      location.toArray(),
+      isInfinite,
+      this._lastTargetLocationSentAtMs
+    );
   }
 }

@@ -7,4 +7,5 @@ export const NetworkPlayerEvents = {
   SET_TARGET_LOCATION: 'player.setTargetLocation',
   SET_TARGET_OBJECT: 'player.setTargetObject',
   JUMP: 'player.jump',
+  SET_COMING_STATE: 'player.setComingState'
 };
