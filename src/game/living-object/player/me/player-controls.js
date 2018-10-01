@@ -1,5 +1,5 @@
 import * as utils from "../../../utils";
-import { LivingObject } from "../../living-object";
+import { LivingObject, StopMovingReason } from "../../living-object";
 import { Game } from "../../../game";
 
 export class PlayerControls {
@@ -154,7 +154,7 @@ export class PlayerControls {
       if (this._playerWalkingByKeyboard) {
         // reset current point
         this._oldInfinitePoint = new THREE.Vector3( );
-        this._me.setComingState( false );
+        this._me.stopMoving( StopMovingReason.CANCEL_BY_USER );
       }
       return ( this._playerWalkingByKeyboard = false );
     }
@@ -182,8 +182,8 @@ export class PlayerControls {
     }
 
     if (escPressed && this._lastEscPressedMs + this._keyPressDelay < currentTimeMs) {
-      if (this._me.isComing && !this._playerWalkingByKeyboard) {
-        this._me.setComingState( false );
+      if (this._me.isMoving && !this._playerWalkingByKeyboard) {
+        this._me.stopMoving( StopMovingReason.CANCEL_BY_USER );
       } else {
         this._me.resetTargetObject();
       }

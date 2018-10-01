@@ -3,6 +3,11 @@ import { GameConnection } from "../game-connection";
 import { throttle } from "../../../util/common-utils";
 import { NetworkPlayerEvents } from "./network-player-events";
 import { isVectorZero } from "../../utils";
+import { StopMovingReason } from "../../living-object/living-object";
+import { Game } from "../../game";
+import { SphereParticle } from "../../visual-effects/particle";
+import { Tween } from "../../utils/tween";
+import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
 
 export class NetworkPlayer extends Player {
 
@@ -22,13 +27,23 @@ export class NetworkPlayer extends Player {
    * @type {number}
    * @private
    */
-  _lastTargetLocationSentAtMs = 0;
+  _lastActionAtMs = 0;
 
   /**
    * @type {THREE.Vector3}
    * @private
    */
   _lastTargetLocation = null;
+
+  /**
+   * @param {Object} options
+   * @returns {*}
+   */
+  init (options) {
+    this._initNetworkCursor();
+
+    return super.init( options );
+  }
 
   /**
    * @param {THREE.Vector3} location
@@ -57,16 +72,23 @@ export class NetworkPlayer extends Player {
   }
 
   /**
-   * @param {boolean} state
+   * Start moving to the target
    */
-  setComingState (state) {
-    super.setComingState( state );
+  startMoving () {
+    super.startMoving();
+  }
 
-    if (!state) {
-      this._lastTargetLocation = null;
+  /**
+   * @param {Symbol} reason
+   */
+  stopMoving (reason) {
+    this._lastTargetLocation = null;
+
+    if (this.isMoving && reason === StopMovingReason.CANCEL_BY_USER) {
+      this._emitStopMoving( Date.now() );
     }
 
-    this.socket.emit( NetworkPlayerEvents.SET_COMING_STATE, state, Date.now() );
+    super.stopMoving( reason );
   }
 
   /**
@@ -116,18 +138,64 @@ export class NetworkPlayer extends Player {
    * @private
    */
   _sendTargetLocation (location = this.targetLocation, isInfinite = this.targetLocationInfinite, calledAtMs = 0) {
-    if (calledAtMs <= this._lastTargetLocationSentAtMs) {
+    if (!this._isActualAction( calledAtMs )) {
+      console.log( calledAtMs, this._lastActionAtMs );
       return;
     }
 
-    this._lastTargetLocationSentAtMs = Date.now();
+    this._updateLastAction();
     this._lastTargetLocation = location;
 
     this.socket.emit(
       NetworkPlayerEvents.SET_TARGET_LOCATION,
       location.toArray(),
       isInfinite,
-      this._lastTargetLocationSentAtMs
+      this._lastActionAtMs
     );
+  }
+
+  /**
+   * @param {number} calledAtMs
+   * @private
+   */
+  _emitStopMoving (calledAtMs = Date.now()) {
+    if (!this._isActualAction( calledAtMs )) {
+      return;
+    }
+    this._updateLastAction();
+
+    this.socket.emit( NetworkPlayerEvents.STOP_MOVING, Date.now() );
+  }
+
+  /**
+   * @private
+   */
+  _updateLastAction () {
+    this._lastActionAtMs = Date.now();
+  }
+
+  /**
+   * @param {number} calledAtMs
+   * @returns {boolean}
+   * @private
+   */
+  _isActualAction (calledAtMs = 0) {
+    return calledAtMs > this._lastActionAtMs;
+  }
+
+  /**
+   * @private
+   */
+  _initNetworkCursor () {
+    const particle = new SphereParticle({ size: 2, color: 0xff15a0 });
+    const game = Game.getInstance();
+    game.scene.add( particle );
+    particle.position.copy( this.position );
+
+    const connection = this.connection;
+    connection.on( 'player.position', position => {
+      position[1] = this.objectHeight + 2 + this.worldPosition.y;
+      particle.position.copy( new THREE.Vector3( ...position ) );
+    });
   }
 }

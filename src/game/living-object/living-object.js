@@ -16,6 +16,11 @@ import { CharactersMapReverted, LivingObjectTypeReverted } from "../dictionary";
 import { WORLD_MAP_BLOCK_SIZE } from "../settings";
 import { Players } from "../world/players";
 
+export const StopMovingReason = {
+  REACHED_THE_TARGET: Symbol( 'REACHED_THE_TARGET' ),
+  CANCEL_BY_USER: Symbol( 'CANCEL_BY_USER' )
+};
+
 export class LivingObject extends WorldObjectAnimated {
 
   /**
@@ -113,7 +118,7 @@ export class LivingObject extends WorldObjectAnimated {
    * @type {boolean}
    * @private
    */
-  _isComing = false;
+  _isMoving = false;
 
   /**
    * @type {boolean}
@@ -142,11 +147,11 @@ export class LivingObject extends WorldObjectAnimated {
    * @param {number} deltaTime
    */
   update ( deltaTime ) {
-    if (this._isComing) {
+    if (this._isMoving) {
       if (this.getTargetLocationDistance() > warp( this._velocityScalar, deltaTime )) {
         this._nextPosition( deltaTime );
       } else {
-        this.setComingState( false );
+        this.stopMoving( StopMovingReason.REACHED_THE_TARGET );
       }
     }
 
@@ -170,7 +175,7 @@ export class LivingObject extends WorldObjectAnimated {
     this._targetLocation = new THREE.Vector3( location.x, location.y, location.z );
     this._targetLocationInfinite = isInfinite;
     this._updateVelocityDirection();
-    this.setComingState();
+    this.startMoving();
   }
 
   /**
@@ -234,18 +239,27 @@ export class LivingObject extends WorldObjectAnimated {
   }
 
   /**
-   * @param {boolean} coming
+   * Start moving to the target
    */
-  setComingState (coming = true) {
-    this._isComing = coming;
+  startMoving () {
+    this._isMoving = true;
 
     if (this.animationMixerInited) {
-      let actionName;
-      if (coming) {
-        actionName = 'RunAction';
-      } else {
-        actionName = 'Pose';
+      let actionName = 'RunAction';
+      if (this.currentClipActionName !== actionName) {
+        this.activateClipAction( actionName );
       }
+    }
+  }
+
+  /**
+   * @param {Symbol} reason
+   */
+  stopMoving (reason) {
+    this._isMoving = false;
+
+    if (this.animationMixerInited) {
+      let actionName = 'Pose';
       if (this.currentClipActionName !== actionName) {
         this.activateClipAction( actionName );
       }
@@ -357,8 +371,8 @@ export class LivingObject extends WorldObjectAnimated {
   /**
    * @returns {boolean}
    */
-  get isComing () {
-    return this._isComing;
+  get isMoving () {
+    return this._isMoving;
   }
 
   /**
@@ -627,7 +641,7 @@ export class LivingObject extends WorldObjectAnimated {
     this.position.add( shiftPosition );
     let distancePassed = oldPosition.distanceTo( this.position );
     if (distancePassed < .01 && !this._targetLocationInfinite) {
-      this.setComingState( false );
+      this.stopMoving( StopMovingReason.REACHED_THE_TARGET );
     }
 
     if (!this._needsVerticalUpdate) {
@@ -659,7 +673,7 @@ export class LivingObject extends WorldObjectAnimated {
       this._gravity.resetVelocity();
 
       if (falling) {
-        !this._isComing && this._stopVerticalUpdate();
+        !this._isMoving && this._stopVerticalUpdate();
         this._isJumping && (this._isJumping = false);
       }
     }
