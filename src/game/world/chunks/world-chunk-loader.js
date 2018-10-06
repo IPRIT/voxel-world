@@ -1,5 +1,6 @@
 import Promise from 'bluebird';
 import { VoxModelLoader } from "../../model/loaders/index";
+import { parseChunkIndex } from "../../utils";
 
 export class WorldChunkLoader extends VoxModelLoader {
 
@@ -24,8 +25,9 @@ export class WorldChunkLoader extends VoxModelLoader {
    * @returns {Promise<{cached: boolean, item: VoxModel}>}
    */
   async load (chunkIndex) {
-    let [ x, z ] = chunkIndex.split('|').map(Number);
-    x = x % 8; z = z % 8;
+    let [ x, z ] = parseChunkIndex( chunkIndex );
+    x %= 8;
+    z %= 8;
     let chunkFileName = `chunk-${x}-${z}.vox`;
     let pathToFile = `/resources/models/chunks/`;
     let fileUrl = `${pathToFile}${chunkFileName}`;

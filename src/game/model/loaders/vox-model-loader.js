@@ -1,4 +1,3 @@
-import { Vox } from "../../vox/index";
 import Promise from "bluebird";
 import { WORLD_MAP_SIZE } from "../../settings";
 import { DownloadOperationCached } from "../../../util/loaders/download-operation-cached";
