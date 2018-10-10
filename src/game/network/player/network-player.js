@@ -194,7 +194,7 @@ export class NetworkPlayer extends Player {
 
     const connection = this.connection;
     connection.on( 'player.position', position => {
-      position[1] = this.objectHeight + 2 + this.worldPosition.y;
+      position[1] += this.objectHeight + 2;
       particle.position.copy( new THREE.Vector3( ...position ) );
     });
   }

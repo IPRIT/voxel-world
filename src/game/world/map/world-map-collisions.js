@@ -1,4 +1,4 @@
-import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
+import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_BLOCK_SIZE_POWER } from "../../settings";
 
 export class WorldMapCollisions {
 
@@ -405,6 +405,6 @@ export class WorldMapCollisions {
    * @private
    */
   _blockCoord (value) {
-    return (value / WORLD_MAP_BLOCK_SIZE) | 0;
+    return value >> WORLD_MAP_BLOCK_SIZE_POWER;
   }
 }
