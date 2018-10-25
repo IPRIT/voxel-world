@@ -1,18 +1,19 @@
-import { WorldChunkType } from '../../chunks/world-chunk-type';
-import { WORLD_MAP_CHUNK_HEIGHT, WORLD_MAP_CHUNK_SIZE_POWER } from "../../../settings";
-import { hasBit } from "../../../utils";
+import { LightChunk } from "../../../../map/chunk/light-chunk";
 
+/**
+ * @param context
+ * @returns {{vertices: Array, colors: Array}}
+ */
 export function computeVertices (context) {
   let {
-    chunkBlocks,
-    heightMap,
-    chunkType,
+    heavyBuffer,
+    lightBuffer,
     chunkSize,
     bs,
-    renderNegY = false
+    renderBottomY = false
   } = context;
 
-  const chunkBlockIndex = (x, y, z) => {
+  const getBufferOffset = (x, y, z) => {
     return x * chunkSize.y * chunkSize.z
       + y * chunkSize.z
       + z;
@@ -24,9 +25,14 @@ export function computeVertices (context) {
       && blockValue2 !== 0;
   };
 
-  const isMapChunk = chunkType === WorldChunkType.MAP_CHUNK;
+  const isMapChunk = true; // todo
   const vertices = [];
   const colors = [];
+
+  const lightChunk = new LightChunk();
+  if (isMapChunk) {
+    lightChunk.repairBuffer( lightBuffer );
+  }
 
   let colorsNumber = 0;
   let blocksNumber = 0;
@@ -35,8 +41,8 @@ export function computeVertices (context) {
   for (let x = 0; x < chunkSize.x; x++) {
     for (let y = 0; y < chunkSize.y; y++) {
       for (let z = 0; z < chunkSize.z; z++) {
-        const blockIndex = chunkBlockIndex(x, y, z);
-        if (chunkBlocks[ blockIndex ] === 0) {
+        const bufferOffset = getBufferOffset(x, y, z);
+        if (heavyBuffer[ bufferOffset ] === 0) {
           continue; // Skip empty blocks
         }
         blocksNumber++;
@@ -45,9 +51,9 @@ export function computeVertices (context) {
         let left = 0, right = 0, above = 0, front = 0, back = 0, below = 0;
 
         if (z > 0) {
-          if (chunkBlocks[ chunkBlockIndex(x, y, z - 1) ] !== 0) {
+          if (heavyBuffer[ getBufferOffset(x, y, z - 1) ] !== 0) {
             back = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x10;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x10;
           }
         } else {
           if (isMapChunk) {
@@ -58,14 +64,14 @@ export function computeVertices (context) {
             let blockExists = false;
             if (blockExists) {
               back = 1;
-              chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x10;
+              heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x10;
             }
           }
         }
         if (x > 0) {
-          if (chunkBlocks[ chunkBlockIndex(x - 1, y, z) ] !== 0) {
+          if (heavyBuffer[ getBufferOffset(x - 1, y, z) ] !== 0) {
             left = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x8;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x8;
           }
         } else if (isMapChunk) {
           // Check hit towards other chunks.
@@ -75,13 +81,13 @@ export function computeVertices (context) {
           let blockExists = false;
           if (blockExists) {
             left = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x8;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x8;
           }
         }
         if (x < chunkSize.x - 1) {
-          if (chunkBlocks[ chunkBlockIndex(x + 1, y, z) ] !== 0) {
+          if (heavyBuffer[ getBufferOffset(x + 1, y, z) ] !== 0) {
             right = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x4;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x4;
           }
         } else if (isMapChunk) {
           /*let blockExists = !!worldMap.getBlock(
@@ -90,34 +96,34 @@ export function computeVertices (context) {
           let blockExists = false;
           if (blockExists) {
             right = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x4;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x4;
           }
         }
 
         // Only check / draw bottom if we are an object!
-        if (!isMapChunk || renderNegY) {
+        if (!isMapChunk || renderBottomY) {
           if (isMapChunk) {
-            let minMaxY = getMinMaxBlock( heightMap, x, z );
+            let minMaxY = lightChunk.getMinMaxY( x, z );
             if (y - 2 < minMaxY) {
               below = 1;
             } else {
-              if (chunkBlocks[ chunkBlockIndex(x, y - 1, z) ] !== 0) {
+              if (heavyBuffer[ getBufferOffset(x, y - 1, z) ] !== 0) {
                 below = 1;
-                chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x20; // bit 6
+                heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x20; // bit 6
               }
             }
           } else if (y > 0) {
-            if (chunkBlocks[ chunkBlockIndex(x, y - 1, z) ] !== 0) {
+            if (heavyBuffer[ getBufferOffset(x, y - 1, z) ] !== 0) {
               below = 1;
-              chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x20; // bit 6
+              heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x20; // bit 6
             }
           }
         }
 
         if (y < chunkSize.y - 1) {
-          if (chunkBlocks[ chunkBlockIndex(x, y + 1, z) ] !== 0) {
+          if (heavyBuffer[ getBufferOffset(x, y + 1, z) ] !== 0) {
             above = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x2;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x2;
           }
         } else if (isMapChunk) {
           /*let blockExists = !!worldMap.getBlock(
@@ -127,13 +133,13 @@ export function computeVertices (context) {
           // Check hit towards other chunks.
           if (blockExists) {
             above = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x2;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x2;
           }
         }
         if (z < chunkSize.z - 1) {
-          if (chunkBlocks[ chunkBlockIndex(x, y, z + 1) ] !== 0) {
+          if (heavyBuffer[ getBufferOffset(x, y, z + 1) ] !== 0) {
             front = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x1;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x1;
           }
         } else if (isMapChunk) {
           // Check hit towards other chunks.
@@ -143,11 +149,11 @@ export function computeVertices (context) {
           let blockExists = false;
           if (blockExists) {
             front = 1;
-            chunkBlocks[ blockIndex ] = chunkBlocks[ blockIndex ] | 0x1;
+            heavyBuffer[ bufferOffset ] = heavyBuffer[ bufferOffset ] | 0x1;
           }
         }
 
-        if (isMapChunk && !renderNegY) {
+        if (isMapChunk && !renderBottomY) {
           if (front === 1 && left === 1 && right === 1 && above === 1 && back === 1) {
             continue; // block is hidden (map)
           }
@@ -160,26 +166,26 @@ export function computeVertices (context) {
         // Draw blocks
 
         // Only draw below if we are an object
-        if (!isMapChunk || renderNegY) {
+        if (!isMapChunk || renderBottomY) {
           if (!below) {
             // Get below (bit 6)
-            if ((chunkBlocks[ blockIndex ] & 0x20) === 0) {
+            if ((heavyBuffer[ bufferOffset ] & 0x20) === 0) {
               let maxX = 0;
               let maxZ = 0;
               let end = 0;
 
               for (let x_ = x; x_ < chunkSize.x; x_++) {
                 // Check not drawn + same color
-                if ((chunkBlocks[ chunkBlockIndex(x_, y, z) ] & 0x20) === 0
-                  && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y, z) ], chunkBlocks[ blockIndex ])) {
+                if ((heavyBuffer[ getBufferOffset(x_, y, z) ] & 0x20) === 0
+                  && isSameColors(heavyBuffer[ getBufferOffset(x_, y, z) ], heavyBuffer[ bufferOffset ])) {
                   maxX++;
                 } else {
                   break;
                 }
                 let tmpZ = 0;
                 for (let z_ = z; z_ < chunkSize.z; z_++) {
-                  if ((chunkBlocks[ chunkBlockIndex(x_, y, z_) ] & 0x20) === 0
-                    && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y, z_) ], chunkBlocks[ blockIndex ])) {
+                  if ((heavyBuffer[ getBufferOffset(x_, y, z_) ] & 0x20) === 0
+                    && isSameColors(heavyBuffer[ getBufferOffset(x_, y, z_) ], heavyBuffer[ bufferOffset ])) {
                     tmpZ++;
                   } else {
                     break;
@@ -191,7 +197,7 @@ export function computeVertices (context) {
               }
               for (let x_ = x; x_ < x + maxX; x_++) {
                 for (let z_ = z; z_ < z + maxZ; z_++) {
-                  chunkBlocks[ chunkBlockIndex(x_, y, z_) ] = chunkBlocks[ chunkBlockIndex(x_, y, z_) ] | 0x20;
+                  heavyBuffer[ getBufferOffset(x_, y, z_) ] = heavyBuffer[ getBufferOffset(x_, y, z_) ] | 0x20;
                 }
               }
               maxX--;
@@ -205,9 +211,9 @@ export function computeVertices (context) {
               vertices.push([x - 1, y - 1, z - 1]);
               vertices.push([x + (maxX), y - 1, z - 1]);
 
-              r = ((chunkBlocks[ blockIndex ] >> 24) & 0xFF) / 255;
-              g = ((chunkBlocks[ blockIndex ] >> 16) & 0xFF) / 255;
-              b = ((chunkBlocks[ blockIndex ] >> 8) & 0xFF) / 255;
+              r = ((heavyBuffer[ bufferOffset ] >> 24) & 0xFF) / 255;
+              g = ((heavyBuffer[ bufferOffset ] >> 16) & 0xFF) / 255;
+              b = ((heavyBuffer[ bufferOffset ] >> 8) & 0xFF) / 255;
               colors[colorsNumber++] = [r,g,b];
               colors[colorsNumber++] = [r,g,b];
               colors[colorsNumber++] = [r,g,b];
@@ -220,23 +226,23 @@ export function computeVertices (context) {
 
         if (!above) {
           // Get above (0010)
-          if ((chunkBlocks[ blockIndex ] & 0x2) === 0) {
+          if ((heavyBuffer[ bufferOffset ] & 0x2) === 0) {
             let maxX = 0;
             let maxZ = 0;
             let end = 0;
 
             for (let x_ = x; x_ < chunkSize.x; x_++) {
               // Check not drawn + same color
-              if ((chunkBlocks[ chunkBlockIndex(x_, y, z) ] & 0x2) === 0
-                && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y, z) ], chunkBlocks[ blockIndex ])) {
+              if ((heavyBuffer[ getBufferOffset(x_, y, z) ] & 0x2) === 0
+                && isSameColors(heavyBuffer[ getBufferOffset(x_, y, z) ], heavyBuffer[ bufferOffset ])) {
                 maxX++;
               } else {
                 break;
               }
               let tmpZ = 0;
               for (let z_ = z; z_ < chunkSize.z; z_++) {
-                if ((chunkBlocks[ chunkBlockIndex(x_, y, z_) ] & 0x2) === 0
-                  && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y, z_) ], chunkBlocks[ blockIndex ])) {
+                if ((heavyBuffer[ getBufferOffset(x_, y, z_) ] & 0x2) === 0
+                  && isSameColors(heavyBuffer[ getBufferOffset(x_, y, z_) ], heavyBuffer[ bufferOffset ])) {
                   tmpZ++;
                 } else {
                   break;
@@ -248,7 +254,7 @@ export function computeVertices (context) {
             }
             for (let x_ = x; x_ < x + maxX; x_++) {
               for (let z_ = z; z_ < z + maxZ; z_++) {
-                chunkBlocks[ chunkBlockIndex(x_, y, z_) ] = chunkBlocks[ chunkBlockIndex(x_, y, z_) ] | 0x2;
+                heavyBuffer[ getBufferOffset(x_, y, z_) ] = heavyBuffer[ getBufferOffset(x_, y, z_) ] | 0x2;
               }
             }
             maxX--;
@@ -262,9 +268,9 @@ export function computeVertices (context) {
             vertices.push([x + (maxX), y, z - 1]);
             vertices.push([x - 1, y, z - 1]);
 
-            r = ((chunkBlocks[ blockIndex ] >> 24) & 0xFF) / 255;
-            g = ((chunkBlocks[ blockIndex ] >> 16) & 0xFF) / 255;
-            b = ((chunkBlocks[ blockIndex ] >> 8) & 0xFF) / 255;
+            r = ((heavyBuffer[ bufferOffset ] >> 24) & 0xFF) / 255;
+            g = ((heavyBuffer[ bufferOffset ] >> 16) & 0xFF) / 255;
+            b = ((heavyBuffer[ bufferOffset ] >> 8) & 0xFF) / 255;
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
@@ -276,22 +282,22 @@ export function computeVertices (context) {
         if (!back) {
           // back  10000
           // this.shadow_blocks.push([x, y, z]);
-          if ((chunkBlocks[ blockIndex ] & 0x10) === 0) {
+          if ((heavyBuffer[ bufferOffset ] & 0x10) === 0) {
             let maxX = 0;
             let maxY = 0;
 
             for (let x_ = x; x_ < chunkSize.x; x_++) {
               // Check not drawn + same color
-              if ((chunkBlocks[ chunkBlockIndex(x_, y, z) ] & 0x10) === 0
-                && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y, z) ], chunkBlocks[ blockIndex ])) {
+              if ((heavyBuffer[ getBufferOffset(x_, y, z) ] & 0x10) === 0
+                && isSameColors(heavyBuffer[ getBufferOffset(x_, y, z) ], heavyBuffer[ bufferOffset ])) {
                 maxX++;
               } else {
                 break;
               }
               let tmpY = 0;
               for (let y_ = y; y_ < chunkSize.y; y_++) {
-                if ((chunkBlocks[ chunkBlockIndex(x_, y_, z) ] & 0x10) === 0
-                  && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y_, z) ], chunkBlocks[ blockIndex ])) {
+                if ((heavyBuffer[ getBufferOffset(x_, y_, z) ] & 0x10) === 0
+                  && isSameColors(heavyBuffer[ getBufferOffset(x_, y_, z) ], heavyBuffer[ bufferOffset ])) {
                   tmpY++;
                 } else {
                   break;
@@ -303,7 +309,7 @@ export function computeVertices (context) {
             }
             for (let x_ = x; x_ < x + maxX; x_++) {
               for (let y_ = y; y_ < y + maxY; y_++) {
-                chunkBlocks[ chunkBlockIndex(x_, y_, z) ] = chunkBlocks[ chunkBlockIndex(x_, y_, z) ] | 0x10;
+                heavyBuffer[ getBufferOffset(x_, y_, z) ] = heavyBuffer[ getBufferOffset(x_, y_, z) ] | 0x10;
               }
             }
             maxX--;
@@ -316,9 +322,9 @@ export function computeVertices (context) {
             vertices.push([x - 1, y - 1, z - 1]);
             vertices.push([x - 1, y + (maxY), z - 1]);
 
-            r = ((chunkBlocks[ blockIndex ] >> 24) & 0xFF) / 255;
-            g = ((chunkBlocks[ blockIndex ] >> 16) & 0xFF) / 255;
-            b = ((chunkBlocks[ blockIndex ] >> 8) & 0xFF) / 255;
+            r = ((heavyBuffer[ bufferOffset ] >> 24) & 0xFF) / 255;
+            g = ((heavyBuffer[ bufferOffset ] >> 16) & 0xFF) / 255;
+            b = ((heavyBuffer[ bufferOffset ] >> 8) & 0xFF) / 255;
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
@@ -329,22 +335,22 @@ export function computeVertices (context) {
         }
         if (!front) {
           // front 0001
-          if ((chunkBlocks[ blockIndex ] & 0x1) === 0) {
+          if ((heavyBuffer[ bufferOffset ] & 0x1) === 0) {
             let maxX = 0;
             let maxY = 0;
 
             for (let x_ = x; x_ < chunkSize.x; x_++) {
               // Check not drawn + same color
-              if ((chunkBlocks[ chunkBlockIndex(x_, y, z) ] & 0x1) === 0
-                && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y, z) ], chunkBlocks[ blockIndex ])) {
+              if ((heavyBuffer[ getBufferOffset(x_, y, z) ] & 0x1) === 0
+                && isSameColors(heavyBuffer[ getBufferOffset(x_, y, z) ], heavyBuffer[ bufferOffset ])) {
                 maxX++;
               } else {
                 break;
               }
               let tmpY = 0;
               for (let y_ = y; y_ < chunkSize.y; y_++) {
-                if ((chunkBlocks[ chunkBlockIndex(x_, y_, z) ] & 0x1) === 0
-                  && isSameColors(chunkBlocks[ chunkBlockIndex(x_, y_, z) ], chunkBlocks[ blockIndex ])) {
+                if ((heavyBuffer[ getBufferOffset(x_, y_, z) ] & 0x1) === 0
+                  && isSameColors(heavyBuffer[ getBufferOffset(x_, y_, z) ], heavyBuffer[ bufferOffset ])) {
                   tmpY++;
                 } else {
                   break;
@@ -356,7 +362,7 @@ export function computeVertices (context) {
             }
             for (let x_ = x; x_ < x + maxX; x_++) {
               for (let y_ = y; y_ < y + maxY; y_++) {
-                chunkBlocks[ chunkBlockIndex(x_, y_, z) ] = chunkBlocks[ chunkBlockIndex(x_, y_, z) ] | 0x1;
+                heavyBuffer[ getBufferOffset(x_, y_, z) ] = heavyBuffer[ getBufferOffset(x_, y_, z) ] | 0x1;
               }
             }
             maxX--;
@@ -370,9 +376,9 @@ export function computeVertices (context) {
             vertices.push([x - 1, y - 1, z]);
             vertices.push([x + (maxX), y - 1, z]);
 
-            r = ((chunkBlocks[ blockIndex ] >> 24) & 0xFF) / 255;
-            g = ((chunkBlocks[ blockIndex ] >> 16) & 0xFF) / 255;
-            b = ((chunkBlocks[ blockIndex ] >> 8) & 0xFF) / 255;
+            r = ((heavyBuffer[ bufferOffset ] >> 24) & 0xFF) / 255;
+            g = ((heavyBuffer[ bufferOffset ] >> 16) & 0xFF) / 255;
+            b = ((heavyBuffer[ bufferOffset ] >> 8) & 0xFF) / 255;
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
@@ -382,22 +388,22 @@ export function computeVertices (context) {
           }
         }
         if (!left) {
-          if ((chunkBlocks[ blockIndex ] & 0x8) === 0) {
+          if ((heavyBuffer[ bufferOffset ] & 0x8) === 0) {
             let maxZ = 0;
             let maxY = 0;
 
             for (let z_ = z; z_ < chunkSize.z; z_++) {
               // Check not drawn + same color
-              if ((chunkBlocks[ chunkBlockIndex(x, y, z_) ] & 0x8) === 0
-                && isSameColors(chunkBlocks[ chunkBlockIndex(x, y, z_) ], chunkBlocks[ blockIndex ])) {
+              if ((heavyBuffer[ getBufferOffset(x, y, z_) ] & 0x8) === 0
+                && isSameColors(heavyBuffer[ getBufferOffset(x, y, z_) ], heavyBuffer[ bufferOffset ])) {
                 maxZ++;
               } else {
                 break;
               }
               let tmpY = 0;
               for (let y_ = y; y_ < chunkSize.y; y_++) {
-                if ((chunkBlocks[ chunkBlockIndex(x, y_, z_) ] & 0x8) === 0
-                  && isSameColors(chunkBlocks[ chunkBlockIndex(x, y_, z_) ], chunkBlocks[ blockIndex ])) {
+                if ((heavyBuffer[ getBufferOffset(x, y_, z_) ] & 0x8) === 0
+                  && isSameColors(heavyBuffer[ getBufferOffset(x, y_, z_) ], heavyBuffer[ bufferOffset ])) {
                   tmpY++;
                 } else {
                   break;
@@ -409,7 +415,7 @@ export function computeVertices (context) {
             }
             for (let z_ = z; z_ < z + maxZ; z_++) {
               for (let y_ = y; y_ < y + maxY; y_++) {
-                chunkBlocks[ chunkBlockIndex(x, y_, z_) ] = chunkBlocks[ chunkBlockIndex(x, y_, z_) ] | 0x8;
+                heavyBuffer[ getBufferOffset(x, y_, z_) ] = heavyBuffer[ getBufferOffset(x, y_, z_) ] | 0x8;
               }
             }
             maxZ--;
@@ -423,9 +429,9 @@ export function computeVertices (context) {
             vertices.push([x - 1, y + (maxY), z + (maxZ)]);
             vertices.push([x - 1, y + (maxY), z - 1]);
 
-            r = ((chunkBlocks[ blockIndex ] >> 24) & 0xFF) / 255;
-            g = ((chunkBlocks[ blockIndex ] >> 16) & 0xFF) / 255;
-            b = ((chunkBlocks[ blockIndex ] >> 8) & 0xFF) / 255;
+            r = ((heavyBuffer[ bufferOffset ] >> 24) & 0xFF) / 255;
+            g = ((heavyBuffer[ bufferOffset ] >> 16) & 0xFF) / 255;
+            b = ((heavyBuffer[ bufferOffset ] >> 8) & 0xFF) / 255;
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
@@ -435,22 +441,22 @@ export function computeVertices (context) {
           }
         }
         if (!right) {
-          if ((chunkBlocks[ blockIndex ] & 0x4) === 0) {
+          if ((heavyBuffer[ bufferOffset ] & 0x4) === 0) {
             let maxZ = 0;
             let maxY = 0;
 
             for (let z_ = z; z_ < chunkSize.z; z_++) {
               // Check not drawn + same color
-              if ((chunkBlocks[ chunkBlockIndex(x, y, z_) ] & 0x4) === 0
-                && isSameColors(chunkBlocks[ chunkBlockIndex(x, y, z_) ], chunkBlocks[ blockIndex ])) {
+              if ((heavyBuffer[ getBufferOffset(x, y, z_) ] & 0x4) === 0
+                && isSameColors(heavyBuffer[ getBufferOffset(x, y, z_) ], heavyBuffer[ bufferOffset ])) {
                 maxZ++;
               } else {
                 break;
               }
               let tmpY = 0;
               for (let y_ = y; y_ < chunkSize.y; y_++) {
-                if ((chunkBlocks[ chunkBlockIndex(x, y_, z_) ] & 0x4) === 0
-                  && isSameColors(chunkBlocks[ chunkBlockIndex(x, y_, z_) ], chunkBlocks[ blockIndex ])) {
+                if ((heavyBuffer[ getBufferOffset(x, y_, z_) ] & 0x4) === 0
+                  && isSameColors(heavyBuffer[ getBufferOffset(x, y_, z_) ], heavyBuffer[ bufferOffset ])) {
                   tmpY++;
                 } else {
                   break;
@@ -462,7 +468,7 @@ export function computeVertices (context) {
             }
             for (let z_ = z; z_ < z + maxZ; z_++) {
               for (let y_ = y; y_ < y + maxY; y_++) {
-                chunkBlocks[ chunkBlockIndex(x, y_, z_) ] = chunkBlocks[ chunkBlockIndex(x, y_, z_) ] | 0x4;
+                heavyBuffer[ getBufferOffset(x, y_, z_) ] = heavyBuffer[ getBufferOffset(x, y_, z_) ] | 0x4;
               }
             }
             maxZ--;
@@ -476,9 +482,9 @@ export function computeVertices (context) {
             vertices.push([x, y - 1, z - 1]);
             vertices.push([x, y + (maxY), z - 1]);
 
-            r = ((chunkBlocks[ blockIndex ] >> 24) & 0xFF) / 255;
-            g = ((chunkBlocks[ blockIndex ] >> 16) & 0xFF) / 255;
-            b = ((chunkBlocks[ blockIndex ] >> 8) & 0xFF) / 255;
+            r = ((heavyBuffer[ bufferOffset ] >> 24) & 0xFF) / 255;
+            g = ((heavyBuffer[ bufferOffset ] >> 16) & 0xFF) / 255;
+            b = ((heavyBuffer[ bufferOffset ] >> 8) & 0xFF) / 255;
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
             colors[colorsNumber++] = [r,g,b];
@@ -501,36 +507,4 @@ export function computeVertices (context) {
     vertices,
     colors
   };
-}
-
-/**
- * @param {Uint32Array} map
- * @param {number} x
- * @param {number} z
- * @return {number}
- */
-function getColumn (map, x, z) {
-  return map[ (x << WORLD_MAP_CHUNK_SIZE_POWER) + z ];
-}
-
-/**
- * @param {Uint32Array} map
- * @param {number} x
- * @param {number} z
- * @return {number}
- */
-function getMinMaxBlock (map, x, z) {
-  let column = getColumn( map, x, z );
-  let minMaxY = 0, minY = -1;
-  for (let y = 0; y < WORLD_MAP_CHUNK_HEIGHT; ++y) {
-    if (hasBit( column, y )) {
-      minMaxY = y;
-      if (minY === -1) {
-        minY = y;
-      }
-    } else if (minY >= 0) {
-      break;
-    }
-  }
-  return minMaxY;
 }

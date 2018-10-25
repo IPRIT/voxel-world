@@ -1,15 +1,15 @@
-import { WorldObjectVox } from "../world-object/index";
-import { WorldMapLoader } from "./world-map-loader";
+import { MapLoader } from "./loader/map-loader";
+import { WorldObjectVox } from "../world-object";
+import { WorldMapCollisions } from "./world-map-collisions";
+import { Tween } from "../../utils/tween";
+import { TweenEvents } from "../../utils/tween/tween-events";
+import { buildChunkIndex } from "../../utils";
 import {
   WORLD_MAP_BLOCK_SIZE,
   WORLD_MAP_CHUNK_HEIGHT,
   WORLD_MAP_CHUNK_SIZE, WORLD_MAP_CHUNK_SIZE_POWER,
   WORLD_MAP_SIZE
 } from "../../settings";
-import { WorldMapCollisions } from "./world-map-collisions";
-import { Tween } from "../../utils/tween";
-import { buildChunkIndex } from "../../utils";
-import { TweenEvents } from "../../utils/tween/tween-events";
 
 export class WorldMap extends THREE.Group {
 
@@ -66,7 +66,7 @@ export class WorldMap extends THREE.Group {
    * @param {THREE.Vector3} position
    */
   updateAtPosition (position) {
-    const mapLoader = WorldMapLoader.getLoader();
+    const mapLoader = MapLoader.getLoader();
     return mapLoader.update( this, position );
   }
 
@@ -93,21 +93,6 @@ export class WorldMap extends THREE.Group {
 
   /**
    * @param {THREE.Vector3|*} position
-   * @param {number|number[]} color
-   */
-  addBlock (position, color) {
-    let worldChunkObject = this.getMapChunkAt( position );
-    if (!worldChunkObject) {
-      return;
-    }
-    const x = position.x - worldChunkObject.chunk._fromX;
-    const y = position.y - worldChunkObject.chunk._fromY;
-    const z = position.z - worldChunkObject.chunk._fromZ;
-    worldChunkObject.addBlock( { x, y, z }, color );
-  }
-
-  /**
-   * @param {THREE.Vector3|*} position
    * @returns {number}
    */
   getBlock (position) {
@@ -115,18 +100,62 @@ export class WorldMap extends THREE.Group {
     if (!worldChunkObject) {
       return 0;
     }
+
     const x = position.x - worldChunkObject.chunk._fromX;
     const y = position.y - worldChunkObject.chunk._fromY;
     const z = position.z - worldChunkObject.chunk._fromZ;
-    return worldChunkObject.getBlock( { x, y, z } );
+
+    return worldChunkObject.getBlock( x, y, z );
   }
 
   /**
-   * @param {{x: number, y: number, z: number}} position
+   * @param {THREE.Vector3|*} position
    * @returns {boolean}
    */
   hasBlock (position) {
-    return !!this.getBlock(position);
+    let worldChunkObject = this.getMapChunkAt( position );
+    if (!worldChunkObject) {
+      return false;
+    }
+
+    const x = position.x - worldChunkObject.chunk._fromX;
+    const y = position.y - worldChunkObject.chunk._fromY;
+    const z = position.z - worldChunkObject.chunk._fromZ;
+
+    return worldChunkObject.hasBlock( x, y, z );
+  }
+
+  /**
+   * @param {THREE.Vector3|*} position
+   * @param {number|number[]} color
+   */
+  addBlock (position, color) {
+    let worldChunkObject = this.getMapChunkAt( position );
+    if (!worldChunkObject) {
+      return;
+    }
+
+    const x = position.x - worldChunkObject.chunk._fromX;
+    const y = position.y - worldChunkObject.chunk._fromY;
+    const z = position.z - worldChunkObject.chunk._fromZ;
+
+    worldChunkObject.addBlock( x, y, z, color );
+  }
+
+  /**
+   * @param {THREE.Vector3|*} position
+   */
+  removeBlock (position) {
+    let worldChunkObject = this.getMapChunkAt( position );
+    if (!worldChunkObject) {
+      return;
+    }
+
+    const x = position.x - worldChunkObject.chunk._fromX;
+    const y = position.y - worldChunkObject.chunk._fromY;
+    const z = position.z - worldChunkObject.chunk._fromZ;
+
+    worldChunkObject.removeBlock( x, y, z );
   }
 
   /**
@@ -248,7 +277,7 @@ export class WorldMap extends THREE.Group {
    */
   register (mapObject) {
     this._map.set(
-      mapObject.chunk.mapChunkIndex,
+      mapObject.chunk.chunkIndex,
       mapObject
     );
   }
@@ -260,7 +289,7 @@ export class WorldMap extends THREE.Group {
     if (typeof mapObjectOrIndex === 'string') {
       this._map.delete( mapObjectOrIndex );
     } else if (mapObjectOrIndex.chunkInited) {
-      this._map.delete( mapObjectOrIndex.chunk.mapChunkIndex );
+      this._map.delete( mapObjectOrIndex.chunk.chunkIndex );
     }
   }
 

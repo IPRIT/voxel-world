@@ -4,7 +4,7 @@ import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_SIZE } from "../settings";
 import { Game } from "../game";
 import { SelectionOverlay } from "../living-object/utils";
 import { Players } from "./players";
-import { toBlockPosition } from "../utils";
+import { transformToBlockCoords } from "../utils";
 import { CharactersMap } from "../dictionary";
 import { DeerAnimal } from "../living-object/animal/deer";
 import { PlayerEnemy } from "../living-object/player/enemy";
@@ -123,7 +123,7 @@ export class World {
     const me = players.me;
 
     const currentPosition = me && me.blockPosition
-      || game.activeCamera && toBlockPosition( game.activeCamera.position );
+      || game.activeCamera && transformToBlockCoords( game.activeCamera.position );
     if (currentPosition) {
       map.updateAtPosition( currentPosition );
     }

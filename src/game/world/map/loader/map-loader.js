@@ -1,5 +1,5 @@
-import { buildChunkIndex, floorVector, parseChunkIndexToVector } from "../../utils";
-import { WorldMapLoadingOperation, WorldMapLoadingOperationEvents } from "./world-map-loading-operation";
+import { buildChunkIndex, floorVector, parseChunkIndexToVector } from "../../../utils/index";
+import { MapLoaderOperation, MapLoaderOperationEvents } from "./map-loader-operation";
 import {
   WORLD_MAP_CHUNK_HEIGHT,
   WORLD_MAP_CHUNK_SIZE,
@@ -7,9 +7,9 @@ import {
   WORLD_MAP_CHUNK_SIZE_VECTOR,
   WORLD_MAP_CHUNK_VIEW_DISTANCE,
   WORLD_MAP_SIZE
-} from "../../settings";
+} from "../../../settings";
 
-export class WorldMapLoader {
+export class MapLoader {
 
   /**
    * @type {WorldMap}
@@ -42,19 +42,19 @@ export class WorldMapLoader {
   _updateTimeoutMs = 500;
 
   /**
-   * @type {WorldMapLoader}
+   * @type {MapLoader}
    * @private
    */
   static _instance = null;
 
   /**
-   * @returns {WorldMapLoader}
+   * @returns {MapLoader}
    */
   static getLoader () {
     if (this._instance) {
       return this._instance;
     }
-    return ( this._instance = new WorldMapLoader() );
+    return ( this._instance = new MapLoader() );
   }
 
   /**
@@ -95,7 +95,7 @@ export class WorldMapLoader {
     }
 
     // Step 3
-    this._downloadOperation = new WorldMapLoadingOperation();
+    this._downloadOperation = new MapLoaderOperation();
     this._downloadOperation.load( ...sortedGroups );
 
     if (!sortedGroups.length) {
@@ -104,7 +104,7 @@ export class WorldMapLoader {
 
     // Subscribing to load events
     // On success loaded
-    this._downloadOperation.on(WorldMapLoadingOperationEvents.CHUNK_LOADED, worldObject => {
+    this._downloadOperation.on(MapLoaderOperationEvents.CHUNK_LOADED, worldObject => {
       // adding chunk to the world
       this.worldMap.attach( worldObject );
 
@@ -116,7 +116,7 @@ export class WorldMapLoader {
     });
 
     // On all chunks loaded
-    this._downloadOperation.once(WorldMapLoadingOperationEvents.ALL_CHUNKS_LOADED, _ => {
+    this._downloadOperation.once(MapLoaderOperationEvents.ALL_CHUNKS_LOADED, _ => {
       // unload the rest
       this.worldMap.unloadChunks( chunksToUnload );
     });

@@ -1,7 +1,6 @@
 import WebworkerPromise from "webworker-promise";
-import MesherWorker from './compute-vertices.worker';
-import { computeVertices } from "./compute-vertices";
-import { WorldChunkType } from '../../chunks/world-chunk-type';
+import MesherWorker from './vertices/compute-vertices.worker';
+import { computeVertices } from "./vertices/compute-vertices";
 
 const isWorkersSupported = !!window.Worker;
 const workersNumber = 3;
@@ -21,8 +20,7 @@ if (isWorkersSupported) {
   });
 }
 
-
-export class WorldObjectVoxMesher {
+export class VoxMesher {
 
   /**
    * @type {WorldObjectVox}
@@ -73,10 +71,10 @@ export class WorldObjectVoxMesher {
     if (!worldObject.mesh) {
       let startingBlocks = 0;
 
-      for (let i = 0; i < chunk.blocks.length; i++) {
-        if (chunk.blocks[ i ] !== 0) {
+      for (let i = 0; i < chunk.buffer.length; i++) {
+        if (chunk.buffer[ i ] !== 0) {
           startingBlocks++;
-          chunk.blocks[ i ] &= 0xFFFFFFE0; // why 0xFFFFFFE0? why not 0xFFFFFFC0?
+          chunk.buffer[ i ] &= 0xFFFFFFE0; // why 0xFFFFFFE0? why not 0xFFFFFFC0?
         }
       }
 
@@ -132,13 +130,7 @@ export class WorldObjectVoxMesher {
    */
   resetFaces () {
     const chunk = this._worldObject.chunk;
-    if (!chunk.inited) {
-      throw new Error('Chunk hasn\'t initialized');
-    }
-    // resetting last 6 bits of block (faces bits)
-    for (let i = 0; i < chunk.blocks.length; ++i) {
-      chunk.blocks[ i ] &= 0xFFFFFFC0; // 11111111111111111111111111000000
-    }
+    chunk && chunk.resetFaces();
   }
 
   /**
@@ -146,16 +138,14 @@ export class WorldObjectVoxMesher {
    * @private
    */
   async computeVertices (bs) {
-    let chunk = this._worldObject.chunk;
-
-    let context = {
-      chunkBlocks: chunk.blocks,
-      chunkType: chunk.type,
-      chunkSize: chunk.size,
+    const chunk = this._worldObject.chunk;
+    const { x, y, z } = chunk.size;
+    const context = {
+      heavyBuffer: chunk.buffer,
+      lightBuffer: chunk.lightChunk.buffer,
+      chunkSize: { x, y, z },
       bs,
-      WorldChunkType: WorldChunkType.getPlainObject(),
-      renderNegY: true,
-      heightMap: chunk.heightMap.map
+      renderBottomY: true
     };
 
     if (isWorkersSupported && workerPool.length) {

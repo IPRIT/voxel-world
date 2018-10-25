@@ -15,7 +15,7 @@ export class NetworkPlayer extends Player {
    * @type {Function}
    * @private
    */
-  _sendTargetLocationThrottled = throttle( this._sendTargetLocation.bind( this ), 250 );
+  _sendTargetLocationThrottled = throttle( this._sendTargetLocation.bind( this ), 50 );
 
   /**
    * @type {Function}
@@ -139,7 +139,7 @@ export class NetworkPlayer extends Player {
    */
   _sendTargetLocation (location = this.targetLocation, isInfinite = this.targetLocationInfinite, calledAtMs = 0) {
     if (!this._isActualAction( calledAtMs )) {
-      console.log( calledAtMs, this._lastActionAtMs );
+      // console.warn( 'sendTargetLocation is not actual', calledAtMs, this._lastActionAtMs );
       return;
     }
 

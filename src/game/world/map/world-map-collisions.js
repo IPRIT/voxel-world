@@ -1,4 +1,7 @@
-import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_BLOCK_SIZE_POWER } from "../../settings";
+import {
+  WORLD_MAP_BLOCK_SIZE,
+  WORLD_MAP_BLOCK_SIZE_POWER
+} from "../../settings";
 
 export class WorldMapCollisions {
 
@@ -78,7 +81,7 @@ export class WorldMapCollisions {
         }
 
         blocksValues = blocksPositions.map(level => {
-          return level.map( blockPosition => map.getBlock( blockPosition ) );
+          return level.map( blockPosition => map.hasBlock( blockPosition ) );
         });
 
         let firstHalfHasValue = false,
@@ -183,7 +186,7 @@ export class WorldMapCollisions {
         }
 
         blocksValues = blocksPositions.map(level => {
-          return level.map( blockPosition => map.getBlock( blockPosition ) );
+          return level.map( blockPosition => map.hasBlock( blockPosition ) );
         });
 
         let firstHalfHasValue = false,
@@ -316,7 +319,7 @@ export class WorldMapCollisions {
         }
 
         blocksValues = blocksPositions.map(level => {
-          return level.map( blockPosition => map.getBlock( blockPosition ) );
+          return level.map( blockPosition => map.hasBlock( blockPosition ) );
         });
 
         let topLeftHasValue = false,

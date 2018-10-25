@@ -1,17 +1,17 @@
 import Promise from "bluebird";
 import EventEmitter from 'eventemitter3';
-import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_CHUNK_SIZE } from "../../settings";
-import { WorldObjectType, WorldObjectVox } from "../world-object";
-import { ModelType } from "../../model";
-import { WorldChunkLoader } from "../chunks/world-chunk-loader";
-import { parseChunkIndex } from "../../utils";
+import { WORLD_MAP_BLOCK_SIZE, WORLD_MAP_CHUNK_SIZE } from "../../../settings";
+import { WorldObjectType, WorldObjectVox } from "../../world-object/index";
+import { ModelType } from "../../../model/index";
+import { parseChunkIndex } from "../../../utils/index";
+import { ChunkLoader } from "./chunk-loader";
 
-export const WorldMapLoadingOperationEvents = {
+export const MapLoaderOperationEvents = {
   CHUNK_LOADED: 'chunkLoaded',
   ALL_CHUNKS_LOADED: 'allChunksLoaded',
 };
 
-export class WorldMapLoadingOperation extends EventEmitter {
+export class MapLoaderOperation extends EventEmitter {
 
   /**
    * @type {Array}
@@ -85,7 +85,7 @@ export class WorldMapLoadingOperation extends EventEmitter {
     if (this._loadQueue.length) {
       this._processQueue();
     } else if (!this._canceled) {
-      this.emit( WorldMapLoadingOperationEvents.ALL_CHUNKS_LOADED );
+      this.emit( MapLoaderOperationEvents.ALL_CHUNKS_LOADED );
       this._loadQueueActive = false;
     }
   }
@@ -106,7 +106,7 @@ export class WorldMapLoadingOperation extends EventEmitter {
       const { cached, item = null } = data || {};
 
       const worldObject = await this._createWorldChunk( item, { x, y: 0, z } );
-      this.emit( WorldMapLoadingOperationEvents.CHUNK_LOADED, worldObject, chunkIndex );
+      this.emit( MapLoaderOperationEvents.CHUNK_LOADED, worldObject, chunkIndex );
 
       return worldObject;
     });
@@ -117,9 +117,10 @@ export class WorldMapLoadingOperation extends EventEmitter {
    * @returns {Promise<{cached: boolean, item: VoxModel}>}
    */
   async _loadChunk (chunkIndex) {
-    let mapLoader = WorldChunkLoader.getLoader();
-    return mapLoader.load( chunkIndex )
-      .catch(error => this._onChunkLoadError( error, chunkIndex ));
+    let loader = ChunkLoader.getLoader();
+    return loader.load( chunkIndex ).catch(error => {
+      this._onChunkLoadError( error, chunkIndex );
+    });
   }
 
   /**
@@ -135,7 +136,7 @@ export class WorldMapLoadingOperation extends EventEmitter {
       this._dummyModelFunction,
       { x, y: 0, z }
     ).then(worldObject => {
-      this.emit( WorldMapLoadingOperationEvents.CHUNK_LOADED, worldObject, chunkIndex );
+      this.emit( MapLoaderOperationEvents.CHUNK_LOADED, worldObject, chunkIndex );
     });
   }
 

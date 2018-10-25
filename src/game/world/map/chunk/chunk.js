@@ -1,16 +1,20 @@
-import { powers } from "../../../utils/game-utils";
 import {
   WORLD_MAP_CHUNK_HEIGHT,
-  WORLD_MAP_CHUNK_HEIGHT_POWER,
   WORLD_MAP_CHUNK_SIZE,
   WORLD_MAP_CHUNK_SIZE_POWER,
   WORLD_MAP_CHUNK_SIZE_VECTOR
 } from "../../../settings";
-import { hasBit } from "../../../utils";
+import { buildChunkIndex } from "../../../utils";
 
-const COLUMN_CAPACITY = 2 ** Math.max(0, WORLD_MAP_CHUNK_HEIGHT_POWER - 5 );
+const chunkSizeVector = WORLD_MAP_CHUNK_SIZE_VECTOR;
 
 export class Chunk {
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _inited = false;
 
   /**
    * @type {VoxModel}
@@ -19,10 +23,10 @@ export class Chunk {
   _model = null;
 
   /**
-   * @type {THREE.Vector3}
+   * @type {{x: number, y: number, z: number}}
    * @private
    */
-  _chunkSize = new THREE.Vector3( ...WORLD_MAP_CHUNK_SIZE_VECTOR );
+  _chunkSize = { x: chunkSizeVector[0], y: chunkSizeVector[1], z: chunkSizeVector[2] };
 
   /**
    * @type {Uint32Array}
@@ -85,65 +89,17 @@ export class Chunk {
   _toZ = 0;
 
   /**
-   * @type {boolean}
-   * @private
-   */
-  _inited = false;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  _voxBlocksNumber = 0;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  _triangles = 0;
-
-  /**
-   * @type {boolean}
-   */
-  needsUpdate = false;
-
-  /**
-   * @type {number}
-   */
-  previousVerticesLength = 0;
-
-  /**
-   * @type {number}
-   */
-  currentBlocks = 0;
-
-  /**
-   * @type {number}
-   */
-  startingBlocks = 0;
-
-  /**
    * @param {VoxModel} model
    * @param {number} x
    * @param {number} z
    */
-  createFrom (model, { x, z }) {
-    this._fillFromModel( model );
-    this._setPosition( x, z );
-  }
+  createFrom (model, { x, z } = {}) {
+    this.setPosition( x, z );
+    this.createBuffer();
 
-  /**
-   * Computes buffer offset
-   *
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
-   * @returns {number}
-   */
-  getBufferOffset (x, y, z) {
-    return ( x << WORLD_MAP_CHUNK_SIZE_POWER )
-      + ( y >> 5 )
-      + z;
+    this._fillFromModel( model );
+
+    this._inited = true;
   }
 
   /**
@@ -153,14 +109,27 @@ export class Chunk {
    * @returns {boolean}
    */
   hasBlock (x, y, z) {
-    if (!this.isInside( x, y, z )) {
-      return false;
-    }
+    throw new Error( 'Not implemented' );
+  }
 
-    return !!this._hasBit(
-      this.getBufferOffset( x, y, z ),
-      y & 0x1f
-    );
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {number|boolean}
+   */
+  getBlock (x, y, z) {
+    throw new Error( 'Not implemented' );
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @param {Array<number>|*} color
+   */
+  addBlock (x, y, z, color = null) {
+    throw new Error( 'Not implemented' );
   }
 
   /**
@@ -168,95 +137,8 @@ export class Chunk {
    * @param {number} y
    * @param {number} z
    */
-  addBlock (x, y, z) {
-    if (!this.isInside( x, y, z )) {
-      return;
-    }
-
-    this._setBit(
-      this.getBufferOffset( x, y, z ),
-      y & 0x1f
-    );
-  }
-
-  /**
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
-   */
-  deleteBlock (x, y, z) {
-    if (!this.isInside( x, y, z )) {
-      return;
-    }
-
-    this._unsetBit(
-      this.getBufferOffset( x, y, z ),
-      y & 0x1f
-    );
-  }
-
-  /**
-   * @param {number} x
-   * @param {number} z
-   * @returns {Uint32Array|*}
-   */
-  getColumn (x, z) {
-    if (!this.isInside( x, 0, z )) {
-      return new Uint32Array( 0 );
-    }
-
-    const bufferOffset = this.getBufferOffset( x, 0, z );
-    return this._buffer.slice( bufferOffset, bufferOffset + COLUMN_CAPACITY );
-  }
-
-  /**
-   * @param {number} x
-   * @param {number} z
-   * @returns {number}
-   */
-  getMinMaxY (x, z) {
-    return this.getMinMaxYBetween( x, z, 0, WORLD_MAP_CHUNK_HEIGHT - 1 );
-  }
-
-  /**
-   * Works correctly
-   *
-   * @param {number} x
-   * @param {number} z
-   * @param {number} fromY
-   * @param {number} toY
-   * @returns {number}
-   */
-  getMinMaxYBetween (x, z, fromY, toY) {
-    if (!this.isInside( x, 0, z )) {
-      return 0;
-    }
-
-    let column = this.getColumn( x, z );
-    let minMaxY = 0, minY = -1;
-
-    fromY = Math.max( fromY, 0 );
-    toY = Math.min( toY, WORLD_MAP_CHUNK_HEIGHT - 1 );
-
-    const minColumn = Math.max( fromY >> 5, 0 );
-    const maxColumn = Math.min( toY >> 5, column.length - 1 );
-
-    l1: for (let columnOffset = minColumn; columnOffset <= maxColumn; ++columnOffset) {
-      const value = column[ columnOffset ];
-
-      for (let y = fromY & 0x1f; y <= ( toY & 0x1f ); ++y) {
-        if (hasBit( value, y )) {
-          minMaxY = columnOffset * 0x20 + y;
-          if (minY === -1) {
-            minY = columnOffset * 0x20 + y;
-          }
-        } else if (minY >= 0) {
-          break l1;
-        }
-      }
-    }
-
-    return minMaxY;
+  removeBlock (x, y, z) {
+    throw new Error( 'Not implemented' );
   }
 
   /**
@@ -272,39 +154,22 @@ export class Chunk {
   }
 
   /**
+   * Computes buffer offset
+   *
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
    * @returns {number}
-   * @override
    */
-  get bufferSize () {
-    return ( WORLD_MAP_CHUNK_SIZE ** 2 ) * COLUMN_CAPACITY;
-  }
-
-  /**
-   * @returns {VoxModel}
-   */
-  get model () {
-    return this._model;
-  }
-
-  /**
-   * @param {VoxModel} model
-   * @private
-   */
-  _fillFromModel (model) {
-    const blocks = model.getBlocks();
-
-    for (let i = 0; i < blocks.length; ++i) {
-      const { x, y, z } = blocks[ i ];
-      this.addBlock( x, y, z );
-    }
+  getBufferOffset (x, y, z) {
+    return 0;
   }
 
   /**
    * @param {number} x
    * @param {number} z
-   * @private
    */
-  _setPosition (x, z) {
+  setPosition (x, z) {
     this._chunkIndexX = x >> WORLD_MAP_CHUNK_SIZE_POWER;
     this._chunkIndexY = 0;
     this._chunkIndexZ = z >> WORLD_MAP_CHUNK_SIZE_POWER;
@@ -319,30 +184,130 @@ export class Chunk {
   }
 
   /**
-   * @param {number} bufferOffset
-   * @param {number} bitPosition
-   * @returns {number} 0 or 1
-   * @private
+   * @returns {Uint32Array}
    */
-  _hasBit (bufferOffset, bitPosition) {
-    return this._buffer[ bufferOffset ] & powers.powersOfTwo[ bitPosition ];
+  createBuffer () {
+    return ( this._buffer = new Uint32Array( this.bufferSize ) );
   }
 
   /**
-   * @param {number} bufferOffset
-   * @param {number} bitPosition
-   * @private
+   * @param {Uint32Array} buffer
    */
-  _setBit (bufferOffset, bitPosition) {
-    this._buffer[ bufferOffset ] |= powers.powersOfTwo[ bitPosition ];
+  repairBuffer (buffer) {
+    this._buffer = buffer;
   }
 
   /**
-   * @param {number} bufferOffset
-   * @param {number} bitPosition
+   * Dispose chunk buffer
+   */
+  disposeBuffer () {
+    this._buffer = null;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isInited () {
+    return this._inited || this._buffer.length > 0;
+  }
+
+  /**
+   * @returns {number}
+   * @override
+   */
+  get bufferSize () {
+    return 0;
+  }
+
+  /**
+   * @returns {VoxModel}
+   */
+  get model () {
+    return this._model;
+  }
+
+  /**
+   * @returns {Uint32Array}
+   */
+  get buffer () {
+    return this._buffer;
+  }
+
+  /**
+   * @returns {{x: number, y: number, z: number}}
+   */
+  get size () {
+    return this._chunkSize;
+  }
+
+  /**
+   * @returns {string}
+   */
+  get chunkIndex () {
+    return buildChunkIndex( this._chunkIndexX, this._chunkIndexZ );
+  }
+
+  /**
+   * @returns {THREE.Vector3}
+   */
+  get fromPosition () {
+    return new THREE.Vector3(
+      this._fromX,
+      this._fromY,
+      this._fromZ
+    );
+  }
+
+  /**
+   * @returns {THREE.Vector3}
+   */
+  get toPosition () {
+    return new THREE.Vector3(
+      this._toX,
+      this._toY,
+      this._toZ
+    );
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isFunctionModel () {
+    return typeof this._model === 'function';
+  }
+
+  /**
+   * @param {VoxModel|Function} model
    * @private
    */
-  _unsetBit (bufferOffset, bitPosition) {
-    this._buffer[ bufferOffset ] &= ~powers.powersOfTwo[ bitPosition ];
+  _fillFromModel (model) {
+    if (this.isFunctionModel) {
+      return this._fillFromFunctionModel();
+    }
+
+    const blocks = model.getBlocks();
+
+    for (let i = 0; i < blocks.length; ++i) {
+      const { x, y, z, color = null } = blocks[ i ];
+      this.addBlock( x, y, z, color );
+    }
+  }
+
+  /**
+   * @private
+   */
+  _fillFromFunctionModel () {
+    const model = this._model;
+
+    // build chunk by function
+    let offsets = this.fromPosition;
+    for (let x = 0; x < this.size.x; ++x) {
+      for (let z = 0; z < this.size.z; ++z) {
+        let [ { x, y, z }, color ] = model(x + offsets.x, z + offsets.z);
+        x -= offsets.x;
+        z -= offsets.z;
+        this.addBlock( x, y, z, color );
+      }
+    }
   }
 }

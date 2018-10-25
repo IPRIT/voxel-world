@@ -1,6 +1,9 @@
 import * as utils from "../../../utils";
 import { LivingObject, StopMovingReason } from "../../living-object";
 import { Game } from "../../../game";
+import { floorVector } from "../../../utils";
+import { transformToBlockCoords } from "../../../utils";
+import { WORLD_MAP_CHUNK_HEIGHT } from "../../../settings";
 
 export class PlayerControls {
 

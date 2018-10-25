@@ -1,23 +1,23 @@
 import Promise from 'bluebird';
-import { VoxModelLoader } from "../../model/loaders/index";
-import { parseChunkIndex } from "../../utils";
+import { VoxModelLoader } from "../../../model/loaders/index";
+import { parseChunkIndex } from "../../../utils/index";
 
-export class WorldChunkLoader extends VoxModelLoader {
+export class ChunkLoader extends VoxModelLoader {
 
   /**
-   * @type {WorldChunkLoader}
+   * @type {ChunkLoader}
    * @private
    */
   static _instance = null;
 
   /**
-   * @returns {WorldChunkLoader}
+   * @returns {ChunkLoader}
    */
   static getLoader () {
     if (this._instance) {
       return this._instance;
     }
-    return ( this._instance = new WorldChunkLoader( 500 ) );
+    return ( this._instance = new ChunkLoader( 500 ) );
   }
 
   /**

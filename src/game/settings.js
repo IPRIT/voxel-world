@@ -1,11 +1,13 @@
 /* Chunks */
 export const WORLD_MAP_CHUNK_SIZE_POWER = 6;
-export const WORLD_MAP_CHUNK_HEIGHT_POWER = 5; // can't be greater than 5 due to UInt32Array limitations
+export const WORLD_MAP_CHUNK_HEIGHT_POWER = 7;
+
+export const WORLD_MAP_CHUNK_COLUMN_CAPACITY = 2 ** Math.max(0, WORLD_MAP_CHUNK_HEIGHT_POWER - 5 );
 
 export const WORLD_MAP_CHUNK_SIZE = 1 << WORLD_MAP_CHUNK_SIZE_POWER;
 export const WORLD_MAP_CHUNK_HEIGHT = 1 << WORLD_MAP_CHUNK_HEIGHT_POWER;
 
-export const WORLD_MAP_CHUNK_VIEW_DISTANCE = 9;
+export const WORLD_MAP_CHUNK_VIEW_DISTANCE = 4;
 
 export const WORLD_MAP_CHUNK_SIZE_VECTOR = [
   WORLD_MAP_CHUNK_SIZE,
@@ -14,7 +16,8 @@ export const WORLD_MAP_CHUNK_SIZE_VECTOR = [
 ];
 
 /* Map */
-export const WORLD_MAP_SIZE = 1 << 11;
+export const WORLD_MAP_SIZE_POWER = 11;
+export const WORLD_MAP_SIZE = 1 << WORLD_MAP_SIZE_POWER;
 export const WORLD_MAP_BLOCK_SIZE_POWER = 1;
 export const WORLD_MAP_BLOCK_SIZE = 1 << WORLD_MAP_BLOCK_SIZE_POWER;
 

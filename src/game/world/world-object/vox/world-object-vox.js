@@ -1,8 +1,8 @@
 import { WorldObjectBase } from "../world-object-base";
-import { WorldChunkMap, WorldChunkObject } from "../../chunks/index";
-import { WorldObjectVoxMesher } from "./world-object-vox-mesher";
 import { WorldObjectType } from '../world-object-type';
-import { WORLD_MAP_BLOCK_SIZE } from "../../../settings";
+import { VoxMesher } from "./mesher/vox-mesher";
+import { HeavyChunk, LightChunk } from "../../map/chunk";
+import { transformToBlockCoords } from "../../../utils";
 
 export class WorldObjectVox extends WorldObjectBase {
 
@@ -13,7 +13,7 @@ export class WorldObjectVox extends WorldObjectBase {
   _model = null;
 
   /**
-   * @type {WorldObjectVoxMesher}
+   * @type {VoxMesher}
    * @private
    */
   _voxMesher = null;
@@ -43,7 +43,7 @@ export class WorldObjectVox extends WorldObjectBase {
   _material = null;
 
   /**
-   * @type {WorldChunkMap|WorldChunkObject|WorldChunkBase}
+   * @type {Chunk|HeavyChunk|LightChunk}
    * @private
    */
   _chunk = null;
@@ -56,18 +56,19 @@ export class WorldObjectVox extends WorldObjectBase {
     super.init( options );
 
     this._createChunk();
+
     return this._createMesh().then(_ => {
       if (this.model && this.objectType === WorldObjectType.OBJECT) {
         this._centerMesh();
       }
       this.attachMesh();
-
+      this._switchToLightChunk();
       return this;
     });
   }
 
   /**
-   * @param {VoxModel|function} model
+   * @param {VoxModel|Function} model
    */
   setModel (model) {
     this.model = model;
@@ -84,11 +85,11 @@ export class WorldObjectVox extends WorldObjectBase {
     this._voxMesher.createOrUpdateMesh( this.blockSize );
   }
 
-  addBlock (...args) {
+  hasBlock (...args) {
     if (!this.chunkInited) {
-      return;
+      return false;
     }
-    this._chunk.addBlock( ...args );
+    return this._chunk.hasBlock( ...args );
   }
 
   getBlock (...args) {
@@ -96,6 +97,13 @@ export class WorldObjectVox extends WorldObjectBase {
       return 0;
     }
     return this._chunk.getBlock( ...args );
+  }
+
+  addBlock (...args) {
+    if (!this.chunkInited) {
+      return;
+    }
+    this._chunk.addBlock( ...args );
   }
 
   removeBlock (...args) {
@@ -120,7 +128,7 @@ export class WorldObjectVox extends WorldObjectBase {
   }
 
   /**
-   * @returns {WorldChunkMap|WorldChunkObject|WorldChunkBase}
+   * @returns {Chunk|HeavyChunk|LightChunk}
    */
   get chunk () {
     return this._chunk;
@@ -182,7 +190,7 @@ export class WorldObjectVox extends WorldObjectBase {
    * @returns {boolean}
    */
   get chunkInited () {
-    return this._chunk && this._chunk.inited;
+    return this._chunk && this._chunk.isInited;
   }
 
   /**
@@ -192,25 +200,29 @@ export class WorldObjectVox extends WorldObjectBase {
     if (this._chunk) {
       return;
     }
+
+    let chunk = null;
+
     switch (this.objectType) {
       case WorldObjectType.MAP:
-        this._chunk = new WorldChunkMap(this._model, {
-          worldPosition: this.position.clone().divideScalar( WORLD_MAP_BLOCK_SIZE )
-        });
+        const { x, z } = transformToBlockCoords( this.position );
+        chunk = new HeavyChunk();
+        chunk.createFrom( this._model, { x, z } );
         break;
       case WorldObjectType.OBJECT:
-        this._chunk = new WorldChunkObject(this._model);
+        chunk = new HeavyChunk( false );
+        chunk.createFrom( this._model, { x: 0, z: 0 } );
         break;
     }
-    // creating chunk buffer
-    this._chunk.init();
+
+    this._chunk = chunk;
   }
 
   /**
    * @private
    */
   _createMesh () {
-    this._voxMesher = new WorldObjectVoxMesher(this);
+    this._voxMesher = new VoxMesher( this );
     return this._voxMesher.createOrUpdateMesh( this.blockSize );
   }
 
@@ -235,5 +247,19 @@ export class WorldObjectVox extends WorldObjectBase {
         this.model.size.z / 2 * this.blockSize
       )
     );
+  }
+
+  /**
+   * @private
+   */
+  _switchToLightChunk () {
+    const chunk = this._chunk;
+    const lightChunk = chunk.lightChunk;
+
+    if (lightChunk) {
+      chunk.disposeBuffer();
+
+      this._chunk = lightChunk;
+    }
   }
 }

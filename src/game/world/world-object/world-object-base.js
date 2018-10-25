@@ -1,7 +1,7 @@
 import { WorldObjectType } from "./world-object-type";
 import { ModelType } from "../../model/model-type";
 import { WORLD_MAP_BLOCK_SIZE } from "../../settings";
-import { toBlockPosition } from "../../utils";
+import { transformToBlockCoords } from "../../utils";
 
 let WORLD_GLOBAL_OBJECT_ID = 1;
 
@@ -222,7 +222,7 @@ export class WorldObjectBase extends THREE.Group {
    * @returns {THREE.Vector3}
    */
   get blockPosition () {
-    return toBlockPosition( this.position );
+    return transformToBlockCoords( this.position );
   }
 
   /**
