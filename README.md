@@ -1,1 +1,1 @@
-# Voxel Royal Game Client
+# Voxel Game Client
