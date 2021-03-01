@@ -41,7 +41,7 @@
     "socketio-wildcard": "^2.0.0",
     "ssr-intersection-observer": "^0.5.0",
     "stats.js": "^0.17.0",
-    "three": "^0.91.0",
+    "three": "^0.125.0",
     "three-orbit-controls": "^82.1.0",
     "vue-virtual-repeater": "^1.1.15",
     "vuex": "^3.0.1",
