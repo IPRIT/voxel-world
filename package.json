@@ -34,7 +34,7 @@
     "lru-cache": "^4.1.3",
     "md-svg-vue": "^1.0.6",
     "normalize.css": "^8.0.0",
-    "nuxt": "^1.4.0",
+    "nuxt": "^3.4.3",
     "parse-magica-voxel": "https://github.com/IPRIT/parse-magica-voxel.git",
     "runtime-shaderfrog": "^0.2.0",
     "socket.io-client": "^2.1.1",
