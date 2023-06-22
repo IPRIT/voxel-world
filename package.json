@@ -79,7 +79,7 @@
     "node-sass": "4.7.2",
     "sass-bem-utils": "^1.15.0",
     "sass-loader": "^6.0.6",
-    "semver": "^5.5.0",
+    "semver": "^7.5.2",
     "stats.js": "^0.17.0",
     "three-webgl-stats": "^1.0.5"
   }
